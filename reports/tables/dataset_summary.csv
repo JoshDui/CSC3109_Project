@@ -1,0 +1,5 @@
+class_name,image_count,corrupt_count,min_width,max_width,min_height,max_height,most_common_size,color_modes,min_file_kb,max_file_kb,avg_file_kb
+bridge,700,0,256,256,256,256,256x256,RGB:700,5.43,78.79,44.34
+freeway,700,0,256,256,256,256,256x256,RGB:700,12.21,20.01,16.0
+overpass,700,0,256,256,256,256,256x256,RGB:700,15.9,27.61,21.33
+railway,700,0,256,256,256,256,256x256,RGB:700,50.58,86.15,68.77
