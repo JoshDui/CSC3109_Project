@@ -1,0 +1,22 @@
+[project]
+name = "csc3109-project"
+version = "0.1.0"
+description = "CSC3109 aerial-image classification group project"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch",
+    "torchvision",
+    "timm",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "pillow",
+    "tqdm",
+    "streamlit",
+]
+
+[tool.uv]
+package = false

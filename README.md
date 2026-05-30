@@ -36,11 +36,19 @@ ML_Group_Project/
 
 ## Suggested Setup
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+This project uses [uv](https://docs.astral.sh/uv/) for dependency and environment management.
+
+```bash
+# Install uv (see https://docs.astral.sh/uv/getting-started/installation/)
+# Then create the environment and install all dependencies from the lockfile:
+uv sync
+
+# Run any project command inside the managed environment, e.g.:
+uv run python -m src.data.inspect_dataset
 ```
+
+Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`. The
+project targets the Python version in `.python-version`.
 
 ## Notes
 
