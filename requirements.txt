@@ -1,5 +1,6 @@
 torch
 torchvision
+timm
 numpy
 pandas
 scikit-learn
@@ -8,4 +9,3 @@ seaborn
 pillow
 tqdm
 streamlit
-

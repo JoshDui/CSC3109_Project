@@ -20,6 +20,12 @@ data/*
 model/*.pt
 model/*.pth
 model/*.onnx
+model/**/*.pt
+model/**/*.pth
+model/**/*.onnx
+model/**/history.csv
+model/**/*.json
+model/**/*.png
 *.log
 
 # Reports and exports
