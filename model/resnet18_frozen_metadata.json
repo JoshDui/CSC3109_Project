@@ -1,0 +1,14 @@
+{
+  "model": "resnet18",
+  "training_strategy": "frozen_feature_extractor",
+  "image_size": 224,
+  "normalization": "imagenet",
+  "data_augmentation": false,
+  "class_order": [
+    "bridge",
+    "freeway",
+    "overpass",
+    "railway"
+  ],
+  "checkpoint": "model/resnet18_frozen.pt"
+}
