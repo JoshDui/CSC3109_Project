@@ -46,6 +46,24 @@ DINOV2_BASE_REG = TimmModelSpec(
     recommended_image_size=224,
     description="DINOv2 ViT-B/14 with register tokens.",
 )
+FOCALNET_TINY_SRF = TimmModelSpec(
+    alias="focalnet-tiny-srf",
+    timm_name="focalnet_tiny_srf",
+    recommended_image_size=224,
+    description="FocalNet-Tiny SRF with ImageNet pretrained weights for the notebook-first run.",
+)
+FOCALNET_TINY_LRF = TimmModelSpec(
+    alias="focalnet-tiny-lrf",
+    timm_name="focalnet_tiny_lrf",
+    recommended_image_size=224,
+    description="FocalNet-Tiny LRF with ImageNet pretrained weights; heavier diagnostic alternative.",
+)
+FOCALNET_SMALL_SRF = TimmModelSpec(
+    alias="focalnet-small-srf",
+    timm_name="focalnet_small_srf",
+    recommended_image_size=224,
+    description="FocalNet-Small SRF with ImageNet pretrained weights; stronger but heavier than tiny.",
+)
 
 
 TIMM_MODEL_SPECS: dict[str, TimmModelSpec] = {
@@ -55,6 +73,9 @@ TIMM_MODEL_SPECS: dict[str, TimmModelSpec] = {
         DINOV2_SMALL_REG,
         DINOV2_BASE,
         DINOV2_BASE_REG,
+        FOCALNET_TINY_SRF,
+        FOCALNET_TINY_LRF,
+        FOCALNET_SMALL_SRF,
     )
 }
 
@@ -125,7 +146,8 @@ def build_timm_classifier(
 
     Args:
         num_classes: Number of output classes.
-        model_name: Friendly alias such as `dinov2-small` or a raw `timm` model name.
+        model_name: Friendly alias such as `dinov2-small`, `focalnet-tiny-srf`,
+            or a raw `timm` model name.
         pretrained: Whether to load pretrained weights.
         image_size: Override model input size. DINOv2 defaults to 518, but 224 is
             a practical project default and is divisible by its patch size of 14.
