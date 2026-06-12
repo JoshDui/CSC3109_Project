@@ -205,11 +205,6 @@ def main() -> None:
     if best_state is None:
         raise RuntimeError("Training did not produce a checkpoint.")
 
-    MODEL_DIR.mkdir(parents=True, exist_ok=True)
-    checkpoint_path = MODEL_DIR / "resnet18_frozen.pt"
-    torch.save(best_state, checkpoint_path)
-    checkpoint_relative_path = checkpoint_path.relative_to(PROJECT_ROOT).as_posix()
-
     metrics = compute_metrics(final_labels, final_predictions)
     metrics.update(
         {
@@ -220,9 +215,44 @@ def main() -> None:
             "epochs": args.epochs,
             "batch_size": args.batch_size,
             "learning_rate": args.learning_rate,
-            "checkpoint": checkpoint_relative_path,
         }
     )
+
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = MODEL_DIR / "resnet18_frozen.pt"
+    torch.save(
+        {
+            "checkpoint_format_version": 1,
+            "model_name": "resnet18",
+            "resolved_model_name": "resnet18",
+            "model_type": "resnet18_frozen",
+            "model_state_dict": best_state,
+            "class_to_idx": {name: index for index, name in enumerate(CLASS_NAMES)},
+            "idx_to_class": {index: name for index, name in enumerate(CLASS_NAMES)},
+            "image_size": 224,
+            "preprocess": {
+                "input_size": (3, 224, 224),
+                "mean": (0.485, 0.456, 0.406),
+                "std": (0.229, 0.224, 0.225),
+                "interpolation": "bilinear",
+            },
+            "training_strategy": "frozen_feature_extractor",
+            "epoch": args.epochs,
+            "args": {
+                "manifest": str(args.manifest),
+                "epochs": args.epochs,
+                "batch_size": args.batch_size,
+                "learning_rate": args.learning_rate,
+                "num_workers": args.num_workers,
+                "seed": args.seed,
+            },
+            "metrics": metrics,
+        },
+        checkpoint_path,
+    )
+    checkpoint_relative_path = checkpoint_path.relative_to(PROJECT_ROOT).as_posix()
+
+    metrics["checkpoint"] = checkpoint_relative_path
 
     save_json(MODEL_DIR / "classes.json", CLASS_NAMES)
     save_json(
