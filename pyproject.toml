@@ -16,6 +16,9 @@ dependencies = [
     "pillow",
     "tqdm",
     "streamlit",
+    "jupyterlab>=4.5.7",
+    "jupyter-collaboration>=4.4.0",
+    "ipykernel>=7.2.0",
 ]
 
 [tool.uv]
