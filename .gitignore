@@ -36,3 +36,11 @@ reports/build/
 .DS_Store
 Thumbs.db
 .vscode/
+.idea/
+
+# Local notebook / OpenCode workspace files
+.jupyter/
+.jupyter_ystore.db
+.opencode/
+AGENTS.md
+opencode.json
