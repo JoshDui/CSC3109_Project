@@ -1,0 +1,82 @@
+{
+  "checkpoint": "model/resnet18_frozen.pt",
+  "output_checkpoint": "reports/quantization/resnet18_int8/resnet18_frozen_int8.pt",
+  "metrics": {
+    "accuracy": 0.9825,
+    "macro_precision": 0.9836448598130841,
+    "macro_recall": 0.9825,
+    "macro_f1": 0.9826103847842979,
+    "classification_report": {
+      "bridge": {
+        "precision": 1.0,
+        "recall": 0.95,
+        "f1-score": 0.9743589743589743,
+        "support": 100.0
+      },
+      "freeway": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 100.0
+      },
+      "overpass": {
+        "precision": 0.9345794392523364,
+        "recall": 1.0,
+        "f1-score": 0.966183574879227,
+        "support": 100.0
+      },
+      "railway": {
+        "precision": 1.0,
+        "recall": 0.98,
+        "f1-score": 0.98989898989899,
+        "support": 100.0
+      },
+      "accuracy": 0.9825,
+      "macro avg": {
+        "precision": 0.9836448598130841,
+        "recall": 0.9825,
+        "f1-score": 0.9826103847842979,
+        "support": 400.0
+      },
+      "weighted avg": {
+        "precision": 0.983644859813084,
+        "recall": 0.9825,
+        "f1-score": 0.9826103847842979,
+        "support": 400.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        95,
+        0,
+        5,
+        0
+      ],
+      [
+        0,
+        100,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        100,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        98
+      ]
+    ],
+    "average_batch_latency_seconds": 0.02539879599935375,
+    "average_image_latency_seconds": 0.0007937123749798047,
+    "timed_batches": 5.0,
+    "checkpoint_path": "model/resnet18_frozen.pt",
+    "checkpoint_size_bytes": 44795659,
+    "quantized_backend": "fbgemm",
+    "calibration_batches": 10
+  }
+}

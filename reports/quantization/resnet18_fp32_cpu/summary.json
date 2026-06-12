@@ -1,0 +1,9 @@
+{
+  "checkpoint": "model/resnet18_frozen.pt",
+  "precision": "fp32",
+  "latency": {
+    "average_batch_latency_seconds": 0.16132177620311267,
+    "average_image_latency_seconds": 0.005041305506347271,
+    "timed_batches": 5.0
+  }
+}
