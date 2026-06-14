@@ -90,6 +90,9 @@ def write_json(path: Path, summaries: list[ClassSummary]) -> None:
 
 
 def write_class_distribution(path: Path, summaries: list[ClassSummary]) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     path.parent.mkdir(parents=True, exist_ok=True)

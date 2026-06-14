@@ -6,6 +6,9 @@ Examples:
 
     # DINOv2 full fine-tuning
     python -m src.training.train_timm_classifier --lr 3e-5
+
+    # Long run that stops when tuning loss plateaus
+    python -m src.training.train_timm_classifier --epochs 50 --patience 6
 """
 
 import argparse
@@ -65,7 +68,7 @@ def parse_args() -> argparse.Namespace:
         help="Output folder. Defaults to model/<model-name>_linear_probe or _finetune.",
     )
     parser.add_argument("--image-size", type=int, default=IMAGE_SIZE)
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--lr", type=float, default=3e-5)
@@ -76,14 +79,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--patience",
         type=int,
-        default=5,
+        default=6,
         help="Early-stopping patience in epochs; 0 disables it.",
+    )
+    parser.add_argument(
+        "--early-stop-metric",
+        choices=("tune-loss", "macro-f1"),
+        default="tune-loss",
+        help="Metric used for checkpointing and early stopping.",
     )
     parser.add_argument(
         "--min-delta",
         type=float,
         default=1e-4,
-        help="Minimum macro-F1 improvement for early stopping.",
+        help=(
+            "Minimum improvement for early stopping. For tune-loss this is "
+            "the minimum loss decrease; for macro-f1 this is the minimum F1 increase."
+        ),
     )
     parser.add_argument("--classifier-only", action="store_true", help="Freeze the backbone and train only the head.")
     parser.add_argument("--no-pretrained", action="store_false", dest="pretrained")
@@ -127,6 +139,47 @@ def serialise_args(args: argparse.Namespace) -> dict[str, Any]:
     for key, value in vars(args).items():
         payload[key] = str(value) if isinstance(value, Path) else value
     return payload
+
+
+def monitor_value(metric_name: str, tune_loss: float, metrics: dict[str, Any]) -> float:
+    if metric_name == "tune-loss":
+        return tune_loss
+    if metric_name == "macro-f1":
+        return float(metrics["macro_f1"])
+    raise ValueError(f"Unsupported early-stop metric: {metric_name}")
+
+
+def monitor_improved(metric_name: str, current_value: float, best_value: float | None, min_delta: float) -> bool:
+    if best_value is None:
+        return True
+    if metric_name == "tune-loss":
+        return current_value < best_value - min_delta
+    if metric_name == "macro-f1":
+        return current_value > best_value + min_delta
+    raise ValueError(f"Unsupported early-stop metric: {metric_name}")
+
+
+def build_checkpoint_metrics(
+    metrics: dict[str, Any],
+    *,
+    epoch: int,
+    train_loss: float,
+    train_acc: float,
+    tune_loss: float,
+    tune_acc: float,
+    selection_metric: str,
+    selection_value: float,
+) -> dict[str, Any]:
+    return {
+        **metrics,
+        "epoch": epoch,
+        "train_loss": float(train_loss),
+        "train_accuracy": float(train_acc),
+        "tune_loss": float(tune_loss),
+        "tune_accuracy": float(tune_acc),
+        "selection_metric": selection_metric,
+        "selection_value": float(selection_value),
+    }
 
 
 def train_one_epoch(
@@ -311,8 +364,14 @@ def main() -> None:
     print(f"Preprocess: mean={mean}, std={std}, interpolation={interpolation}")
     print(f"Trainable parameters: {trainable_count:,} / {total_count:,}")
 
+    best_stop_value: float | None = None
+    best_stop_epoch: int | None = None
+    best_stop_metrics: dict[str, Any] | None = None
+
     best_macro_f1 = -1.0
-    best_metrics: dict[str, Any] | None = None
+    best_macro_f1_epoch: int | None = None
+    best_macro_f1_metrics: dict[str, Any] | None = None
+
     epochs_without_improvement = 0
     history: list[dict[str, Any]] = []
 
@@ -358,11 +417,72 @@ def main() -> None:
             f"tune_macro_f1={metrics['macro_f1']:.4f}"
         )
 
-        improved = metrics["macro_f1"] > best_macro_f1 + args.min_delta
-        if improved:
-            best_macro_f1 = metrics["macro_f1"]
+        current_stop_value = monitor_value(args.early_stop_metric, val_loss, metrics)
+        stop_improved = monitor_improved(
+            args.early_stop_metric,
+            current_stop_value,
+            best_stop_value,
+            args.min_delta,
+        )
+        if stop_improved:
+            best_stop_value = current_stop_value
+            best_stop_epoch = epoch
             epochs_without_improvement = 0
-            best_metrics = metrics
+            best_stop_metrics = build_checkpoint_metrics(
+                metrics,
+                epoch=epoch,
+                train_loss=train_loss,
+                train_acc=train_acc,
+                tune_loss=val_loss,
+                tune_acc=val_acc,
+                selection_metric=args.early_stop_metric,
+                selection_value=current_stop_value,
+            )
+            save_checkpoint(
+                args.output_dir / "best_stop_model.pt",
+                model,
+                optimizer,
+                epoch,
+                class_to_idx,
+                args,
+                best_stop_metrics,
+                preprocess,
+            )
+            write_metrics_json(best_stop_metrics, args.output_dir / "best_stop_tune_metrics.json")
+            save_confusion_matrix_plot(
+                metrics["confusion_matrix"],
+                class_names,
+                args.output_dir / "best_stop_tune_confusion_matrix.png",
+                title=f"{resolved_model_name} Best Early-Stop Confusion Matrix",
+            )
+        else:
+            epochs_without_improvement += 1
+
+        current_macro_f1 = float(metrics["macro_f1"])
+        if current_macro_f1 > best_macro_f1 + args.min_delta:
+            best_macro_f1 = current_macro_f1
+            best_macro_f1_epoch = epoch
+            best_macro_f1_metrics = build_checkpoint_metrics(
+                metrics,
+                epoch=epoch,
+                train_loss=train_loss,
+                train_acc=train_acc,
+                tune_loss=val_loss,
+                tune_acc=val_acc,
+                selection_metric="macro-f1",
+                selection_value=current_macro_f1,
+            )
+
+            save_checkpoint(
+                args.output_dir / "best_macro_f1_model.pt",
+                model,
+                optimizer,
+                epoch,
+                class_to_idx,
+                args,
+                best_macro_f1_metrics,
+                preprocess,
+            )
             save_checkpoint(
                 args.output_dir / "best_model.pt",
                 model,
@@ -370,31 +490,48 @@ def main() -> None:
                 epoch,
                 class_to_idx,
                 args,
-                metrics,
+                best_macro_f1_metrics,
                 preprocess,
             )
-            write_metrics_json(metrics, args.output_dir / "best_tune_metrics.json")
+            write_metrics_json(best_macro_f1_metrics, args.output_dir / "best_macro_f1_tune_metrics.json")
+            write_metrics_json(best_macro_f1_metrics, args.output_dir / "best_tune_metrics.json")
+            save_confusion_matrix_plot(
+                metrics["confusion_matrix"],
+                class_names,
+                args.output_dir / "best_macro_f1_tune_confusion_matrix.png",
+                title=f"{resolved_model_name} Best Macro-F1 Confusion Matrix",
+            )
             save_confusion_matrix_plot(
                 metrics["confusion_matrix"],
                 class_names,
                 args.output_dir / "best_tune_confusion_matrix.png",
-                title=f"{resolved_model_name} Best Confusion Matrix",
+                title=f"{resolved_model_name} Best Macro-F1 Confusion Matrix",
             )
-        else:
-            epochs_without_improvement += 1
 
         scheduler.step()
 
         if args.patience > 0 and epochs_without_improvement >= args.patience:
-            print(f"Early stopping after {epoch} epochs without macro-F1 improvement.")
+            print(f"Early stopping after {epoch} epochs without {args.early_stop_metric} improvement.")
             break
 
     write_epoch_history_csv(history, args.output_dir / "history.csv")
-    if best_metrics is not None:
+    if best_macro_f1_metrics is not None:
         print(
-            "Best tuning metrics: "
-            f"acc={best_metrics['accuracy']:.4f}, "
-            f"macro_f1={best_metrics['macro_f1']:.4f}"
+            "Best macro-F1 tuning metrics: "
+            f"epoch={best_macro_f1_epoch}, "
+            f"tune_loss={best_macro_f1_metrics['tune_loss']:.4f}, "
+            f"acc={best_macro_f1_metrics['accuracy']:.4f}, "
+            f"macro_f1={best_macro_f1_metrics['macro_f1']:.4f}"
+        )
+
+    if best_stop_metrics is not None:
+        print(
+            "Best early-stop tuning metrics: "
+            f"epoch={best_stop_epoch}, "
+            f"tune_loss={best_stop_metrics['tune_loss']:.4f}, "
+            f"acc={best_stop_metrics['accuracy']:.4f}, "
+            f"macro_f1={best_stop_metrics['macro_f1']:.4f}, "
+            f"{best_stop_metrics['selection_metric']}={best_stop_metrics['selection_value']:.4f}"
         )
 
 

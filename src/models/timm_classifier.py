@@ -64,6 +64,18 @@ FOCALNET_SMALL_SRF = TimmModelSpec(
     recommended_image_size=224,
     description="FocalNet-Small SRF with ImageNet pretrained weights; stronger but heavier than tiny.",
 )
+MOBILENETV4_SMALL = TimmModelSpec(
+    alias="mobilenetv4-small",
+    timm_name="mobilenetv4_conv_small.e2400_r224_in1k",
+    recommended_image_size=224,
+    description="MobileNetV4 Conv Small, lightweight deployment-oriented CNN baseline.",
+)
+CONVNEXTV2_TINY = TimmModelSpec(
+    alias="convnextv2-tiny",
+    timm_name="convnextv2_tiny.fcmae_ft_in1k",
+    recommended_image_size=224,
+    description="ConvNeXt V2 Tiny, modern ConvNet baseline.",
+)
 
 
 TIMM_MODEL_SPECS: dict[str, TimmModelSpec] = {
@@ -76,6 +88,8 @@ TIMM_MODEL_SPECS: dict[str, TimmModelSpec] = {
         FOCALNET_TINY_SRF,
         FOCALNET_TINY_LRF,
         FOCALNET_SMALL_SRF,
+        MOBILENETV4_SMALL,
+        CONVNEXTV2_TINY,
     )
 }
 
