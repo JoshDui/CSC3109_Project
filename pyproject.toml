@@ -3,7 +3,7 @@ name = "csc3109-project"
 version = "0.1.0"
 description = "CSC3109 aerial-image classification group project"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "torch",
     "torchvision",
@@ -19,6 +19,8 @@ dependencies = [
     "jupyterlab>=4.5.7",
     "jupyter-collaboration>=4.4.0",
     "ipykernel>=7.2.0",
+    "pandas-stubs~=3.0.3",
+    "ipywidgets>=8.1",
 ]
 
 [tool.uv]
