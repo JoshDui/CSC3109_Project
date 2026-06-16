@@ -18,6 +18,7 @@ def multiclass_dice_loss(
     """Compute multiclass soft Dice loss for class-index masks."""
 
     _validate_segmentation_shapes(logits, targets)
+    logits = logits.float()
     if epsilon <= 0.0:
         raise ValueError(f"epsilon must be positive, got {epsilon}")
 
@@ -59,6 +60,7 @@ def segmentation_ce_or_focal_loss_map(
 
     if focal_gamma < 0.0:
         raise ValueError(f"focal_gamma must be non-negative, got {focal_gamma}")
+    logits = logits.float()
     weights = None
     if class_weights is not None:
         if class_weights.ndim != 1:
@@ -127,6 +129,7 @@ class SemanticGuidedSegmentationLoss(nn.Module):
 
     def forward(self, logits: Tensor, targets: Tensor) -> dict[str, Tensor]:
         _validate_segmentation_shapes(logits, targets)
+        logits = logits.float()
         _validate_integral_targets(targets, "segmentation targets")
         targets = targets.long()
         valid_mask = targets != self.ignore_index
@@ -186,7 +189,7 @@ class SemanticGuidedSceneLoss(nn.Module):
             scene_logits.shape[1],
             "Scene targets",
         )
-        return self.cross_entropy(scene_logits, scene_targets.long())
+        return self.cross_entropy(scene_logits.float(), scene_targets.long())
 
 
 class SemanticGuidedJointLoss(nn.Module):

@@ -233,12 +233,17 @@ class SemanticSegmentationDataset(Dataset):
             image = image_file.convert("RGB")
             mask = mask_file.copy()
 
+        raw_mask_tensor: torch.Tensor | None = None
+        if self.validate_mask_values:
+            raw_mask_tensor = _mask_to_tensor(mask)
+            _validate_mask_values(raw_mask_tensor, record, require_foreground=True)
+
         if self.transform is not None:
             image_tensor, mask_tensor = self.transform(image, mask)
         else:
             _, functional = _import_torchvision_transforms()
             image_tensor = functional.to_tensor(image)
-            mask_tensor = _mask_to_tensor(mask)
+            mask_tensor = raw_mask_tensor if raw_mask_tensor is not None else _mask_to_tensor(mask)
 
         if image_tensor.ndim != 3 or image_tensor.shape[0] != 3:
             raise ValueError(
@@ -252,7 +257,10 @@ class SemanticSegmentationDataset(Dataset):
                 f"image={tuple(image_tensor.shape[-2:])}, mask={tuple(mask_tensor.shape[-2:])}"
             )
         if self.validate_mask_values:
-            _validate_mask_values(mask_tensor, record)
+            # Augmentations such as rotation can legitimately move a small
+            # foreground object out of the tensor. Source masks are validated
+            # strictly above; augmented tensors only need to preserve legal IDs.
+            _validate_mask_values(mask_tensor, record, require_foreground=False)
 
         return image_tensor, mask_tensor, record.scene_class_index
 
@@ -456,7 +464,7 @@ def _validate_scene_mapping(
         )
 
 
-def _validate_mask_values(mask_tensor: torch.Tensor, record: SemanticMaskRecord) -> None:
+def _validate_mask_values(mask_tensor: torch.Tensor, record: SemanticMaskRecord, *, require_foreground: bool = True) -> None:
     values = set(torch.unique(mask_tensor).tolist())
     allowed_values = set(record.allowed_mask_values)
     unexpected = sorted(values - allowed_values)
@@ -465,7 +473,7 @@ def _validate_mask_values(mask_tensor: torch.Tensor, record: SemanticMaskRecord)
             f"Mask {record.mask_path} from manifest row {record.row_number} contains unsupported values "
             f"{unexpected}; expected subset of {record.allowed_mask_values}"
         )
-    if record.mask_schema == "scene_v1" and record.mask_foreground_id is not None and record.mask_foreground_id not in values:
+    if require_foreground and record.mask_schema == "scene_v1" and record.mask_foreground_id is not None and record.mask_foreground_id not in values:
         raise ValueError(
             f"Mask {record.mask_path} from manifest row {record.row_number} does not contain "
             f"scene foreground ID {record.mask_foreground_id}"

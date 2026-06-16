@@ -34,7 +34,14 @@ from src.models.semantic_guided_cgaf import (
     SEMANTIC_GUIDED_CGAF_CONVNEXT_TINY,
     build_semantic_guided_cgaf_cnn,
 )
-from src.training.qat import clean_state_dict
+from src.training.qat import (
+    QATConfig,
+    apply_qat_epoch_schedule,
+    clean_state_dict,
+    parse_qat_skip_patterns,
+    prepare_model_for_qat,
+    qat_checkpoint_note,
+)
 from src.training.semantic_guided_checkpointing import (
     SEMANTIC_GUIDED_CGAF_ARCHITECTURE,
     SEMANTIC_GUIDED_CGAF_TRANSFER_MODEL,
@@ -125,11 +132,28 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--early-stopping-min-delta", type=float, default=1.0e-4)
     parser.add_argument("--monitor", choices=("macro_f1", "accuracy"), default="macro_f1")
     parser.add_argument("--amp", action="store_true", help="Use CUDA mixed precision.")
+    parser.add_argument(
+        "--amp-dtype",
+        choices=("fp16", "bf16"),
+        default="fp16",
+        help="CUDA autocast dtype when --amp is enabled. Defaults to fp16 to preserve previous behavior.",
+    )
     parser.add_argument("--device", default="auto", help="auto, cpu, cuda, mps, or a torch device string")
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)
     parser.add_argument("--max-train-batches", type=int, default=None)
     parser.add_argument("--max-val-batches", type=int, default=None)
     parser.add_argument("--no-validate-mask-values", action="store_false", dest="validate_mask_values")
+    parser.add_argument(
+        "--qat-mode",
+        choices=("none", "w8a8"),
+        default="none",
+        help="Enable fake QAT. QAT checkpoints save clean float weights; exact QAT resume is not supported yet.",
+    )
+    parser.add_argument("--qat-observer-warmup-epochs", type=int, default=1)
+    parser.add_argument("--qat-freeze-observer-epoch", type=int, default=0)
+    parser.add_argument("--qat-skip-pattern", action="append", default=[])
+    parser.add_argument("--qat-quantize-segmentation-head", action="store_true")
+    parser.add_argument("--qat-quantize-gates", action="store_true", help="Also quantize CG-AF gate projections skipped by default.")
     parser.add_argument("--audit-manifest", action="store_true", help="Audit train/tune semantic manifest splits before training.")
     parser.add_argument("--audit-hash-images", action="store_true", help="Hash image files during --audit-manifest.")
     parser.set_defaults(include_background_dice=True, validate_mask_values=True)
@@ -193,6 +217,21 @@ def validate_args(args: argparse.Namespace) -> None:
         value = getattr(args, name)
         if value is not None and value <= 0:
             raise ValueError(f"--{name.replace('_', '-')} must be positive when provided, got {value}")
+    if args.qat_observer_warmup_epochs < 0:
+        raise ValueError("--qat-observer-warmup-epochs must be non-negative")
+    if args.qat_freeze_observer_epoch < 0:
+        raise ValueError("--qat-freeze-observer-epoch must be non-negative")
+
+
+def qat_config_from_args(args: argparse.Namespace) -> QATConfig:
+    return QATConfig(
+        mode=args.qat_mode,
+        observer_warmup_epochs=args.qat_observer_warmup_epochs,
+        freeze_observer_epoch=args.qat_freeze_observer_epoch,
+        skip_patterns=parse_qat_skip_patterns(args.qat_skip_pattern),
+        quantize_segmentation_head=args.qat_quantize_segmentation_head,
+        quantize_gates=args.qat_quantize_gates,
+    )
 
 
 def set_seed(seed: int) -> None:
@@ -225,6 +264,36 @@ def resolve_device(device_arg: str) -> torch.device:
     if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
         return torch.device("mps")
     return torch.device("cpu")
+
+
+def resolve_amp_config(args: argparse.Namespace, device: torch.device) -> tuple[bool, torch.dtype, bool]:
+    autocast_dtype = amp_dtype_from_arg(args.amp_dtype)
+    if args.amp and args.amp_dtype == "bf16":
+        if device.type != "cuda":
+            raise ValueError(f"--amp --amp-dtype bf16 requires a CUDA device; resolved device={device}")
+        if hasattr(torch.cuda, "is_bf16_supported") and not torch.cuda.is_bf16_supported():
+            raise RuntimeError("--amp --amp-dtype bf16 was requested, but torch.cuda.is_bf16_supported() is false")
+    use_amp = bool(args.amp and device.type == "cuda")
+    use_grad_scaler = bool(use_amp and args.amp_dtype == "fp16")
+    return use_amp, autocast_dtype, use_grad_scaler
+
+
+def amp_dtype_from_arg(amp_dtype: str) -> torch.dtype:
+    if amp_dtype == "fp16":
+        return torch.float16
+    if amp_dtype == "bf16":
+        return torch.bfloat16
+    raise ValueError(f"Unsupported --amp-dtype {amp_dtype!r}")
+
+
+def amp_metadata(args: argparse.Namespace) -> dict[str, Any]:
+    return {
+        "requested": bool(args.amp),
+        "enabled": bool(getattr(args, "amp_enabled", False)),
+        "amp_dtype": args.amp_dtype,
+        "effective_amp_dtype": getattr(args, "effective_amp_dtype", None),
+        "grad_scaler_enabled": bool(getattr(args, "grad_scaler_enabled", False)),
+    }
 
 
 def class_names_from_mapping(class_to_idx: dict[str, int]) -> list[str]:
@@ -538,6 +607,7 @@ def train_one_epoch(
     *,
     epoch: int,
     use_amp: bool,
+    amp_dtype: torch.dtype,
     max_batches: int | None,
 ) -> dict[str, float]:
     model.train()
@@ -550,7 +620,7 @@ def train_one_epoch(
         masks = masks.to(device, non_blocking=True)
         scene_labels = scene_labels.to(device, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
-        with autocast(device_type=device.type, enabled=use_amp):
+        with autocast(device_type=device.type, dtype=amp_dtype, enabled=use_amp):
             outputs = model(images, return_scene=True)
             losses = criterion(outputs, masks, scene_labels)
             loss = losses["loss"]
@@ -560,7 +630,7 @@ def train_one_epoch(
 
         batch_size = int(scene_labels.shape[0])
         update_loss_totals(totals, losses, batch_size=batch_size)
-        predictions = outputs["scene_logits"].detach().argmax(dim=1)
+        predictions = outputs["scene_logits"].detach().float().argmax(dim=1)
         correct += int((predictions == scene_labels).sum().item())
         samples += batch_size
         progress.set_postfix(loss=totals["loss"] / max(samples, 1), acc=correct / max(samples, 1))
@@ -578,6 +648,7 @@ def evaluate(
     *,
     epoch: int,
     use_amp: bool,
+    amp_dtype: torch.dtype,
     max_batches: int | None,
     scene_class_names: list[str],
     segmentation_class_names_: list[str],
@@ -592,15 +663,15 @@ def evaluate(
         images = images.to(device, non_blocking=True)
         masks = masks.to(device, non_blocking=True)
         scene_labels = scene_labels.to(device, non_blocking=True)
-        with autocast(device_type=device.type, enabled=use_amp):
+        with autocast(device_type=device.type, dtype=amp_dtype, enabled=use_amp):
             outputs = model(images, return_scene=True)
             losses = criterion(outputs, masks, scene_labels)
 
         batch_size = int(scene_labels.shape[0])
         update_loss_totals(totals, losses, batch_size=batch_size)
         samples += batch_size
-        scene_predictions = outputs["scene_logits"].argmax(dim=1)
-        segmentation_predictions = outputs["segmentation_logits"].argmax(dim=1)
+        scene_predictions = outputs["scene_logits"].float().argmax(dim=1)
+        segmentation_predictions = outputs["segmentation_logits"].float().argmax(dim=1)
         scene_confusion += batch_confusion(scene_predictions.cpu(), scene_labels.cpu(), len(scene_class_names), ignore_index=None)
         segmentation_confusion += batch_confusion(
             segmentation_predictions.cpu(),
@@ -732,9 +803,11 @@ def save_checkpoint(
         {
             "epoch": epoch,
             "model_state_dict": clean_state_dict(model),
+            "qat_model_state_dict": model.state_dict() if getattr(args, "qat_mode", "none") != "none" else None,
             "optimizer_state_dict": optimizer.state_dict(),
             "args": serialise_args(args),
             "metrics": metrics,
+            "amp": amp_metadata(args),
             "class_to_idx": class_to_idx,
             "idx_to_class": {index: name for name, index in class_to_idx.items()},
             "segmentation_classes": segmentation_classes,
@@ -743,6 +816,9 @@ def save_checkpoint(
             "model": SEMANTIC_GUIDED_CGAF_TRANSFER_MODEL,
             "fine_tuning_mode": args.fine_tuning_mode,
             "checkpoint_load_info": checkpoint_load_info,
+            "qat": getattr(args, "qat_prepare", None),
+            "qat_resume_supported": False if getattr(args, "qat_mode", "none") != "none" else None,
+            "qat_checkpoint_note": qat_checkpoint_note(getattr(args, "qat_mode", "none") != "none"),
             "created_at": datetime.now(timezone.utc).isoformat(),
         },
         path,
@@ -784,7 +860,10 @@ def main() -> None:
         args.output_dir = default_output_dir(args.mask_source, args.fine_tuning_mode)
     set_seed(args.seed)
     device = resolve_device(args.device)
-    use_amp = bool(args.amp and device.type == "cuda")
+    use_amp, autocast_dtype, use_grad_scaler = resolve_amp_config(args, device)
+    args.amp_enabled = use_amp
+    args.effective_amp_dtype = args.amp_dtype if use_amp else None
+    args.grad_scaler_enabled = use_grad_scaler
     args.output_dir.mkdir(parents=True, exist_ok=True)
     manifest_audit = audit_semantic_manifest(args) if args.audit_manifest else None
 
@@ -809,13 +888,23 @@ def main() -> None:
 
     model = build_model(args, num_segmentation_classes=num_segmentation_classes, num_scene_classes=num_scene_classes)
     checkpoint_load_info = load_partial_checkpoint(model, args.checkpoint) if args.checkpoint is not None else None
+    qat_prepare = None
+    qat_config = qat_config_from_args(args)
+    if qat_config.mode != "none":
+        qat_prepare = prepare_model_for_qat(model, qat_config)
+        args.qat_prepare = qat_prepare.to_dict()
+        print(
+            f"QAT prepared: mode={qat_config.mode}, wrapped={qat_prepare.wrapped_count}, "
+            f"skipped={len(qat_prepare.skipped_names)}",
+            flush=True,
+        )
     model = model.to(device)
     if args.freeze_backbone or args.freeze_backbone_epochs > 0:
         frozen_parameters = set_backbone_trainable(model, False)
         print(f"Backbone frozen: {frozen_parameters:,} parameters", flush=True)
     optimizer = build_optimizer(model, args)
     initial_lrs = [float(group["lr"]) for group in optimizer.param_groups]
-    scaler = GradScaler("cuda", enabled=use_amp)
+    scaler = GradScaler("cuda", enabled=use_grad_scaler)
 
     class_weights = parse_manual_class_weights(args.class_weights, num_classes=num_segmentation_classes)
     args.resolved_class_weights = class_weights.detach().cpu().tolist() if class_weights is not None else None
@@ -835,7 +924,8 @@ def main() -> None:
 
     print(
         "Semantic-Guided CG-AF CNN transfer: "
-        f"mode={args.fine_tuning_mode}, device={device}, amp={use_amp}, mask_source={args.mask_source}, "
+        f"mode={args.fine_tuning_mode}, device={device}, amp={use_amp}, amp_dtype={args.amp_dtype}, "
+        f"grad_scaler={use_grad_scaler}, mask_source={args.mask_source}, "
         f"seg_classes={num_segmentation_classes}, scene_classes={num_scene_classes}, "
         f"train_batches={len(train_loader)}, tune_batches={len(tune_loader)}, "
         f"checkpoint={args.checkpoint}, output={args.output_dir}",
@@ -863,6 +953,7 @@ def main() -> None:
             initial_lrs = [float(group["lr"]) for group in optimizer.param_groups]
             print(f"Backbone unfrozen at epoch {epoch}: {unfrozen_parameters:,} parameters", flush=True)
 
+        qat_state = apply_qat_epoch_schedule(model, qat_config, epoch=epoch)
         apply_epoch_lr_schedule(optimizer, args=args, epoch=epoch, initial_lrs=initial_lrs)
         train_metrics = train_one_epoch(
             model,
@@ -873,6 +964,7 @@ def main() -> None:
             device,
             epoch=epoch,
             use_amp=use_amp,
+            amp_dtype=autocast_dtype,
             max_batches=args.max_train_batches,
         )
         val_metrics = evaluate(
@@ -882,6 +974,7 @@ def main() -> None:
             device,
             epoch=epoch,
             use_amp=use_amp,
+            amp_dtype=autocast_dtype,
             max_batches=args.max_val_batches,
             scene_class_names=scene_class_names,
             segmentation_class_names_=segmentation_classes,
@@ -894,6 +987,9 @@ def main() -> None:
         row: dict[str, object] = {
             "epoch": epoch,
             "fine_tuning_mode": args.fine_tuning_mode,
+            "amp_enabled": use_amp,
+            "amp_dtype": args.amp_dtype,
+            "grad_scaler_enabled": use_grad_scaler,
             "train_loss": train_metrics["loss"],
             "train_scene_loss": train_metrics["scene_loss"],
             "train_segmentation_loss": train_metrics["segmentation_loss"],
@@ -916,6 +1012,7 @@ def main() -> None:
             "monitor_score": current_score,
         }
         add_learning_rates(row, optimizer)
+        row.update({f"qat_{key}": value for key, value in qat_state.items()})
         for class_name, value in segmentation["per_class_iou"].items():
             row[f"tune_seg_iou_{slugify(class_name)}"] = value
         for class_name, value in segmentation["per_class_dice"].items():
@@ -967,6 +1064,10 @@ def main() -> None:
                 "early_stop_message": early_stop_message,
                 "checkpoint_load_info": checkpoint_load_info,
                 "manifest_audit": manifest_audit,
+                "qat": qat_prepare.to_dict() if qat_prepare is not None else None,
+                "qat_resume_supported": False if qat_prepare is not None else None,
+                "qat_checkpoint_note": qat_checkpoint_note(qat_prepare is not None),
+                "amp": amp_metadata(args),
                 "args": serialise_args(args),
             },
             args.output_dir / "metrics.json",

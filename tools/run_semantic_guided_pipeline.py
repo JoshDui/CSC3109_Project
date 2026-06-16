@@ -15,8 +15,10 @@ from typing import Any
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 DEFAULT_RUN_ID = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-STAGE_ORDER = ("split", "masks", "dataset", "loveda", "fft", "peft", "quant", "jupyter-artifacts")
+STAGE_ORDER = ("split", "masks", "dataset", "loveda", "fft", "peft", "quant", "mask-export", "jupyter-artifacts")
 
 
 @dataclass(frozen=True)
@@ -74,12 +76,91 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-workers", type=int, default=8)
     parser.add_argument("--image-size", type=int, default=512)
     parser.add_argument("--device", default="auto")
+    parser.add_argument("--lr", type=float, default=1.0e-4)
+    parser.add_argument("--weight-decay", type=float, default=0.05)
+    parser.add_argument("--amp", action="store_true", help="Use CUDA AMP for LoveDA, FFT, and PEFT training stages.")
+    parser.add_argument(
+        "--amp-dtype",
+        choices=("fp16", "bf16"),
+        default="fp16",
+        help="CUDA autocast dtype passed with --amp to LoveDA, FFT, and PEFT training stages.",
+    )
+    parser.add_argument("--fft-freeze-backbone", action="store_true", help="Keep the FFT transfer backbone frozen.")
+    parser.add_argument(
+        "--fft-freeze-backbone-epochs",
+        type=int,
+        default=0,
+        help="Freeze the FFT transfer backbone for the first N epochs, then unfreeze.",
+    )
+    parser.add_argument("--peft-freeze-backbone", action="store_true", help="Keep the PEFT transfer backbone frozen.")
+    parser.add_argument(
+        "--peft-freeze-backbone-epochs",
+        type=int,
+        default=0,
+        help="Freeze the PEFT transfer backbone for the first N epochs, then unfreeze.",
+    )
+    parser.add_argument(
+        "--qat-mode",
+        choices=("none", "w8a8"),
+        default="none",
+        help="Pass fake QAT mode to LoveDA, FFT, and PEFT training stages.",
+    )
+    parser.add_argument("--qat-observer-warmup-epochs", type=int, default=1)
+    parser.add_argument("--qat-freeze-observer-epoch", type=int, default=0)
+    parser.add_argument("--qat-skip-pattern", action="append", default=[])
+    parser.add_argument("--qat-quantize-segmentation-head", action="store_true")
+    parser.add_argument("--qat-quantize-gates", action="store_true", help="Also quantize CG-AF gate projections skipped by default.")
+
+    parser.add_argument("--loveda-scheduler", choices=("none", "cosine"), default="none")
+    parser.add_argument("--loveda-warmup-epochs", type=int, default=0)
+    parser.add_argument("--loveda-min-lr", type=float, default=0.0)
+    parser.add_argument("--loveda-encoder-lr-mult", type=float, default=1.0)
+    parser.add_argument("--loveda-early-stopping-patience", type=int, default=0)
+    parser.add_argument("--loveda-early-stopping-min-delta", type=float, default=0.0)
+    parser.add_argument("--loveda-class-weight-mode", choices=("none", "inverse", "inverse_sqrt"), default="none")
+    parser.add_argument("--loveda-focal-gamma", type=float, default=0.0)
+
+    parser.add_argument("--transfer-scheduler", choices=("none", "cosine"), default="cosine")
+    parser.add_argument("--transfer-warmup-epochs", type=int, default=1)
+    parser.add_argument("--transfer-min-lr", type=float, default=0.0)
+    parser.add_argument("--transfer-encoder-lr-mult", type=float, default=0.25)
+    parser.add_argument("--transfer-early-stopping-patience", type=int, default=8)
+    parser.add_argument("--transfer-early-stopping-min-delta", type=float, default=1.0e-4)
+    parser.add_argument("--transfer-monitor", choices=("macro_f1", "accuracy"), default="macro_f1")
+    parser.add_argument("--transfer-focal-gamma", type=float, default=0.0)
 
     parser.add_argument("--quant-output-dir", type=Path, default=None)
     parser.add_argument("--quant-summary", type=Path, default=None)
-    parser.add_argument("--quant-modes", default="fp32,ptq_w8a8,awq_w8a8")
+    parser.add_argument(
+        "--quant-modes",
+        default="fp32,awq_w8a8",
+        help="Default evaluates the four review candidates: FFT/PEFT raw and FFT/PEFT AWQ W8A8.",
+    )
     parser.add_argument("--quant-calibration-batches", type=int, default=32)
     parser.add_argument("--quant-max-eval-batches", type=int, default=None)
+    parser.add_argument("--checkpoint-export-dir", type=Path, default=None)
+    parser.add_argument("--checkpoint-export-manifest", type=Path, default=None)
+
+    parser.add_argument("--mask-export-dir", type=Path, default=None)
+    parser.add_argument("--mask-figure-dir", type=Path, default=None)
+    parser.add_argument("--mask-export-manifest", type=Path, default=None)
+    parser.add_argument("--mask-export-summary", type=Path, default=None)
+    parser.add_argument("--mask-export-summary-csv", type=Path, default=None)
+    parser.add_argument("--mask-export-split", default="internal_tune")
+    parser.add_argument(
+        "--mask-export-quant-mode",
+        choices=("fp32", "ptq_w8a8", "ptq_w4a8", "awq_w8a8", "awq_w4a8"),
+        default="awq_w8a8",
+        help="Quantization emulation used by the mask export visualizer.",
+    )
+    parser.add_argument("--mask-export-calibration-split", default="train")
+    parser.add_argument("--mask-export-calibration-batches", type=int, default=32)
+    parser.add_argument(
+        "--mask-export-max-examples",
+        type=int,
+        default=0,
+        help="Maximum examples to export; 0 means all selected split examples.",
+    )
 
     parser.add_argument("--tables-dir", type=Path, default=None)
     parser.add_argument("--figures-dir", type=Path, default=None)
@@ -97,15 +178,27 @@ def resolve_paths(args: argparse.Namespace) -> None:
     args.figures_dir = figures_dir
     args.artifact_dir = artifact_dir
     args.loveda_output_dir = args.loveda_output_dir or args.project_root / "model" / f"semantic_guided_cgaf_loveda_{args.run_id}"
-    args.loveda_checkpoint = args.loveda_checkpoint or args.loveda_output_dir / "best.pt"
+    args.loveda_checkpoint = args.loveda_checkpoint or args.loveda_output_dir / "best_miou.pt"
     args.fft_output_dir = args.fft_output_dir or args.project_root / "model" / f"semantic_guided_cgaf_fft_{args.run_id}"
-    args.fft_checkpoint = args.fft_checkpoint or args.fft_output_dir / "best.pt"
+    args.fft_checkpoint = args.fft_checkpoint or args.fft_output_dir / "best_miou.pt"
     args.peft_output_dir = args.peft_output_dir or args.project_root / "model" / f"semantic_guided_cgaf_peft_{args.run_id}"
-    args.peft_checkpoint = args.peft_checkpoint or args.peft_output_dir / "best.pt"
+    args.peft_checkpoint = args.peft_checkpoint or args.peft_output_dir / "best_macro_f1.pt"
     if args.quant_output_dir is None and args.quant_summary is not None:
         args.quant_output_dir = args.quant_summary.parent
     args.quant_output_dir = args.quant_output_dir or tables_dir / "quant_eval"
     args.quant_summary = args.quant_summary or args.quant_output_dir / "semantic_guided_cgaf_quant_summary.csv"
+    args.model_size_summary = args.quant_output_dir / "semantic_guided_cgaf_model_size_by_quant_mode.csv"
+    args.checkpoint_export_dir = args.checkpoint_export_dir or args.project_root / "model" / f"semantic_guided_cgaf_checkpoint_exports_{args.run_id}"
+    args.checkpoint_export_manifest = args.checkpoint_export_manifest or args.checkpoint_export_dir / "semantic_guided_cgaf_checkpoint_export_manifest.csv"
+    args.fft_raw_checkpoint_export = args.checkpoint_export_dir / "raw" / "fft_raw.pt"
+    args.peft_raw_checkpoint_export = args.checkpoint_export_dir / "raw" / "peft_raw.pt"
+    args.fft_awq_checkpoint = args.checkpoint_export_dir / "awq_w8a8" / "fft_awq_w8a8.pt"
+    args.peft_awq_checkpoint = args.checkpoint_export_dir / "awq_w8a8" / "peft_awq_w8a8.pt"
+    args.mask_export_dir = args.mask_export_dir or args.project_root / "reports" / "tables" / f"semantic_guided_cgaf_mask_exports_{args.run_id}"
+    args.mask_figure_dir = args.mask_figure_dir or args.project_root / "reports" / "figures" / f"semantic_guided_cgaf_mask_exports_{args.run_id}"
+    args.mask_export_manifest = args.mask_export_manifest or args.mask_export_dir / "semantic_guided_cgaf_mask_export_manifest.csv"
+    args.mask_export_summary = args.mask_export_summary or args.mask_export_dir / "semantic_guided_cgaf_mask_export_summary.json"
+    args.mask_export_summary_csv = args.mask_export_summary_csv or args.mask_export_dir / "semantic_guided_cgaf_mask_export_summary.csv"
     args.pipeline_manifest = args.pipeline_manifest or artifact_dir / "semantic_guided_cgaf_pipeline_manifest.json"
     args.pipeline_summary = args.pipeline_summary or artifact_dir / "semantic_guided_cgaf_pipeline_summary.csv"
 
@@ -129,12 +222,51 @@ def validate_args(args: argparse.Namespace, stages: list[str]) -> None:
         raise ValueError("--num-workers must be non-negative")
     if args.image_size <= 0:
         raise ValueError("--image-size must be positive")
+    if args.lr <= 0.0:
+        raise ValueError("--lr must be positive")
+    if args.weight_decay < 0.0:
+        raise ValueError("--weight-decay must be non-negative")
+    if args.fft_freeze_backbone and args.fft_freeze_backbone_epochs > 0:
+        raise ValueError("--fft-freeze-backbone and --fft-freeze-backbone-epochs are mutually exclusive")
+    if args.peft_freeze_backbone and args.peft_freeze_backbone_epochs > 0:
+        raise ValueError("--peft-freeze-backbone and --peft-freeze-backbone-epochs are mutually exclusive")
+    if args.fft_freeze_backbone_epochs < 0:
+        raise ValueError("--fft-freeze-backbone-epochs must be non-negative")
+    if args.peft_freeze_backbone_epochs < 0:
+        raise ValueError("--peft-freeze-backbone-epochs must be non-negative")
+    if args.qat_observer_warmup_epochs < 0:
+        raise ValueError("--qat-observer-warmup-epochs must be non-negative")
+    if args.qat_freeze_observer_epoch < 0:
+        raise ValueError("--qat-freeze-observer-epoch must be non-negative")
+    if args.loveda_warmup_epochs < 0 or args.transfer_warmup_epochs < 0:
+        raise ValueError("warmup epoch counts must be non-negative")
+    if args.loveda_min_lr < 0.0 or args.transfer_min_lr < 0.0:
+        raise ValueError("minimum learning rates must be non-negative")
+    if args.loveda_encoder_lr_mult <= 0.0 or args.transfer_encoder_lr_mult <= 0.0:
+        raise ValueError("encoder LR multipliers must be positive")
+    if args.loveda_early_stopping_patience < 0 or args.transfer_early_stopping_patience < 0:
+        raise ValueError("early stopping patience values must be non-negative")
+    if args.loveda_early_stopping_min_delta < 0.0 or args.transfer_early_stopping_min_delta < 0.0:
+        raise ValueError("early stopping min deltas must be non-negative")
+    if args.loveda_focal_gamma < 0.0 or args.transfer_focal_gamma < 0.0:
+        raise ValueError("focal gamma values must be non-negative")
     if args.dataset_max_mask_checks is not None and args.dataset_max_mask_checks < 0:
         raise ValueError("--dataset-max-mask-checks must be non-negative")
     if args.quant_calibration_batches <= 0:
         raise ValueError("--quant-calibration-batches must be positive")
     if args.quant_max_eval_batches is not None and args.quant_max_eval_batches <= 0:
         raise ValueError("--quant-max-eval-batches must be positive when provided")
+    if Path(args.quant_summary).parent != Path(args.quant_output_dir):
+        raise ValueError("--quant-summary must be inside --quant-output-dir; pass only --quant-summary or keep matching parents")
+    quant_modes = {mode.strip() for mode in str(args.quant_modes).split(",") if mode.strip()}
+    if "quant" in stages and not {"fp32", "awq_w8a8"}.issubset(quant_modes):
+        raise ValueError("--quant-modes must include fp32 and awq_w8a8 so the pipeline evaluates raw FFT/PEFT and AWQ FFT/PEFT")
+    if args.mask_export_max_examples < 0:
+        raise ValueError("--mask-export-max-examples must be non-negative")
+    if args.mask_export_calibration_batches <= 0:
+        raise ValueError("--mask-export-calibration-batches must be positive")
+    if "mask-export" in stages and args.mask_export_quant_mode != "awq_w8a8":
+        raise ValueError("--mask-export-quant-mode must be awq_w8a8 for review artifacts")
     if not stages:
         raise ValueError("No stages selected")
 
@@ -214,6 +346,28 @@ def build_commands(args: argparse.Namespace, stages: list[str]) -> list[Pipeline
                     str(args.image_size),
                     "--device",
                     str(args.device),
+                    "--lr",
+                    str(args.lr),
+                    "--weight-decay",
+                    str(args.weight_decay),
+                    "--scheduler",
+                    str(args.loveda_scheduler),
+                    "--warmup-epochs",
+                    str(args.loveda_warmup_epochs),
+                    "--min-lr",
+                    str(args.loveda_min_lr),
+                    "--encoder-lr-mult",
+                    str(args.loveda_encoder_lr_mult),
+                    "--early-stopping-patience",
+                    str(args.loveda_early_stopping_patience),
+                    "--early-stopping-min-delta",
+                    str(args.loveda_early_stopping_min_delta),
+                    "--class-weight-mode",
+                    str(args.loveda_class_weight_mode),
+                    "--focal-gamma",
+                    str(args.loveda_focal_gamma),
+                    *amp_training_args(args),
+                    *qat_training_args(args),
                 ],
                 heavy=True,
             )
@@ -226,6 +380,8 @@ def build_commands(args: argparse.Namespace, stages: list[str]) -> list[Pipeline
         quant_command = [
             py,
             str(args.project_root / "tools" / "evaluate_semantic_guided_quant.py"),
+            "--run-id",
+            str(args.run_id),
             "--checkpoint",
             f"fft={args.fft_checkpoint}",
             "--checkpoint",
@@ -236,6 +392,12 @@ def build_commands(args: argparse.Namespace, stages: list[str]) -> list[Pipeline
             str(args.quant_output_dir),
             "--summary-filename",
             args.quant_summary.name,
+            "--model-size-filename",
+            args.model_size_summary.name,
+            "--checkpoint-export-dir",
+            str(args.checkpoint_export_dir),
+            "--checkpoint-export-manifest",
+            str(args.checkpoint_export_manifest),
             "--mask-source",
             str(args.mask_source),
             "--manifest-path",
@@ -254,6 +416,8 @@ def build_commands(args: argparse.Namespace, stages: list[str]) -> list[Pipeline
         if args.quant_max_eval_batches is not None:
             quant_command.extend(["--max-eval-batches", str(args.quant_max_eval_batches)])
         commands.append(PipelineCommand("quant", "evaluate quantization artifacts", quant_command, heavy=True))
+    if "mask-export" in stages:
+        commands.append(mask_export_command(args, py))
     return commands
 
 
@@ -288,6 +452,96 @@ def dataset_commands(args: argparse.Namespace, py: str) -> list[PipelineCommand]
     ]
 
 
+def qat_training_args(args: argparse.Namespace) -> list[str]:
+    values = [
+        "--qat-mode",
+        str(args.qat_mode),
+        "--qat-observer-warmup-epochs",
+        str(args.qat_observer_warmup_epochs),
+        "--qat-freeze-observer-epoch",
+        str(args.qat_freeze_observer_epoch),
+    ]
+    for pattern in args.qat_skip_pattern:
+        values.extend(["--qat-skip-pattern", str(pattern)])
+    if args.qat_quantize_segmentation_head:
+        values.append("--qat-quantize-segmentation-head")
+    if args.qat_quantize_gates:
+        values.append("--qat-quantize-gates")
+    return values
+
+
+def amp_training_args(args: argparse.Namespace) -> list[str]:
+    if not args.amp:
+        return []
+    return ["--amp", "--amp-dtype", str(args.amp_dtype)]
+
+
+def mask_export_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    command = [
+        py,
+        str(args.project_root / "tools" / "export_semantic_guided_masks.py"),
+        "--run-id",
+        str(args.run_id),
+        "--checkpoint",
+        f"fft={args.fft_checkpoint}",
+        "--checkpoint",
+        f"peft={args.peft_checkpoint}",
+        "--checkpoint-artifact",
+        f"fft={args.fft_awq_checkpoint}",
+        "--checkpoint-artifact",
+        f"peft={args.peft_awq_checkpoint}",
+        "--manifest-path",
+        str(args.sam3_mask_manifest),
+        "--mask-source",
+        str(args.mask_source),
+        "--split",
+        str(args.mask_export_split),
+        "--output-dir",
+        str(args.mask_export_dir),
+        "--figure-dir",
+        str(args.mask_figure_dir),
+        "--manifest-output",
+        str(args.mask_export_manifest),
+        "--summary-output",
+        str(args.mask_export_summary),
+        "--summary-csv-output",
+        str(args.mask_export_summary_csv),
+        "--max-examples",
+        str(args.mask_export_max_examples),
+        "--quant-mode",
+        str(args.mask_export_quant_mode),
+        "--calibration-split",
+        str(args.mask_export_calibration_split),
+        "--calibration-batches",
+        str(args.mask_export_calibration_batches),
+        "--batch-size",
+        str(args.batch_size),
+        "--num-workers",
+        str(args.num_workers),
+        "--image-size",
+        str(args.image_size),
+        "--device",
+        str(args.device if args.device in {"auto", "cpu", "cuda"} else "auto"),
+    ]
+    return PipelineCommand("mask-export", "export FFT/PEFT masks and visual comparisons", command, heavy=True)
+
+
+def transfer_freeze_args(args: argparse.Namespace, *, mode: str) -> list[str]:
+    if mode == "fft":
+        if args.fft_freeze_backbone:
+            return ["--freeze-backbone"]
+        if args.fft_freeze_backbone_epochs > 0:
+            return ["--freeze-backbone-epochs", str(args.fft_freeze_backbone_epochs)]
+        return []
+    if mode == "peft":
+        if args.peft_freeze_backbone:
+            return ["--freeze-backbone"]
+        if args.peft_freeze_backbone_epochs > 0:
+            return ["--freeze-backbone-epochs", str(args.peft_freeze_backbone_epochs)]
+        return []
+    raise ValueError(f"Unsupported transfer mode: {mode!r}")
+
+
 def transfer_command(args: argparse.Namespace, py: str, *, mode: str, output_dir: Path) -> PipelineCommand:
     return PipelineCommand(
         mode,
@@ -315,6 +569,29 @@ def transfer_command(args: argparse.Namespace, py: str, *, mode: str, output_dir
             str(args.image_size),
             "--device",
             str(args.device),
+            "--lr",
+            str(args.lr),
+            "--weight-decay",
+            str(args.weight_decay),
+            "--scheduler",
+            str(args.transfer_scheduler),
+            "--warmup-epochs",
+            str(args.transfer_warmup_epochs),
+            "--min-lr",
+            str(args.transfer_min_lr),
+            "--encoder-lr-mult",
+            str(args.transfer_encoder_lr_mult),
+            "--early-stopping-patience",
+            str(args.transfer_early_stopping_patience),
+            "--early-stopping-min-delta",
+            str(args.transfer_early_stopping_min_delta),
+            "--monitor",
+            str(args.transfer_monitor),
+            "--focal-gamma",
+            str(args.transfer_focal_gamma),
+            *amp_training_args(args),
+            *transfer_freeze_args(args, mode=mode),
+            *qat_training_args(args),
         ],
         heavy=True,
     )
@@ -352,7 +629,20 @@ def pipeline_outputs(args: argparse.Namespace) -> dict[str, str]:
         "loveda_checkpoint": str(args.loveda_checkpoint),
         "fft_checkpoint": str(args.fft_checkpoint),
         "peft_checkpoint": str(args.peft_checkpoint),
+        "checkpoint_export_dir": str(args.checkpoint_export_dir),
+        "checkpoint_export_manifest": str(args.checkpoint_export_manifest),
+        "fft_raw_checkpoint_export": str(args.fft_raw_checkpoint_export),
+        "peft_raw_checkpoint_export": str(args.peft_raw_checkpoint_export),
+        "fft_awq_checkpoint": str(args.fft_awq_checkpoint),
+        "peft_awq_checkpoint": str(args.peft_awq_checkpoint),
         "quant_summary": str(args.quant_summary),
+        "model_size_summary": str(args.model_size_summary),
+        "mask_export_quant_mode": str(args.mask_export_quant_mode),
+        "mask_export_dir": str(args.mask_export_dir),
+        "mask_figure_dir": str(args.mask_figure_dir),
+        "mask_export_manifest": str(args.mask_export_manifest),
+        "mask_export_summary": str(args.mask_export_summary),
+        "mask_export_summary_csv": str(args.mask_export_summary_csv),
         "tables_dir": str(args.tables_dir),
         "figures_dir": str(args.figures_dir),
         "artifact_dir": str(args.artifact_dir),
@@ -371,10 +661,15 @@ def validate_checkpoint_handoffs(args: argparse.Namespace, stages: list[str]) ->
     checkpoints: dict[str, Path] = {}
     if any(stage in stages for stage in ("loveda", "fft", "peft")):
         checkpoints["loveda_checkpoint"] = args.loveda_checkpoint
-    if any(stage in stages for stage in ("fft", "quant")):
+    if any(stage in stages for stage in ("fft", "quant", "mask-export")):
         checkpoints["fft_checkpoint"] = args.fft_checkpoint
-    if any(stage in stages for stage in ("peft", "quant")):
+    if any(stage in stages for stage in ("peft", "quant", "mask-export")):
         checkpoints["peft_checkpoint"] = args.peft_checkpoint
+    if "quant" in stages or "mask-export" in stages:
+        checkpoints["fft_raw_checkpoint_export"] = args.fft_raw_checkpoint_export
+        checkpoints["peft_raw_checkpoint_export"] = args.peft_raw_checkpoint_export
+        checkpoints["fft_awq_checkpoint"] = args.fft_awq_checkpoint
+        checkpoints["peft_awq_checkpoint"] = args.peft_awq_checkpoint
     if not checkpoints:
         return {}
 
@@ -400,6 +695,11 @@ def write_jupyter_artifacts(
     checkpoint_handoff_validation: dict[str, Any],
 ) -> None:
     args.artifact_dir.mkdir(parents=True, exist_ok=True)
+    artifact_status = required_artifact_status(args, stages)
+    missing_required = [row for row in artifact_status if row["required"] and not row["exists"]]
+    if missing_required:
+        missing_text = ", ".join(f"{row['artifact']}={row['path']}" for row in missing_required)
+        raise FileNotFoundError(f"Jupyter artifact manifest would reference missing required pipeline artifacts: {missing_text}")
     payload = {
         "run_id": args.run_id,
         "architecture": "semantic_guided_cgaf",
@@ -408,14 +708,23 @@ def write_jupyter_artifacts(
         "created_at": datetime.now(timezone.utc).isoformat(),
         "commands": command_records,
         "outputs": pipeline_outputs(args),
+        "artifact_status": artifact_status,
         "checkpoint_handoff_validation": checkpoint_handoff_validation,
         "checkpoint_paths": {
             "loveda_checkpoint": str(args.loveda_checkpoint),
             "fft_checkpoint": str(args.fft_checkpoint),
             "peft_checkpoint": str(args.peft_checkpoint),
+            "fft_raw_checkpoint_export": str(args.fft_raw_checkpoint_export),
+            "peft_raw_checkpoint_export": str(args.peft_raw_checkpoint_export),
+            "fft_awq_checkpoint": str(args.fft_awq_checkpoint),
+            "peft_awq_checkpoint": str(args.peft_awq_checkpoint),
         },
         "summary_paths": {
             "quant_summary": str(args.quant_summary),
+            "model_size_summary": str(args.model_size_summary),
+            "checkpoint_export_manifest": str(args.checkpoint_export_manifest),
+            "mask_export_summary": str(args.mask_export_summary),
+            "mask_export_summary_csv": str(args.mask_export_summary_csv),
             "pipeline_summary": str(args.pipeline_summary),
         },
     }
@@ -426,6 +735,28 @@ def write_jupyter_artifacts(
     print(f"Wrote pipeline summary: {args.pipeline_summary}")
 
 
+def required_artifact_status(args: argparse.Namespace, stages: list[str]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+
+    def add(artifact: str, path: Path, *, required: bool) -> None:
+        rows.append({"artifact": artifact, "path": str(path), "exists": Path(path).exists(), "required": required})
+
+    quant_required = "quant" in stages or "jupyter-artifacts" in stages
+    mask_export_required = "mask-export" in stages or "jupyter-artifacts" in stages
+    add("quant_summary", args.quant_summary, required=quant_required)
+    add("model_size_summary", args.model_size_summary, required=quant_required)
+    add("checkpoint_export_manifest", args.checkpoint_export_manifest, required=quant_required)
+    add("fft_raw_checkpoint_export", args.fft_raw_checkpoint_export, required=quant_required)
+    add("peft_raw_checkpoint_export", args.peft_raw_checkpoint_export, required=quant_required)
+    add("fft_awq_checkpoint", args.fft_awq_checkpoint, required=quant_required)
+    add("peft_awq_checkpoint", args.peft_awq_checkpoint, required=quant_required)
+    add("mask_export_manifest", args.mask_export_manifest, required=mask_export_required)
+    add("mask_export_summary", args.mask_export_summary, required=mask_export_required)
+    add("mask_export_summary_csv", args.mask_export_summary_csv, required=mask_export_required)
+    add("mask_figure_dir", args.mask_figure_dir, required=mask_export_required)
+    return rows
+
+
 def write_summary_csv(path: Path, args: argparse.Namespace) -> None:
     rows = [
         {"run_id": args.run_id, "artifact": "semantic_split_manifest", "path": str(args.semantic_split_manifest)},
@@ -433,7 +764,17 @@ def write_summary_csv(path: Path, args: argparse.Namespace) -> None:
         {"run_id": args.run_id, "artifact": "loveda_checkpoint", "path": str(args.loveda_checkpoint)},
         {"run_id": args.run_id, "artifact": "fft_checkpoint", "path": str(args.fft_checkpoint)},
         {"run_id": args.run_id, "artifact": "peft_checkpoint", "path": str(args.peft_checkpoint)},
+        {"run_id": args.run_id, "artifact": "fft_raw_checkpoint_export", "path": str(args.fft_raw_checkpoint_export)},
+        {"run_id": args.run_id, "artifact": "peft_raw_checkpoint_export", "path": str(args.peft_raw_checkpoint_export)},
+        {"run_id": args.run_id, "artifact": "fft_awq_checkpoint", "path": str(args.fft_awq_checkpoint)},
+        {"run_id": args.run_id, "artifact": "peft_awq_checkpoint", "path": str(args.peft_awq_checkpoint)},
+        {"run_id": args.run_id, "artifact": "checkpoint_export_manifest", "path": str(args.checkpoint_export_manifest)},
         {"run_id": args.run_id, "artifact": "quant_summary", "path": str(args.quant_summary)},
+        {"run_id": args.run_id, "artifact": "model_size_summary", "path": str(args.model_size_summary)},
+        {"run_id": args.run_id, "artifact": "mask_export_manifest", "path": str(args.mask_export_manifest)},
+        {"run_id": args.run_id, "artifact": "mask_export_summary", "path": str(args.mask_export_summary)},
+        {"run_id": args.run_id, "artifact": "mask_export_summary_csv", "path": str(args.mask_export_summary_csv)},
+        {"run_id": args.run_id, "artifact": "mask_figure_dir", "path": str(args.mask_figure_dir)},
     ]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as file:

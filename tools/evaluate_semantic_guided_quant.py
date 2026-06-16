@@ -10,6 +10,7 @@ import json
 import math
 from pathlib import Path
 import re
+import shutil
 import sys
 import time
 from typing import Any
@@ -323,9 +324,13 @@ def parse_args() -> argparse.Namespace:
         allow_abbrev=False,
     )
     parser.add_argument("--checkpoint", action="append", default=[], metavar="NAME=PATH")
-    parser.add_argument("--modes", default=",".join(SUPPORTED_MODES), help=f"Comma-separated modes: {SUPPORTED_MODES}")
+    parser.add_argument("--modes", default="fp32,awq_w8a8", help=f"Comma-separated modes: {SUPPORTED_MODES}")
+    parser.add_argument("--run-id", default=None, help="Optional run identifier stored in exported artifact metadata.")
     parser.add_argument("--output-dir", type=Path, default=TABLES_DIR / "semantic_guided_cgaf_quant_eval")
     parser.add_argument("--summary-filename", default="semantic_guided_cgaf_quant_summary.csv")
+    parser.add_argument("--model-size-filename", default="semantic_guided_cgaf_model_size_by_quant_mode.csv")
+    parser.add_argument("--checkpoint-export-dir", type=Path, default=None)
+    parser.add_argument("--checkpoint-export-manifest", type=Path, default=None)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--num-workers", type=int, default=0)
@@ -461,6 +466,8 @@ def main() -> None:
     print(EMULATION_NOTE, flush=True)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     summary_rows: list[dict[str, Any]] = []
+    checkpoint_export_rows: list[dict[str, Any]] = []
+    model_size_rows: list[dict[str, Any]] = []
 
     for checkpoint_spec in checkpoint_specs:
         checkpoint = load_checkpoint_payload(checkpoint_spec.path, map_location=torch.device("cpu"))
@@ -488,6 +495,22 @@ def main() -> None:
         )
         for warning in checkpoint_validation["warnings"]:
             print(f"WARNING {checkpoint_spec.name}: {warning}", file=sys.stderr, flush=True)
+        fp32_reference_bytes = fp32_state_tensor_bytes(build_and_load_model(checkpoint, model_config).state_dict())
+
+        raw_checkpoint_artifact_path = export_raw_checkpoint_artifact(args, checkpoint_spec)
+        if raw_checkpoint_artifact_path is not None:
+            checkpoint_export_rows.append(
+                checkpoint_export_row(
+                    args=args,
+                    checkpoint_spec=checkpoint_spec,
+                    mode="fp32",
+                    artifact_path=raw_checkpoint_artifact_path,
+                    artifact_kind="raw_checkpoint_copy",
+                    quant_metadata=fp32_quant_metadata(skip_patterns=skip_patterns),
+                    calibration_result=None,
+                    model_config=model_config,
+                )
+            )
 
         calibration_result: CalibrationResult | None = None
         if needs_calibration:
@@ -531,6 +554,43 @@ def main() -> None:
                 max_batches=args.max_eval_batches,
                 desc=f"{checkpoint_spec.name} {mode}",
             )
+            checkpoint_artifact_path = raw_checkpoint_artifact_path
+            if mode_spec.is_quantized:
+                checkpoint_artifact_path = export_emulated_quant_checkpoint_artifact(
+                    args=args,
+                    checkpoint_spec=checkpoint_spec,
+                    source_checkpoint=checkpoint,
+                    model=model,
+                    mode=mode,
+                    model_config=model_config,
+                    quant_metadata=quant_metadata,
+                    checkpoint_validation=checkpoint_validation,
+                    calibration_result=calibration_result,
+                    metrics=metrics,
+                )
+                if checkpoint_artifact_path is not None:
+                    checkpoint_export_rows.append(
+                        checkpoint_export_row(
+                            args=args,
+                            checkpoint_spec=checkpoint_spec,
+                            mode=mode,
+                            artifact_path=checkpoint_artifact_path,
+                            artifact_kind="emulated_quant_checkpoint",
+                            quant_metadata=quant_metadata,
+                            calibration_result=calibration_result,
+                            model_config=model_config,
+                        )
+                    )
+            model_size_rows.append(
+                model_size_row(
+                    checkpoint_name=checkpoint_spec.name,
+                    mode=mode,
+                    model=model,
+                    quant_metadata=quant_metadata,
+                    fp32_reference_bytes=fp32_reference_bytes,
+                    checkpoint_artifact_path=checkpoint_artifact_path,
+                )
+            )
             payload = build_payload(
                 args=args,
                 checkpoint_spec=checkpoint_spec,
@@ -542,6 +602,7 @@ def main() -> None:
                 metrics=metrics,
                 eval_dataset_size=len(eval_loader.dataset),
                 calibration_dataset_size=len(calibration_loader.dataset) if calibration_loader is not None else None,
+                checkpoint_artifact_path=checkpoint_artifact_path,
             )
             json_path = args.output_dir / f"{checkpoint_spec.name}_{mode}_metrics.json"
             write_json(payload, json_path)
@@ -557,6 +618,13 @@ def main() -> None:
     summary_path = args.output_dir / args.summary_filename
     write_summary_csv(summary_rows, summary_path)
     print(f"Wrote summary CSV: {summary_path}", flush=True)
+    model_size_path = args.output_dir / args.model_size_filename
+    write_summary_csv(model_size_rows, model_size_path)
+    print(f"Wrote model-size CSV: {model_size_path}", flush=True)
+    checkpoint_export_manifest = resolved_checkpoint_export_manifest(args)
+    if checkpoint_export_manifest is not None:
+        write_summary_csv(checkpoint_export_rows, checkpoint_export_manifest)
+        print(f"Wrote checkpoint export manifest: {checkpoint_export_manifest}", flush=True)
 
 
 def build_semantic_loader(
@@ -747,7 +815,15 @@ def infer_model_config(
 
 
 def build_and_load_model(checkpoint: Any, model_config: ModelConfig) -> nn.Module:
-    model = build_semantic_guided_cgaf_cnn(
+    model = build_model_from_config(model_config)
+    state = {strip_parallel_prefix(key): value for key, value in extract_state_dict(checkpoint).items()}
+    model.load_state_dict(state, strict=True)
+    model.eval()
+    return model
+
+
+def build_model_from_config(model_config: ModelConfig) -> nn.Module:
+    return build_semantic_guided_cgaf_cnn(
         num_segmentation_classes=model_config.num_segmentation_classes,
         num_scene_classes=model_config.num_scene_classes,
         backbone_name=model_config.backbone_name,
@@ -759,10 +835,90 @@ def build_and_load_model(checkpoint: Any, model_config: ModelConfig) -> nn.Modul
         scene_dropout=model_config.scene_dropout,
         ignore_index=SEMANTIC_IGNORE_INDEX,
     )
-    state = {strip_parallel_prefix(key): value for key, value in extract_state_dict(checkpoint).items()}
+
+
+def model_config_from_export_metadata(payload: dict[str, Any]) -> ModelConfig:
+    raw_config = payload.get("model_config")
+    if not isinstance(raw_config, dict):
+        raise ValueError("Emulated quant checkpoint is missing model_config metadata")
+    return ModelConfig(
+        backbone_name=str(raw_config["backbone_name"]),
+        fpn_channels=int(raw_config["fpn_channels"]),
+        shallow_channels=None if raw_config.get("shallow_channels") is None else int(raw_config["shallow_channels"]),
+        scene_hidden_dim=int(raw_config["scene_hidden_dim"]),
+        scene_dropout=float(raw_config["scene_dropout"]),
+        num_segmentation_classes=int(raw_config["num_segmentation_classes"]),
+        num_scene_classes=int(raw_config["num_scene_classes"]),
+        mask_source=str(raw_config["mask_source"]),
+        segmentation_classes=[str(value) for value in raw_config["segmentation_classes"]],
+        scene_class_names=[str(value) for value in raw_config["scene_class_names"]],
+        checkpoint_epoch=None if raw_config.get("checkpoint_epoch") is None else int(raw_config["checkpoint_epoch"]),
+        checkpoint_architecture=None if raw_config.get("checkpoint_architecture") is None else str(raw_config["checkpoint_architecture"]),
+    )
+
+
+def build_emulated_quant_model_from_checkpoint(payload: Any) -> tuple[nn.Module, ModelConfig]:
+    if not isinstance(payload, dict):
+        raise ValueError("Emulated quant checkpoint payload must be a dictionary")
+    if payload.get("export_format") != "semantic_guided_emulated_quant_checkpoint_v1":
+        raise ValueError("Checkpoint is not a semantic_guided_emulated_quant_checkpoint_v1 artifact")
+    quantization = payload.get("quantization")
+    if not isinstance(quantization, dict) or not quantization.get("mode"):
+        raise ValueError("Emulated quant checkpoint is missing quantization metadata")
+    model_config = model_config_from_export_metadata(payload)
+    model = build_model_from_config(model_config)
+    apply_emulated_quant_wrappers_from_metadata(model, quantization)
+    state = require_tensor_state_dict(payload.get("model_state_dict"))
+    state = {strip_parallel_prefix(key): value for key, value in state.items()}
     model.load_state_dict(state, strict=True)
     model.eval()
-    return model
+    return model, model_config
+
+
+def apply_emulated_quant_wrappers_from_metadata(model: nn.Module, quantization: dict[str, Any]) -> None:
+    wrapped_names = set(str(name) for name in quantization.get("wrapped_names", []))
+    if not wrapped_names:
+        raise ValueError("Emulated quant checkpoint metadata does not list wrapped_names")
+    weight_bits = int(quantization.get("weight_bits") or 0)
+    if weight_bits not in (4, 8):
+        raise ValueError(f"Unsupported exported weight_bits={weight_bits!r}")
+    awq_enabled = bool(quantization.get("awq_enabled"))
+    found_names: set[str] = set()
+
+    def visit(parent: nn.Module, prefix: str = "") -> None:
+        for child_name, child in list(parent.named_children()):
+            full_name = f"{prefix}.{child_name}" if prefix else child_name
+            if full_name in wrapped_names:
+                awq_input_scale = torch.ones(input_channel_count(child), dtype=torch.float32) if awq_enabled else None
+                if isinstance(child, nn.Conv2d):
+                    replacement: nn.Module = EmulatedQuantizedConv2d(
+                        child,
+                        name=full_name,
+                        weight_bits=weight_bits,
+                        activation_min=0.0,
+                        activation_max=1.0,
+                        awq_input_scale=awq_input_scale,
+                    )
+                elif isinstance(child, nn.Linear):
+                    replacement = EmulatedQuantizedLinear(
+                        child,
+                        name=full_name,
+                        weight_bits=weight_bits,
+                        activation_min=0.0,
+                        activation_max=1.0,
+                        awq_input_scale=awq_input_scale,
+                    )
+                else:
+                    raise TypeError(f"Cannot apply exported quant wrapper to {full_name}: {type(child).__name__}")
+                setattr(parent, child_name, replacement)
+                found_names.add(full_name)
+                continue
+            visit(child, full_name)
+
+    visit(model)
+    missing = sorted(wrapped_names - found_names)
+    if missing:
+        raise RuntimeError(f"Exported quant checkpoint listed modules not present in model: {missing[:20]}")
 
 
 def extract_state_dict(checkpoint: Any) -> dict[str, Tensor]:
@@ -999,8 +1155,8 @@ def evaluate_model(
     for batch_index, (images, masks, scene_labels) in enumerate(progress, start=1):
         images = images.to(device, non_blocking=True)
         outputs = model(images, return_scene=True)
-        scene_predictions = outputs["scene_logits"].argmax(dim=1).cpu()
-        segmentation_predictions = outputs["segmentation_logits"].argmax(dim=1).cpu()
+        scene_predictions = outputs["scene_logits"].float().argmax(dim=1).cpu()
+        segmentation_predictions = outputs["segmentation_logits"].float().argmax(dim=1).cpu()
         scene_confusion += batch_confusion(scene_predictions, scene_labels.cpu(), len(scene_class_names), ignore_index=None)
         segmentation_confusion += batch_confusion(segmentation_predictions, masks.cpu(), len(segmentation_class_names_), ignore_index=SEMANTIC_IGNORE_INDEX)
         observed_batches += 1
@@ -1037,16 +1193,20 @@ def build_payload(
     metrics: dict[str, Any],
     eval_dataset_size: int,
     calibration_dataset_size: int | None,
+    checkpoint_artifact_path: Path | None,
 ) -> dict[str, Any]:
     return {
+        "run_id": args.run_id,
         "checkpoint_name": checkpoint_spec.name,
         "checkpoint_path": str(checkpoint_spec.path),
+        "checkpoint_artifact_path": None if checkpoint_artifact_path is None else str(checkpoint_artifact_path),
         "mode": mode,
         "emulation_note": EMULATION_NOTE,
         "model_config": model_config.to_dict(),
         "checkpoint_validation": {**checkpoint_validation, "trusted_checkpoint_note": TRUSTED_CHECKPOINT_NOTE},
         "data": {
             "mask_source": args.mask_source,
+            "segmentation_reference_note": f"Segmentation metrics are agreement with {args.mask_source} pseudo-masks, not human ground truth.",
             "manifest_path": str(args.manifest_path) if args.manifest_path is not None else None,
             "calibration_split": args.calibration_split,
             "eval_split": args.eval_split,
@@ -1064,6 +1224,170 @@ def build_payload(
     }
 
 
+def resolved_checkpoint_export_manifest(args: argparse.Namespace) -> Path | None:
+    if args.checkpoint_export_manifest is not None:
+        return args.checkpoint_export_manifest
+    if args.checkpoint_export_dir is None:
+        return None
+    return args.checkpoint_export_dir / "semantic_guided_cgaf_checkpoint_export_manifest.csv"
+
+
+def export_raw_checkpoint_artifact(args: argparse.Namespace, checkpoint_spec: CheckpointSpec) -> Path | None:
+    if args.checkpoint_export_dir is None:
+        return None
+    export_path = args.checkpoint_export_dir / "raw" / f"{checkpoint_spec.name}_raw.pt"
+    export_path.parent.mkdir(parents=True, exist_ok=True)
+    source = checkpoint_spec.path.resolve()
+    destination = export_path.resolve()
+    if source != destination:
+        shutil.copy2(source, destination)
+    return export_path
+
+
+def export_emulated_quant_checkpoint_artifact(
+    *,
+    args: argparse.Namespace,
+    checkpoint_spec: CheckpointSpec,
+    source_checkpoint: Any,
+    model: nn.Module,
+    mode: str,
+    model_config: ModelConfig,
+    quant_metadata: dict[str, Any],
+    checkpoint_validation: dict[str, Any],
+    calibration_result: CalibrationResult | None,
+    metrics: dict[str, Any],
+) -> Path | None:
+    if args.checkpoint_export_dir is None:
+        return None
+    export_path = args.checkpoint_export_dir / mode / f"{checkpoint_spec.name}_{mode}.pt"
+    export_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "architecture": "semantic_guided_cgaf",
+        "model": "semantic_guided_cgaf",
+        "model_display_name": "Semantic-Guided CG-AF CNN",
+        "export_format": "semantic_guided_emulated_quant_checkpoint_v1",
+        "run_id": args.run_id,
+        "created_at": datetime_now_iso(),
+        "source_checkpoint_name": checkpoint_spec.name,
+        "source_checkpoint_path": str(checkpoint_spec.path),
+        "source_checkpoint_epoch": source_checkpoint.get("epoch") if isinstance(source_checkpoint, dict) else None,
+        "mode": mode,
+        "emulation_note": EMULATION_NOTE,
+        "trusted_checkpoint_note": TRUSTED_CHECKPOINT_NOTE,
+        "model_config": model_config.to_dict(),
+        "quantization": quant_metadata,
+        "calibration": None if calibration_result is None else calibration_result.to_metadata(include_module_stats=True),
+        "checkpoint_validation": checkpoint_validation,
+        "metrics_vs_sam3": metrics,
+        "data": {
+            "mask_source": args.mask_source,
+            "segmentation_reference_note": f"Segmentation metrics are agreement with {args.mask_source} pseudo-masks, not human ground truth.",
+            "manifest_path": str(args.manifest_path) if args.manifest_path is not None else None,
+            "calibration_split": args.calibration_split,
+            "eval_split": args.eval_split,
+            "image_size": args.image_size,
+        },
+        "model_state_dict": state_dict_to_cpu(model.state_dict()),
+    }
+    build_emulated_quant_model_from_checkpoint(payload)
+    torch.save(payload, export_path)
+    return export_path
+
+
+def checkpoint_export_row(
+    *,
+    args: argparse.Namespace,
+    checkpoint_spec: CheckpointSpec,
+    mode: str,
+    artifact_path: Path,
+    artifact_kind: str,
+    quant_metadata: dict[str, Any],
+    calibration_result: CalibrationResult | None,
+    model_config: ModelConfig,
+) -> dict[str, Any]:
+    calibration = None if calibration_result is None else calibration_result.to_metadata(include_module_stats=False)
+    return {
+        "run_id": args.run_id,
+        "checkpoint_name": checkpoint_spec.name,
+        "variant": f"{checkpoint_spec.name}_{mode}",
+        "mode": mode,
+        "artifact_kind": artifact_kind,
+        "artifact_path": str(artifact_path),
+        "source_checkpoint_path": str(checkpoint_spec.path),
+        "mask_source": args.mask_source,
+        "manifest_path": str(args.manifest_path) if args.manifest_path is not None else None,
+        "calibration_split": args.calibration_split if MODE_SPECS[mode].is_quantized else None,
+        "calibration_batches": None if calibration is None else calibration.get("observed_batches"),
+        "calibration_images": None if calibration is None else calibration.get("observed_images"),
+        "eval_split": args.eval_split,
+        "weight_bits": quant_metadata.get("weight_bits"),
+        "activation_bits": quant_metadata.get("activation_bits"),
+        "awq_enabled": quant_metadata.get("awq_enabled"),
+        "wrapped_count": quant_metadata.get("wrapped_count"),
+        "model_config": json.dumps(model_config.to_dict(), sort_keys=True),
+        "emulation_note": quant_metadata.get("emulation_note"),
+    }
+
+
+def model_size_row(
+    *,
+    checkpoint_name: str,
+    mode: str,
+    model: nn.Module,
+    quant_metadata: dict[str, Any],
+    fp32_reference_bytes: int,
+    checkpoint_artifact_path: Path | None,
+) -> dict[str, Any]:
+    state = model.state_dict()
+    state_bytes = fp32_state_tensor_bytes(state)
+    theoretical_bytes = theoretical_packed_state_bytes(state, quant_metadata)
+    return {
+        "checkpoint": checkpoint_name,
+        "mode": mode,
+        "checkpoint_artifact_path": None if checkpoint_artifact_path is None else str(checkpoint_artifact_path),
+        "weight_bits": quant_metadata.get("weight_bits"),
+        "activation_bits": quant_metadata.get("activation_bits"),
+        "awq_enabled": quant_metadata.get("awq_enabled"),
+        "state_tensor_mib_emulated": bytes_to_mib(state_bytes),
+        "state_tensor_mib_theoretical_packed": bytes_to_mib(theoretical_bytes),
+        "compression_vs_fp32_tensor": compression_label(fp32_reference_bytes, state_bytes),
+        "compression_vs_fp32_theoretical": compression_label(fp32_reference_bytes, theoretical_bytes),
+    }
+
+
+def state_dict_to_cpu(state: dict[str, Tensor]) -> dict[str, Tensor]:
+    return {key: tensor.detach().cpu() for key, tensor in state.items()}
+
+
+def fp32_state_tensor_bytes(state: dict[str, Tensor]) -> int:
+    return int(sum(tensor.numel() * tensor.element_size() for tensor in state.values()))
+
+
+def theoretical_packed_state_bytes(state: dict[str, Tensor], quant_metadata: dict[str, Any]) -> int:
+    weight_bits = quant_metadata.get("weight_bits")
+    total = 0
+    for name, tensor in state.items():
+        if weight_bits == 4 and name.endswith("qweight"):
+            total += math.ceil(tensor.numel() * 4 / 8)
+        else:
+            total += tensor.numel() * tensor.element_size()
+    return int(total)
+
+
+def bytes_to_mib(value: int) -> float:
+    return float(value) / float(1024**2)
+
+
+def compression_label(reference_bytes: int, candidate_bytes: int) -> str:
+    if candidate_bytes <= 0:
+        return "n/a"
+    return f"{reference_bytes / candidate_bytes:.3f}x"
+
+
+def datetime_now_iso() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
 def summary_row(payload: dict[str, Any]) -> dict[str, Any]:
     classification = payload["metrics"]["classification"]
     segmentation = payload["metrics"]["segmentation"]
@@ -1074,7 +1398,10 @@ def summary_row(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "checkpoint_name": payload["checkpoint_name"],
         "checkpoint_path": payload["checkpoint_path"],
+        "checkpoint_artifact_path": payload.get("checkpoint_artifact_path"),
         "mode": payload["mode"],
+        "mask_source": payload["data"].get("mask_source"),
+        "segmentation_reference_note": payload["data"].get("segmentation_reference_note"),
         "weight_bits": quantization.get("weight_bits"),
         "activation_bits": quantization.get("activation_bits"),
         "awq_enabled": quantization.get("awq_enabled"),
