@@ -82,6 +82,9 @@ def save_confusion_matrix_plot(
 ) -> None:
     """Save a labelled confusion matrix heatmap."""
 
+    import matplotlib
+
+    matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     import seaborn as sns
 

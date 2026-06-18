@@ -24,32 +24,67 @@ def _import_torchvision():
     return datasets, transforms
 
 
-def build_train_transform(image_size: int = IMAGE_SIZE):
+def _resolve_interpolation(transforms, interpolation: str):
+    """Resolve a string interpolation name to a torchvision InterpolationMode."""
+
+    normalized = interpolation.lower().replace("_", "-")
+    mapping = {
+        "nearest": transforms.InterpolationMode.NEAREST,
+        "bilinear": transforms.InterpolationMode.BILINEAR,
+        "bicubic": transforms.InterpolationMode.BICUBIC,
+        "box": transforms.InterpolationMode.BOX,
+        "hamming": transforms.InterpolationMode.HAMMING,
+        "lanczos": transforms.InterpolationMode.LANCZOS,
+    }
+    if normalized not in mapping:
+        supported = ", ".join(sorted(mapping))
+        raise ValueError(f"Unsupported interpolation '{interpolation}'. Use one of: {supported}.")
+    return mapping[normalized]
+
+
+def build_train_transform(
+    image_size: int = IMAGE_SIZE,
+    mean: tuple[float, float, float] = IMAGENET_MEAN,
+    std: tuple[float, float, float] = IMAGENET_STD,
+    interpolation: str = "bilinear",
+):
     """Build augmentation transform for training images."""
 
     _, transforms = _import_torchvision()
+    resize_interpolation = _resolve_interpolation(transforms, interpolation)
     return transforms.Compose(
         [
-            transforms.RandomResizedCrop(image_size, scale=(0.75, 1.0), ratio=(0.9, 1.1)),
+            transforms.RandomResizedCrop(
+                image_size,
+                scale=(0.75, 1.0),
+                ratio=(0.9, 1.1),
+                interpolation=resize_interpolation,
+            ),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
             transforms.RandomRotation(degrees=20),
             transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.1, hue=0.03),
             transforms.ToTensor(),
-            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+            transforms.Normalize(mean, std),
         ]
     )
 
 
-def build_eval_transform(image_size: int = IMAGE_SIZE):
+def build_eval_transform(
+    image_size: int = IMAGE_SIZE,
+    mean: tuple[float, float, float] = IMAGENET_MEAN,
+    std: tuple[float, float, float] = IMAGENET_STD,
+    interpolation: str = "bilinear",
+):
     """Build deterministic preprocessing transform for validation/test images."""
 
     _, transforms = _import_torchvision()
+    resize_interpolation = _resolve_interpolation(transforms, interpolation)
     return transforms.Compose(
         [
-            transforms.Resize((image_size, image_size)),
+            transforms.Resize((image_size, image_size), interpolation=resize_interpolation),
             transforms.ToTensor(),
-            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+            transforms.Normalize(mean, std),
         ]
     )
 
@@ -59,6 +94,9 @@ def build_imagefolder_datasets(
     train_dir: Path = TRAIN_DIR,
     val_dir: Path = VAL_DIR,
     image_size: int = IMAGE_SIZE,
+    mean: tuple[float, float, float] = IMAGENET_MEAN,
+    std: tuple[float, float, float] = IMAGENET_STD,
+    interpolation: str = "bilinear",
 ):
     """Create ImageFolder train and validation datasets."""
 
@@ -68,8 +106,24 @@ def build_imagefolder_datasets(
     if not val_dir.exists():
         raise FileNotFoundError(f"Validation directory not found: {val_dir}")
 
-    train_dataset = datasets.ImageFolder(train_dir, transform=build_train_transform(image_size))
-    val_dataset = datasets.ImageFolder(val_dir, transform=build_eval_transform(image_size))
+    train_dataset = datasets.ImageFolder(
+        train_dir,
+        transform=build_train_transform(
+            image_size,
+            mean=mean,
+            std=std,
+            interpolation=interpolation,
+        ),
+    )
+    val_dataset = datasets.ImageFolder(
+        val_dir,
+        transform=build_eval_transform(
+            image_size,
+            mean=mean,
+            std=std,
+            interpolation=interpolation,
+        ),
+    )
 
     if train_dataset.class_to_idx != val_dataset.class_to_idx:
         raise ValueError(
@@ -88,6 +142,9 @@ def build_dataloaders(
     batch_size: int = 16,
     num_workers: int = 0,
     pin_memory: bool = False,
+    mean: tuple[float, float, float] = IMAGENET_MEAN,
+    std: tuple[float, float, float] = IMAGENET_STD,
+    interpolation: str = "bilinear",
 ):
     """Create train and validation DataLoaders."""
 
@@ -95,6 +152,9 @@ def build_dataloaders(
         train_dir=train_dir,
         val_dir=val_dir,
         image_size=image_size,
+        mean=mean,
+        std=std,
+        interpolation=interpolation,
     )
 
     train_loader = DataLoader(
@@ -149,6 +209,9 @@ def build_internal_split_dataloaders(
     num_workers: int = 0,
     pin_memory: bool = False,
     seed: int = RANDOM_SEED,
+    mean: tuple[float, float, float] = IMAGENET_MEAN,
+    std: tuple[float, float, float] = IMAGENET_STD,
+    interpolation: str = "bilinear",
 ):
     """Create train/tune loaders from `data/train` without touching held-out validation."""
 
@@ -156,8 +219,24 @@ def build_internal_split_dataloaders(
     if not train_dir.exists():
         raise FileNotFoundError(f"Training directory not found: {train_dir}")
 
-    train_dataset_full = datasets.ImageFolder(train_dir, transform=build_train_transform(image_size))
-    tune_dataset_full = datasets.ImageFolder(train_dir, transform=build_eval_transform(image_size))
+    train_dataset_full = datasets.ImageFolder(
+        train_dir,
+        transform=build_train_transform(
+            image_size,
+            mean=mean,
+            std=std,
+            interpolation=interpolation,
+        ),
+    )
+    tune_dataset_full = datasets.ImageFolder(
+        train_dir,
+        transform=build_eval_transform(
+            image_size,
+            mean=mean,
+            std=std,
+            interpolation=interpolation,
+        ),
+    )
     train_indices, tune_indices = stratified_split_indices(
         train_dataset_full.targets,
         val_ratio=tune_ratio,

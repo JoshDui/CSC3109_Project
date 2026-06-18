@@ -4,14 +4,16 @@ This folder contains dataset inspection, split, and dataloader utilities.
 
 Current files:
 
-- `eda_summary.py`: generates dataset EDA summaries.
 - `create_split_manifest.py`: creates a deterministic stratified train/validation split CSV without moving or copying raw images.
 - `dataloaders.py`: loads images from the split manifest and applies deterministic ResNet preprocessing.
 - `inspect_dataset.py`: prints basic image counts.
+
+EDA is notebook-first in this project. Use `notebooks/01_dataset_eda.ipynb` for
+dataset inspection and for generating the report-ready EDA artifacts under
+`reports/tables/` and `reports/figures/`.
 
 First baseline rule:
 
 - Do not use stochastic data augmentation.
 - Do not modify raw image folders.
 - Use the manifest to control train/validation membership.
-

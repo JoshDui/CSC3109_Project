@@ -20,3 +20,5 @@ Keep final report evidence here:
 - Model comparison tables.
 - Streamlit and Docker screenshots.
 
+The canonical EDA notebook (`notebooks/01_dataset_eda.ipynb`) writes the main
+EDA artifacts to this folder.

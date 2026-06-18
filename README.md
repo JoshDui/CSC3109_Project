@@ -50,9 +50,29 @@ uv run python -m src.data.inspect_dataset
 Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`. The
 project targets the Python version in `.python-version`.
 
+### JupyterLab for notebooks and collaboration
+
+Start a uv-managed JupyterLab server from the repository root:
+
+```bash
+bash scripts/run_jupyter_server.sh
+```
+
+The launcher enables JupyterLab collaboration, does not open a browser, and
+serves notebooks from the project root. It defaults to `127.0.0.1:8888` and
+accepts environment overrides plus extra Jupyter CLI arguments:
+
+```bash
+JUPYTER_HOST=0.0.0.0 JUPYTER_PORT=8890 JUPYTER_TOKEN="$(openssl rand -hex 32)" \
+  bash scripts/run_jupyter_server.sh --ServerApp.allow_remote_access=True
+```
+
+Share the displayed Jupyter URL/token only with trusted collaborators. If
+`JUPYTER_TOKEN` is set, that token is passed to Jupyter; otherwise Jupyter
+generates and prints its usual access URL.
+
 ## Notes
 
 - Do not commit the actual dataset unless the team has confirmed it is allowed.
 - Do not commit large trained model files unless required by the final submission.
 - Keep all experiment results reproducible by recording the model settings and metrics.
-
