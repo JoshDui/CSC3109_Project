@@ -71,6 +71,65 @@ def build_resnet18_preprocess():
     return ResNet18_Weights.DEFAULT.transforms()
 
 
+def create_manifest_loader(
+    manifest_path: Path,
+    split: str,
+    *,
+    batch_size: int = 32,
+    num_workers: int = 0,
+    shuffle: bool = False,
+    seed: int = 42,
+    transform=None,
+) -> DataLoader:
+    dataset = ManifestImageDataset(manifest_path, split=split, transform=transform)
+    generator = torch.Generator()
+    generator.manual_seed(seed)
+    pin_memory = torch.cuda.is_available()
+    return DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        generator=generator if shuffle else None,
+    )
+
+
+def create_manifest_dataloaders(
+    manifest_path: Path = SPLIT_MANIFEST_PATH,
+    *,
+    train_split: str = "train",
+    eval_split: str = "val",
+    batch_size: int = 32,
+    num_workers: int = 0,
+    seed: int = 42,
+    train_transform=None,
+    eval_transform=None,
+) -> tuple[DataLoader, DataLoader]:
+    if eval_transform is None:
+        eval_transform = train_transform
+
+    train_loader = create_manifest_loader(
+        manifest_path,
+        train_split,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        shuffle=True,
+        seed=seed,
+        transform=train_transform,
+    )
+    eval_loader = create_manifest_loader(
+        manifest_path,
+        eval_split,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        shuffle=False,
+        seed=seed,
+        transform=eval_transform,
+    )
+    return train_loader, eval_loader
+
+
 def create_dataloaders(
     manifest_path: Path = SPLIT_MANIFEST_PATH,
     batch_size: int = 32,
@@ -78,30 +137,16 @@ def create_dataloaders(
     seed: int = 42,
 ) -> tuple[DataLoader, DataLoader]:
     preprocess = build_resnet18_preprocess()
-
-    train_dataset = ManifestImageDataset(manifest_path, split="train", transform=preprocess)
-    val_dataset = ManifestImageDataset(manifest_path, split="val", transform=preprocess)
-
-    generator = torch.Generator()
-    generator.manual_seed(seed)
-    pin_memory = torch.cuda.is_available()
-
-    train_loader = DataLoader(
-        train_dataset,
+    return create_manifest_dataloaders(
+        manifest_path,
+        train_split="train",
+        eval_split="val",
         batch_size=batch_size,
-        shuffle=True,
         num_workers=num_workers,
-        pin_memory=pin_memory,
-        generator=generator,
+        seed=seed,
+        train_transform=preprocess,
+        eval_transform=preprocess,
     )
-    val_loader = DataLoader(
-        val_dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-    )
-    return train_loader, val_loader
 
 
 def class_names() -> list[str]:
