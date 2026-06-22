@@ -150,6 +150,21 @@ augmentation as the augmented frozen run, but unfreezes `layer4` and the
 classifier head. It uses a smaller learning rate for `layer4` than for `fc` to
 adapt the pretrained features conservatively.
 
+For stricter internal validation, first create contiguous-block split manifests:
+
+```powershell
+python -m src.data.create_strict_split_manifests --seeds 42 123 999
+```
+
+Then run the fine-tuned ResNet18 on each manifest with a unique artifact prefix:
+
+```powershell
+python -m src.training.train_resnet18_finetune_last_block `
+  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --seed 42 `
+  --artifact-prefix resnet18_finetune_last_block_strict_seed42
+```
+
 ## Custom CNN from scratch
 
 Run the small from-scratch CNN baseline:

@@ -5,6 +5,7 @@ This folder contains dataset inspection, split, and dataloader utilities.
 Current files:
 
 - `create_split_manifest.py`: creates a deterministic stratified train/validation split CSV without moving or copying raw images.
+- `create_strict_split_manifests.py`: creates stricter validation manifests by holding out contiguous filename blocks per class.
 - `dataloaders.py`: loads images from the split manifest and applies deterministic ResNet preprocessing.
 - `resnet_augmented_dataloaders.py`: loads the same manifest split but applies stochastic augmentation to the training split only.
 - `inspect_dataset.py`: prints basic image counts.

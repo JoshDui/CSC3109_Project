@@ -69,6 +69,7 @@ def save_confusion_matrix(labels: list[int], predictions: list[int], output_path
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Fine-tune ResNet18 by unfreezing only layer4 and the classifier.")
     parser.add_argument("--manifest", type=Path, default=SPLIT_MANIFEST_PATH)
+    parser.add_argument("--artifact-prefix", default=ARTIFACT_PREFIX)
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--layer4-learning-rate", type=float, default=1e-4)
@@ -148,7 +149,7 @@ def main() -> None:
         raise RuntimeError("Training did not produce a checkpoint.")
 
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
-    checkpoint_path = MODEL_DIR / f"{ARTIFACT_PREFIX}.pt"
+    checkpoint_path = MODEL_DIR / f"{args.artifact_prefix}.pt"
     checkpoint_relative_path = checkpoint_path.relative_to(PROJECT_ROOT).as_posix()
     augmentation_config = _json_safe_augmentation_config()
 
@@ -156,6 +157,7 @@ def main() -> None:
     metrics.update(
         {
             "model": "resnet18",
+            "artifact_prefix": args.artifact_prefix,
             "training_strategy": "fine_tune_last_block",
             "trainable_modules": ["layer4", "fc"],
             "frozen_modules": ["conv1", "bn1", "layer1", "layer2", "layer3"],
@@ -202,9 +204,10 @@ def main() -> None:
     )
 
     save_json(
-        MODEL_DIR / f"{ARTIFACT_PREFIX}_metadata.json",
+        MODEL_DIR / f"{args.artifact_prefix}_metadata.json",
         {
             "model": "resnet18",
+            "artifact_prefix": args.artifact_prefix,
             "training_strategy": "fine_tune_last_block",
             "image_size": IMAGE_SIZE,
             "normalization": "imagenet",
@@ -220,10 +223,10 @@ def main() -> None:
             "checkpoint": checkpoint_relative_path,
         },
     )
-    save_json(TABLES_DIR / f"{ARTIFACT_PREFIX}_metrics.json", metrics)
-    save_json(TABLES_DIR / f"{ARTIFACT_PREFIX}_history.json", history)
-    save_confusion_matrix(final_labels, final_predictions, FIGURES_DIR / f"{ARTIFACT_PREFIX}_confusion_matrix.png")
-    save_training_curves(history, FIGURES_DIR / f"{ARTIFACT_PREFIX}_training_curves.png")
+    save_json(TABLES_DIR / f"{args.artifact_prefix}_metrics.json", metrics)
+    save_json(TABLES_DIR / f"{args.artifact_prefix}_history.json", history)
+    save_confusion_matrix(final_labels, final_predictions, FIGURES_DIR / f"{args.artifact_prefix}_confusion_matrix.png")
+    save_training_curves(history, FIGURES_DIR / f"{args.artifact_prefix}_training_curves.png")
 
 
 if __name__ == "__main__":
