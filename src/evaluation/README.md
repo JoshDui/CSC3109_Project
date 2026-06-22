@@ -8,6 +8,8 @@ Current evaluation files:
 - `evaluate_swin.py` — evaluates a saved Swin checkpoint on a labelled image folder.
 - `evaluate_timm_classifier.py` — evaluates a saved generic `timm`/DINOv2 checkpoint.
 
+- `evaluate_resnet18_finetune.py` - evaluates the fine-tuned ResNet18 last-block checkpoint.
+
 Evaluate the trained Swin-Tiny checkpoint:
 
 ```bash
@@ -49,6 +51,26 @@ python -m src.evaluation.evaluate_timm_classifier `
 
 Do not report internal sanity-check metrics as final held-out validation
 performance.
+
+Evaluate the fine-tuned ResNet18 last-block checkpoint on the newer held-out
+validation folder:
+
+```powershell
+python -m src.evaluation.evaluate_resnet18_finetune `
+  --checkpoint model/resnet18_finetune_last_block.pt `
+  --data-dir data/raw/val `
+  --output-dir reports/resnet18_finetune_last_block_raw_val_eval `
+  --device cuda
+```
+
+This evaluator writes:
+
+```text
+reports/resnet18_finetune_last_block_raw_val_eval/
+  metrics.json
+  confusion_matrix.png
+  predictions.csv
+```
 
 Suggested files for later phases:
 

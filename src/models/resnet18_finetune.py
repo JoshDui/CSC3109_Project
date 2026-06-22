@@ -4,8 +4,11 @@ from torchvision.models import ResNet18_Weights, resnet18
 from src.config import NUM_CLASSES
 
 
-def build_resnet18_finetune_last_block(num_classes: int = NUM_CLASSES) -> nn.Module:
-    model = resnet18(weights=ResNet18_Weights.DEFAULT)
+def build_resnet18_finetune_last_block(
+    num_classes: int = NUM_CLASSES,
+    weights: ResNet18_Weights | None = ResNet18_Weights.DEFAULT,
+) -> nn.Module:
+    model = resnet18(weights=weights)
 
     for parameter in model.parameters():
         parameter.requires_grad = False
