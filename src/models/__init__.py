@@ -8,6 +8,11 @@ from src.models.swin_transformer import (
     build_swin_classifier,
     build_swin_tiny_classifier,
 )
+from src.models.custom_cnn import (
+    CUSTOM_CNN_SMALL,
+    CustomCnnSpec,
+    build_custom_cnn,
+)
 from src.models.timm_classifier import (
     DINOV2_BASE,
     DINOV2_BASE_REG,
@@ -32,6 +37,8 @@ __all__ = [
     "SWIN_TINY",
     "SWIN_VARIANTS",
     "SwinModelSpec",
+    "CUSTOM_CNN_SMALL",
+    "CustomCnnSpec",
     "DINOV2_BASE",
     "DINOV2_BASE_REG",
     "DINOV2_SMALL",
@@ -43,6 +50,7 @@ __all__ = [
     "MOBILENETV4_SMALL",
     "CONVNEXTV2_TINY",
     "TimmModelSpec",
+    "build_custom_cnn",
     "build_swin_classifier",
     "build_swin_tiny_classifier",
     "build_timm_classifier",

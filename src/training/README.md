@@ -7,6 +7,7 @@ Current training scripts:
 - `train_swin.py` - trains the pretrained Swin-Tiny/Swin-Small classifier.
 - `train_timm_classifier.py` - trains generic `timm` classifiers, including DINOv2.
 - `train_resnet18_frozen.py` - trains the no-augmentation frozen ResNet18 baseline.
+- `train_custom_cnn.py` - trains a small custom CNN from scratch as the project baseline.
 
 FocalNet is notebook-first for this project: use
 `notebooks/06_focalnet_training_and_evaluation.ipynb` rather than adding a
@@ -124,6 +125,57 @@ This first run uses:
 - Custom 4-class final layer.
 - Deterministic ResNet preprocessing.
 - No stochastic data augmentation.
+
+## Custom CNN from scratch
+
+Run the small from-scratch CNN baseline:
+
+```bash
+python -m src.training.train_custom_cnn --epochs 40 --batch-size 64
+```
+
+CUDA is supported through the same `--device` flag style used elsewhere:
+
+```bash
+python -m src.training.train_custom_cnn --device cuda --epochs 40 --batch-size 64
+```
+
+Recommended architecture choices in this script:
+
+- 4 convolution stages with channel growth `32 -> 64 -> 128 -> 256`
+- two `3x3` conv layers per stage
+- BatchNorm + GELU for stable scratch training
+- max-pooling downsampling after each stage
+- global average pooling + dropout head to limit overfitting
+
+To combine the provided `data/raw/train` and `data/raw/val` folders and create
+fresh experiment splits without moving files:
+
+```bash
+python -m src.data.create_experiment_manifest \
+  --dataset-roots data/raw/train data/raw/val \
+  --holdout-ratio 0.1 \
+  --tune-ratio 0.2
+```
+
+This creates a manifest with:
+
+- `train` - fitting split
+- `tune` - model-selection / early-stopping split
+- `holdout` - untouched final evaluation split
+
+Train the custom CNN on that manifest and evaluate the holdout exactly once at the end:
+
+```bash
+python -m src.training.train_custom_cnn \
+  --manifest reports/tables/combined_experiment_manifest.csv \
+  --train-split train \
+  --tune-split tune \
+  --holdout-split holdout \
+  --device cuda \
+  --epochs 40 \
+  --batch-size 64
+```
 
 ## GPU Note
 
