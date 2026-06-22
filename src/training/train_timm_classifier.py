@@ -276,6 +276,7 @@ def save_checkpoint(
     resolved_model_name = resolve_timm_model_name(args.model_name)
     torch.save(
         {
+            "checkpoint_format_version": 1,
             "epoch": epoch,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
@@ -285,6 +286,7 @@ def save_checkpoint(
             "metrics": metrics,
             "model_name": args.model_name,
             "resolved_model_name": resolved_model_name,
+            "model_type": "timm_classifier",
             "image_size": args.image_size,
             "preprocess": preprocess,
         },

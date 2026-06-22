@@ -67,5 +67,12 @@
       0,
       100
     ]
-  ]
+  ],
+  "average_batch_latency_seconds": 0.008460393600398675,
+  "average_image_latency_seconds": 0.0002643873000124586,
+  "timed_batches": 5.0,
+  "checkpoint_path": "model/vit_small_patch14_dinov2_lvd142m_finetune/best_model.pt",
+  "checkpoint_size_bytes": 259782737,
+  "precision": "fp16",
+  "exported_fp16_checkpoint": "reports/quantization/dinov2_finetune_fp16/dinov2_finetune_fp16.pt"
 }

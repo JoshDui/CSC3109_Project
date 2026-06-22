@@ -22,7 +22,7 @@ from src.evaluation import (
     write_epoch_history_csv,
     write_metrics_json,
 )
-from src.models import build_swin_classifier
+from src.models import SWIN_VARIANTS, build_swin_classifier
 
 
 def parse_args() -> argparse.Namespace:
@@ -180,10 +180,13 @@ def save_checkpoint(
     class_to_idx: dict[str, int],
     args: argparse.Namespace,
     metrics: dict[str, Any],
+    preprocess: dict[str, Any],
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    spec = SWIN_VARIANTS[args.variant]
     torch.save(
         {
+            "checkpoint_format_version": 1,
             "epoch": epoch,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
@@ -191,6 +194,11 @@ def save_checkpoint(
             "idx_to_class": {index: name for name, index in class_to_idx.items()},
             "args": serialise_args(args),
             "metrics": metrics,
+            "model_name": spec.timm_name,
+            "resolved_model_name": spec.timm_name,
+            "model_type": f"swin_{args.variant}",
+            "image_size": args.image_size,
+            "preprocess": preprocess,
         },
         path,
     )
@@ -247,6 +255,13 @@ def main() -> None:
     print(f"Train images: {len(train_loader.dataset)} | Tune images: {len(val_loader.dataset)}")
     print(f"Tuning source: {validation_source}")
     print(f"Model: Swin-{args.variant} | pretrained={args.pretrained}")
+
+    preprocess = {
+        "input_size": (3, args.image_size, args.image_size),
+        "mean": (0.485, 0.456, 0.406),
+        "std": (0.229, 0.224, 0.225),
+        "interpolation": "bilinear",
+    }
 
     best_macro_f1 = -1.0
     best_metrics: dict[str, Any] | None = None
@@ -308,6 +323,7 @@ def main() -> None:
                 class_to_idx,
                 args,
                 metrics,
+                preprocess,
             )
             write_metrics_json(metrics, args.output_dir / "best_tune_metrics.json")
             save_confusion_matrix_plot(

@@ -67,5 +67,15 @@
       0,
       100
     ]
-  ]
+  ],
+  "average_batch_latency_seconds": 0.6089380721998168,
+  "average_image_latency_seconds": 0.019029314756244274,
+  "timed_batches": 5.0,
+  "checkpoint_path": "model/vit_small_patch14_dinov2_lvd142m_finetune/best_model.pt",
+  "checkpoint_size_bytes": 259782737,
+  "quantization": "dynamic_int8_linear",
+  "dynamic_quantized_linear_modules": 49,
+  "quantized_checkpoint_path": "reports/quantization/dinov2_finetune_dynamic_int8/best_model_dynamic_int8.pt",
+  "quantized_checkpoint_size_bytes": 22951423,
+  "serialization_mode": "full_model_pickle"
 }
