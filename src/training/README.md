@@ -8,6 +8,7 @@ Current training scripts:
 - `train_timm_classifier.py` - trains generic `timm` classifiers, including DINOv2.
 - `train_resnet18_frozen.py` - trains the no-augmentation frozen ResNet18 baseline.
 - `train_custom_cnn.py` - trains a small custom CNN from scratch as the project baseline.
+- `train_resnet18_frozen_augmented.py` - trains the frozen ResNet18 follow-up run with training-only augmentation.
 
 FocalNet is notebook-first for this project: use
 `notebooks/06_focalnet_training_and_evaluation.ipynb` rather than adding a
@@ -125,6 +126,17 @@ This first run uses:
 - Custom 4-class final layer.
 - Deterministic ResNet preprocessing.
 - No stochastic data augmentation.
+
+Then run the augmentation comparison:
+
+```powershell
+python -m src.training.train_resnet18_frozen_augmented --epochs 10 --batch-size 32
+```
+
+This second run keeps the frozen pretrained ResNet18 and the same manifest
+split, but applies RandomResizedCrop, horizontal flip, small rotation, and mild
+ColorJitter to training images only. Validation uses deterministic ResNet
+preprocessing.
 
 ## Custom CNN from scratch
 
