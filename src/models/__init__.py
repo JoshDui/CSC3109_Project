@@ -13,6 +13,11 @@ from src.models.custom_cnn import (
     CustomCnnSpec,
     build_custom_cnn,
 )
+from src.models.resnet18_finetune import (
+    build_resnet18_finetune_last_block,
+    last_block_parameter_groups,
+    trainable_parameter_summary,
+)
 from src.models.timm_classifier import (
     DINOV2_BASE,
     DINOV2_BASE_REG,
@@ -51,11 +56,14 @@ __all__ = [
     "CONVNEXTV2_TINY",
     "TimmModelSpec",
     "build_custom_cnn",
+    "build_resnet18_finetune_last_block",
     "build_swin_classifier",
     "build_swin_tiny_classifier",
     "build_timm_classifier",
     "get_timm_preprocess_settings",
+    "last_block_parameter_groups",
     "resolve_timm_model_name",
     "slugify_model_name",
+    "trainable_parameter_summary",
     "trainable_parameters",
 ]

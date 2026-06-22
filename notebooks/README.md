@@ -15,6 +15,8 @@ Current notebooks:
 - `06_focalnet_training_and_evaluation.ipynb` — notebook-first FocalNet-Tiny
   SRF training, internal tune evaluation, and guarded held-out validation
   evaluation.
+- `07_resnet_convnext_results_summary.ipynb` - ResNet18 transfer-learning /
+  fine-tuning comparison plus ConvNeXtV2 Tiny local artifact summary.
 
 Shared reusable code should still live under `src/`, but the notebook itself is
 the source of truth when a workflow is intentionally notebook-first.

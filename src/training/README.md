@@ -9,6 +9,7 @@ Current training scripts:
 - `train_resnet18_frozen.py` - trains the no-augmentation frozen ResNet18 baseline.
 - `train_custom_cnn.py` - trains a small custom CNN from scratch as the project baseline.
 - `train_resnet18_frozen_augmented.py` - trains the frozen ResNet18 follow-up run with training-only augmentation.
+- `train_resnet18_finetune_last_block.py` - fine-tunes ResNet18 by unfreezing only `layer4` and `fc`.
 
 FocalNet is notebook-first for this project: use
 `notebooks/06_focalnet_training_and_evaluation.ipynb` rather than adding a
@@ -137,6 +138,17 @@ This second run keeps the frozen pretrained ResNet18 and the same manifest
 split, but applies RandomResizedCrop, horizontal flip, small rotation, and mild
 ColorJitter to training images only. Validation uses deterministic ResNet
 preprocessing.
+
+Then run the light fine-tuning comparison:
+
+```powershell
+python -m src.training.train_resnet18_finetune_last_block --epochs 10 --batch-size 32
+```
+
+This third ResNet run keeps the same manifest split and training-only
+augmentation as the augmented frozen run, but unfreezes `layer4` and the
+classifier head. It uses a smaller learning rate for `layer4` than for `fc` to
+adapt the pretrained features conservatively.
 
 ## Custom CNN from scratch
 
