@@ -6,6 +6,7 @@ import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision.models import ResNet18_Weights
+from torchvision import datasets
 
 from src.config import CLASS_NAMES, PROJECT_ROOT, SPLIT_MANIFEST_PATH
 
@@ -54,12 +55,17 @@ def load_manifest_records(manifest_path: Path, split: str) -> list[ManifestRecor
             if row["split"] != split:
                 continue
 
+            image_path = PROJECT_ROOT / row["image_path"]
+            if not image_path.exists() and row["image_path"].startswith("data/set 12/"):
+                relative_suffix = row["image_path"].removeprefix("data/set 12/")
+                image_path = PROJECT_ROOT / "data" / "raw" / split / relative_suffix
+
             records.append(
                 ManifestRecord(
                     split=row["split"],
                     class_name=row["class_name"],
                     class_index=int(row["class_index"]),
-                    image_path=PROJECT_ROOT / row["image_path"],
+                    image_path=image_path,
                 )
             )
 
@@ -137,16 +143,46 @@ def create_dataloaders(
     seed: int = 42,
 ) -> tuple[DataLoader, DataLoader]:
     preprocess = build_resnet18_preprocess()
-    return create_manifest_dataloaders(
-        manifest_path,
-        train_split="train",
-        eval_split="val",
+
+    if not manifest_path.exists():
+        raise FileNotFoundError(
+            f"Split manifest not found: {manifest_path}. Create it with `python -m src.data.create_split_manifest`."
+        )
+
+    train_root = PROJECT_ROOT / "data" / "raw" / "train"
+    val_root = PROJECT_ROOT / "data" / "raw" / "val"
+    if not train_root.exists() or not val_root.exists():
+        raise FileNotFoundError("Expected `data/raw/train` and `data/raw/val` to exist for ResNet18 training.")
+
+    train_dataset = datasets.ImageFolder(train_root, transform=preprocess)
+    val_dataset = datasets.ImageFolder(val_root, transform=preprocess)
+
+    if train_dataset.class_to_idx != val_dataset.class_to_idx:
+        raise ValueError(
+            "Train and validation class mappings differ: "
+            f"train={train_dataset.class_to_idx}, val={val_dataset.class_to_idx}"
+        )
+
+    generator = torch.Generator()
+    generator.manual_seed(seed)
+    pin_memory = torch.cuda.is_available()
+
+    train_loader = DataLoader(
+        train_dataset,
         batch_size=batch_size,
+        shuffle=True,
         num_workers=num_workers,
-        seed=seed,
-        train_transform=preprocess,
-        eval_transform=preprocess,
+        pin_memory=pin_memory,
+        generator=generator,
     )
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+    )
+    return train_loader, val_loader
 
 
 def class_names() -> list[str]:

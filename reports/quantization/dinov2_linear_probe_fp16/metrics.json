@@ -1,0 +1,78 @@
+{
+  "accuracy": 0.985,
+  "macro_precision": 0.9854368932038835,
+  "macro_recall": 0.985,
+  "macro_f1": 0.9849966242404541,
+  "classification_report": {
+    "bridge": {
+      "precision": 1.0,
+      "recall": 0.97,
+      "f1-score": 0.9847715736040609,
+      "support": 100.0
+    },
+    "freeway": {
+      "precision": 1.0,
+      "recall": 0.97,
+      "f1-score": 0.9847715736040609,
+      "support": 100.0
+    },
+    "overpass": {
+      "precision": 0.970873786407767,
+      "recall": 1.0,
+      "f1-score": 0.9852216748768473,
+      "support": 100.0
+    },
+    "railway": {
+      "precision": 0.970873786407767,
+      "recall": 1.0,
+      "f1-score": 0.9852216748768473,
+      "support": 100.0
+    },
+    "accuracy": 0.985,
+    "macro avg": {
+      "precision": 0.9854368932038835,
+      "recall": 0.985,
+      "f1-score": 0.9849966242404541,
+      "support": 400.0
+    },
+    "weighted avg": {
+      "precision": 0.9854368932038835,
+      "recall": 0.985,
+      "f1-score": 0.9849966242404541,
+      "support": 400.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      97,
+      0,
+      0,
+      3
+    ],
+    [
+      0,
+      97,
+      3,
+      0
+    ],
+    [
+      0,
+      0,
+      100,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      100
+    ]
+  ],
+  "average_batch_latency_seconds": 0.007640872997581027,
+  "average_image_latency_seconds": 0.0002387772811744071,
+  "timed_batches": 5.0,
+  "checkpoint_path": "model/vit_small_patch14_dinov2_lvd142m_linear_probe/best_model.pt",
+  "checkpoint_size_bytes": 86604807,
+  "precision": "fp16",
+  "exported_fp16_checkpoint": "reports/quantization/dinov2_linear_probe_fp16/dinov2_linear_probe_fp16.pt"
+}
