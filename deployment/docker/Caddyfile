@@ -1,0 +1,22 @@
+:8080 {
+	root * /srv
+
+	encode zstd gzip
+	try_files {path} /index.html
+	file_server {
+		precompressed br gzip
+	}
+
+	@immutable path /assets/* /models/* /ort/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Embedder-Policy "require-corp"
+	}
+}

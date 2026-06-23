@@ -1,0 +1,30 @@
+{
+  "name": "csc3109-edge-onnx-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.14",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "build:cdn": "bun run build && bun run compress",
+    "compress": "bun scripts/precompress.mjs dist",
+    "deploy:cloudflare": "wrangler deploy --config ../cloudflare/wrangler.jsonc",
+    "deploy:cloudflare:dry-run": "wrangler deploy --config ../cloudflare/wrangler.jsonc --dry-run",
+    "preview": "vite preview --host 0.0.0.0",
+    "check": "tsc -b"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "6.0.3",
+    "onnxruntime-web": "1.27.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "vite": "8.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "6.0.3",
+    "wrangler": "4.104.0"
+  }
+}
