@@ -147,7 +147,7 @@ visible for review.
 
 Primary workflow file:
 
-- `notebooks/06_focalnet_training_and_evaluation.ipynb`
+- `notebooks/03_focalnet_training_and_evaluation.ipynb`
 
 Supporting integration:
 
@@ -192,7 +192,7 @@ This gives a clear comparison story:
 
 ## Immediate Next Steps
 
-1. Open `notebooks/06_focalnet_training_and_evaluation.ipynb`.
+1. Open `notebooks/03_focalnet_training_and_evaluation.ipynb`.
 2. Restart the kernel and run top-to-bottom for the final pretrained
    FocalNet-Tiny SRF fine-tuning run.
 3. Run the final held-out evaluation section once on `data/raw/val`.

@@ -21,6 +21,10 @@ dependencies = [
     "ipykernel>=7.2.0",
     "pandas-stubs~=3.0.3",
     "ipywidgets>=8.1",
+    "transformers>=5.12.1",
+    "onnx>=1.22.0",
+    "onnxruntime>=1.27.0",
+    "onnxscript>=0.7.0",
 ]
 
 [tool.uv]

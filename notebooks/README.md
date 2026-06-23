@@ -10,13 +10,20 @@ Current notebooks:
   - `reports/tables/dataset_summary.csv`
   - `reports/tables/dataset_summary.json`
   - `reports/figures/class_distribution.png`
-- `05_swin_tiny_results_summary.ipynb` — Swin-Tiny training and held-out
+- `02_swin_tiny_results_summary.ipynb` — Swin-Tiny training and held-out
   validation summary.
-- `06_focalnet_training_and_evaluation.ipynb` — notebook-first FocalNet-Tiny
+- `03_focalnet_training_and_evaluation.ipynb` — notebook-first FocalNet-Tiny
   SRF training, internal tune evaluation, and guarded held-out validation
   evaluation.
-- `07_resnet_convnext_results_summary.ipynb` - ResNet18 transfer-learning /
+- `04_resnet_convnext_results_summary.ipynb` — ResNet18 transfer-learning /
   fine-tuning comparison plus ConvNeXtV2 Tiny local artifact summary.
+- `05_semantic_guided_cgaf_quantisation.ipynb` — Semantic-Guided CG-AF CNN
+  pretraining, pseudo-mask transfer, quantization, ONNX deployment, and final
+  artifact summary.
+- `06_clip_trained_classifier.ipynb` — CLIP-based aerial-image classifier
+  workflow and validation artifact summary.
+- `07_clip_peft_fft_comparison.ipynb` — CLIP PEFT-vs-FFT comparison and
+  deployment-oriented result summary.
 
 Shared reusable code should still live under `src/`, but the notebook itself is
 the source of truth when a workflow is intentionally notebook-first.

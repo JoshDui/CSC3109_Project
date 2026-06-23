@@ -12,7 +12,7 @@ Current training scripts:
 - `train_resnet18_finetune_last_block.py` - fine-tunes ResNet18 by unfreezing only `layer4` and `fc`.
 
 FocalNet is notebook-first for this project: use
-`notebooks/06_focalnet_training_and_evaluation.ipynb` rather than adding a
+`notebooks/03_focalnet_training_and_evaluation.ipynb` rather than adding a
 standalone `train_focalnet.py`. The notebook imports the shared data, model, and
 evaluation helpers while keeping the FocalNet-specific training loop visible.
 It uses `data/raw/train` for training/internal tuning and reserves
@@ -91,7 +91,7 @@ python -m src.evaluation.evaluate_timm_classifier \
 Run FocalNet from the notebook:
 
 ```text
-notebooks/06_focalnet_training_and_evaluation.ipynb
+notebooks/03_focalnet_training_and_evaluation.ipynb
 ```
 
 The recommended preset is `focalnet-tiny-srf`, which resolves to the `timm`
