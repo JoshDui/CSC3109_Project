@@ -8,7 +8,16 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision.models import ResNet18_Weights
 from torchvision import datasets
 
-from src.config import CLASS_NAMES, PROJECT_ROOT, SPLIT_MANIFEST_PATH
+from src.config import CLASS_NAMES, IMAGE_SIZE, PROJECT_ROOT, RANDOM_SEED, SPLIT_MANIFEST_PATH
+from src.data.semantic_segmentation import (
+    SEMANTIC_CLASS_TO_IDX,
+    SEMANTIC_MASK_MANIFEST_PATH,
+    SEMANTIC_MASK_SOURCE_DEFAULT_MANIFESTS,
+    SEMANTIC_MASK_SOURCE_NUM_CLASSES,
+    SemanticSegmentationDataset,
+    build_semantic_eval_transform,
+    build_semantic_train_transform,
+)
 
 
 @dataclass(frozen=True)
@@ -183,6 +192,84 @@ def create_dataloaders(
         pin_memory=pin_memory,
     )
     return train_loader, val_loader
+
+
+def create_semantic_dataloaders(
+    manifest_path: Path | None = None,
+    mask_source: str = "scene_v1",
+    batch_size: int = 8,
+    num_workers: int = 0,
+    seed: int = RANDOM_SEED,
+    image_size: int = IMAGE_SIZE,
+    train_split: str = "train",
+    tune_split: str = "internal_tune",
+    pin_memory: bool | None = None,
+    usable_for_training: bool | None = True,
+    validate_mask_values: bool = True,
+) -> tuple[DataLoader, DataLoader, dict[str, int]]:
+    """Create train/internal-tune loaders for paired image/mask semantic training.
+
+    ``mask_source`` selects the mask ontology only.  Scene labels remain the
+    four project classes in both modes, while masks contain either the v1
+    background+scene IDs (5 classes) or the v2 background+primitive IDs (7
+    classes).  The selected datasets expose ``mask_num_classes`` for callers
+    that need to size segmentation heads.
+    """
+
+    if mask_source not in SEMANTIC_MASK_SOURCE_DEFAULT_MANIFESTS:
+        raise ValueError(
+            f"mask_source must be one of {sorted(SEMANTIC_MASK_SOURCE_DEFAULT_MANIFESTS)}, got {mask_source!r}"
+        )
+    resolved_manifest_path = Path(manifest_path or SEMANTIC_MASK_SOURCE_DEFAULT_MANIFESTS[mask_source])
+
+    train_dataset = SemanticSegmentationDataset(
+        resolved_manifest_path,
+        split=train_split,
+        mask_source=mask_source,
+        transform=build_semantic_train_transform(image_size=image_size),
+        usable_for_training=usable_for_training,
+        validate_mask_values=validate_mask_values,
+    )
+    tune_dataset = SemanticSegmentationDataset(
+        resolved_manifest_path,
+        split=tune_split,
+        mask_source=mask_source,
+        transform=build_semantic_eval_transform(image_size=image_size),
+        usable_for_training=usable_for_training,
+        validate_mask_values=validate_mask_values,
+    )
+
+    generator = torch.Generator()
+    generator.manual_seed(seed)
+    if pin_memory is None:
+        pin_memory = torch.cuda.is_available()
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        generator=generator,
+    )
+    tune_loader = DataLoader(
+        tune_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+    )
+    return train_loader, tune_loader, dict(SEMANTIC_CLASS_TO_IDX)
+
+
+def semantic_mask_num_classes(mask_source: str = "scene_v1") -> int:
+    """Return segmentation class count for a semantic mask source."""
+
+    if mask_source not in SEMANTIC_MASK_SOURCE_NUM_CLASSES:
+        raise ValueError(
+            f"mask_source must be one of {sorted(SEMANTIC_MASK_SOURCE_NUM_CLASSES)}, got {mask_source!r}"
+        )
+    return SEMANTIC_MASK_SOURCE_NUM_CLASSES[mask_source]
 
 
 def class_names() -> list[str]:

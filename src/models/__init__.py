@@ -1,5 +1,20 @@
 """Model definitions."""
 
+from src.models.convnext_feature_backbone import (
+    CONVNEXT_FEATURE_BACKBONE_TINY,
+    CONVNEXT_FEATURE_TEST_BACKBONE,
+    ConvNormAct,
+    TinyFeatureBackbone,
+)
+from src.models.semantic_guided_cgaf import (
+    SEMANTIC_GUIDED_CGAF_CONVNEXT_TINY,
+    SEMANTIC_GUIDED_CGAF_TEST_BACKBONE,
+    AsymmetricContextMixer,
+    SegmentationGuidedSceneHead,
+    SemanticGuidedCGAFCNN,
+    SpatialContextGate,
+    build_semantic_guided_cgaf_cnn,
+)
 from src.models.swin_transformer import (
     SWIN_SMALL,
     SWIN_TINY,
@@ -19,6 +34,7 @@ from src.models.resnet18_finetune import (
     trainable_parameter_summary,
 )
 from src.models.timm_classifier import (
+    CONVNEXTV2_TINY,
     DINOV2_BASE,
     DINOV2_BASE_REG,
     DINOV2_SMALL,
@@ -26,9 +42,8 @@ from src.models.timm_classifier import (
     FOCALNET_SMALL_SRF,
     FOCALNET_TINY_LRF,
     FOCALNET_TINY_SRF,
-    TIMM_MODEL_SPECS,
     MOBILENETV4_SMALL,
-    CONVNEXTV2_TINY,
+    TIMM_MODEL_SPECS,
     TimmModelSpec,
     build_timm_classifier,
     get_timm_preprocess_settings,
@@ -42,6 +57,7 @@ __all__ = [
     "SWIN_TINY",
     "SWIN_VARIANTS",
     "SwinModelSpec",
+    "CONVNEXTV2_TINY",
     "CUSTOM_CNN_SMALL",
     "CustomCnnSpec",
     "DINOV2_BASE",
@@ -51,10 +67,20 @@ __all__ = [
     "FOCALNET_SMALL_SRF",
     "FOCALNET_TINY_LRF",
     "FOCALNET_TINY_SRF",
-    "TIMM_MODEL_SPECS",
     "MOBILENETV4_SMALL",
-    "CONVNEXTV2_TINY",
+    "TIMM_MODEL_SPECS",
     "TimmModelSpec",
+    "CONVNEXT_FEATURE_BACKBONE_TINY",
+    "CONVNEXT_FEATURE_TEST_BACKBONE",
+    "SEMANTIC_GUIDED_CGAF_CONVNEXT_TINY",
+    "SEMANTIC_GUIDED_CGAF_TEST_BACKBONE",
+    "AsymmetricContextMixer",
+    "ConvNormAct",
+    "SegmentationGuidedSceneHead",
+    "SemanticGuidedCGAFCNN",
+    "SpatialContextGate",
+    "TinyFeatureBackbone",
+    "build_semantic_guided_cgaf_cnn",
     "build_custom_cnn",
     "build_resnet18_finetune_last_block",
     "build_swin_classifier",

@@ -1,0 +1,39 @@
+policy_name: semantic_sam3_class_aware_v1
+prompt_set_id: semantic_sam3_class_aware_relation_prompts_v1
+allowed_splits: train, internal_tune
+
+teacher:
+  sam3_model_id: facebook/sam3
+  teacher_env_id: vaporeon_uv_teacher_sam3_class_aware
+  default_device: auto
+  seed: 42
+
+thresholds:
+  instance_score: 0.50
+  mask: 0.50
+
+output_policy:
+  root_default: data/semantic_masks/sam3_class_aware
+  manifest_default: reports/tables/semantic_sam3_class_aware_mask_manifest.csv
+  stats_default: reports/tables/semantic_sam3_class_aware_mask_stats.json
+  overlay_dir_default: reports/figures/semantic_sam3_class_aware_examples/full
+  mask_extension: .png
+  mask_filename_suffix: _sam3_class_mask
+
+prompts:
+  bridge:
+    mask_foreground_id: 1
+    chosen_prompt: road bridge deck over water
+    prompt_candidates: road bridge deck over water; bridge deck crossing water; elevated road over water; roadway bridge above water
+  freeway:
+    mask_foreground_id: 2
+    chosen_prompt: freeway road surface
+    prompt_candidates: freeway road surface; multi lane highway pavement; highway lanes; paved freeway surface
+  overpass:
+    mask_foreground_id: 3
+    chosen_prompt: overpass deck over road
+    prompt_candidates: overpass deck over road; elevated road crossing another road; road overpass above highway; road deck above road
+  railway:
+    mask_foreground_id: 4
+    chosen_prompt: railway corridor and rail bed
+    prompt_candidates: railway corridor and rail bed; railroad tracks and rail bed; train tracks; rail yard tracks
