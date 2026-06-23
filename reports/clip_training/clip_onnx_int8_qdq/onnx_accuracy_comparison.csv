@@ -1,0 +1,15 @@
+model,metric,value
+fp32_onnx,accuracy,0.9675
+fp32_onnx,macro_precision,0.9696490603010599
+fp32_onnx,macro_recall,0.9675
+fp32_onnx,macro_f1,0.9673936670306906
+fp32_onnx,weighted_precision,0.9696490603010599
+fp32_onnx,weighted_recall,0.9675
+fp32_onnx,weighted_f1,0.9673936670306906
+int8_qdq_onnx,accuracy,0.93
+int8_qdq_onnx,macro_precision,0.9394132653061225
+int8_qdq_onnx,macro_recall,0.9299999999999999
+int8_qdq_onnx,macro_f1,0.9289270338774266
+int8_qdq_onnx,weighted_precision,0.9394132653061225
+int8_qdq_onnx,weighted_recall,0.93
+int8_qdq_onnx,weighted_f1,0.9289270338774266

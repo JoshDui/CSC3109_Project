@@ -7,6 +7,9 @@ Current evaluation files:
 - `metrics.py` — accuracy, precision, recall, F1, confusion matrix helpers.
 - `evaluate_swin.py` — evaluates a saved Swin checkpoint on a labelled image folder.
 - `evaluate_timm_classifier.py` — evaluates a saved generic `timm`/DINOv2 checkpoint.
+- `clip/export_onnx_int8_qdq.py` — exports the CLIP FFT classifier to ONNX,
+  creates an INT8 QDQ artifact, and evaluates FP32/INT8 ONNX outputs.
+- `export_clip_onnx_int8_qdq.py` — compatibility wrapper for the CLIP exporter.
 
 - `evaluate_resnet18_finetune.py` - evaluates the fine-tuned ResNet18 last-block checkpoint.
 
@@ -37,6 +40,15 @@ reports/<model>_eval/
 `predictions.csv` contains one row per evaluated image, including the image
 path, true label, predicted label, correctness flag, top confidence, and
 per-class confidence scores.
+
+Export and evaluate the CLIP FFT ONNX artifacts:
+
+```bash
+python -m src.evaluation.clip.export_onnx_int8_qdq \
+  --checkpoint reports/clip_training/clip_fft_augmented/model_state.pt \
+  --train-dir "data/set 12/set 12" \
+  --val-dir "data/val 12/val 12"
+```
 
 If the official held-out validation folder is not available yet, `data/set 12`
 may be used only for internal sanity checks:
