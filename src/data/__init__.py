@@ -10,6 +10,7 @@ from src.data.image_classification import (
     build_train_transform,
     stratified_split_indices,
 )
+from src.data.dataloaders import create_manifest_dataloaders, create_manifest_loader
 
 __all__ = [
     "IMAGENET_MEAN",
@@ -19,5 +20,7 @@ __all__ = [
     "build_imagefolder_datasets",
     "build_internal_split_dataloaders",
     "build_train_transform",
+    "create_manifest_dataloaders",
+    "create_manifest_loader",
     "stratified_split_indices",
 ]

@@ -23,6 +23,16 @@ from src.models.swin_transformer import (
     build_swin_classifier,
     build_swin_tiny_classifier,
 )
+from src.models.custom_cnn import (
+    CUSTOM_CNN_SMALL,
+    CustomCnnSpec,
+    build_custom_cnn,
+)
+from src.models.resnet18_finetune import (
+    build_resnet18_finetune_last_block,
+    last_block_parameter_groups,
+    trainable_parameter_summary,
+)
 from src.models.timm_classifier import (
     CONVNEXTV2_TINY,
     DINOV2_BASE,
@@ -48,6 +58,8 @@ __all__ = [
     "SWIN_VARIANTS",
     "SwinModelSpec",
     "CONVNEXTV2_TINY",
+    "CUSTOM_CNN_SMALL",
+    "CustomCnnSpec",
     "DINOV2_BASE",
     "DINOV2_BASE_REG",
     "DINOV2_SMALL",
@@ -69,11 +81,15 @@ __all__ = [
     "SpatialContextGate",
     "TinyFeatureBackbone",
     "build_semantic_guided_cgaf_cnn",
+    "build_custom_cnn",
+    "build_resnet18_finetune_last_block",
     "build_swin_classifier",
     "build_swin_tiny_classifier",
     "build_timm_classifier",
     "get_timm_preprocess_settings",
+    "last_block_parameter_groups",
     "resolve_timm_model_name",
     "slugify_model_name",
+    "trainable_parameter_summary",
     "trainable_parameters",
 ]

@@ -1,25 +1,25 @@
 {
-  "accuracy": 0.9925,
-  "macro_precision": 0.9927184466019418,
-  "macro_recall": 0.9924999999999999,
-  "macro_f1": 0.9925238847869241,
+  "accuracy": 0.9975,
+  "macro_precision": 0.9975247524752475,
+  "macro_recall": 0.9975,
+  "macro_f1": 0.9974999374984375,
   "classification_report": {
     "bridge": {
-      "precision": 1.0,
-      "recall": 0.98,
-      "f1-score": 0.98989898989899,
-      "support": 100.0
-    },
-    "freeway": {
       "precision": 1.0,
       "recall": 0.99,
       "f1-score": 0.9949748743718593,
       "support": 100.0
     },
-    "overpass": {
-      "precision": 0.970873786407767,
+    "freeway": {
+      "precision": 1.0,
       "recall": 1.0,
-      "f1-score": 0.9852216748768473,
+      "f1-score": 1.0,
+      "support": 100.0
+    },
+    "overpass": {
+      "precision": 0.9900990099009901,
+      "recall": 1.0,
+      "f1-score": 0.9950248756218906,
       "support": 100.0
     },
     "railway": {
@@ -28,31 +28,31 @@
       "f1-score": 1.0,
       "support": 100.0
     },
-    "accuracy": 0.9925,
+    "accuracy": 0.9975,
     "macro avg": {
-      "precision": 0.9927184466019418,
-      "recall": 0.9924999999999999,
-      "f1-score": 0.9925238847869241,
+      "precision": 0.9975247524752475,
+      "recall": 0.9975,
+      "f1-score": 0.9974999374984375,
       "support": 400.0
     },
     "weighted avg": {
-      "precision": 0.9927184466019418,
-      "recall": 0.9925,
-      "f1-score": 0.9925238847869241,
+      "precision": 0.9975247524752475,
+      "recall": 0.9975,
+      "f1-score": 0.9974999374984376,
       "support": 400.0
     }
   },
   "confusion_matrix": [
     [
-      98,
+      99,
       0,
-      2,
+      1,
       0
     ],
     [
       0,
-      99,
-      1,
+      100,
+      0,
       0
     ],
     [

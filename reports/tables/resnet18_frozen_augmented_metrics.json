@@ -1,0 +1,38 @@
+{
+  "accuracy": 0.9946428571428572,
+  "precision_macro": 0.9947058235940466,
+  "recall_macro": 0.9946428571428572,
+  "f1_macro": 0.9946296894118706,
+  "model": "resnet18",
+  "training_strategy": "frozen_feature_extractor",
+  "data_augmentation": true,
+  "augmentation_config": {
+    "random_resized_crop": {
+      "scale": [
+        0.85,
+        1.0
+      ],
+      "ratio": [
+        0.9,
+        1.1
+      ]
+    },
+    "random_horizontal_flip": {
+      "p": 0.5
+    },
+    "random_rotation": {
+      "degrees": 10
+    },
+    "color_jitter": {
+      "brightness": 0.1,
+      "contrast": 0.1,
+      "saturation": 0.05,
+      "hue": 0.02
+    }
+  },
+  "best_val_accuracy": 0.9946428571428572,
+  "epochs": 10,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "checkpoint": "model/resnet18_frozen_augmented.pt"
+}

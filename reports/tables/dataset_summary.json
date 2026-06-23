@@ -1,5 +1,6 @@
 [
   {
+    "split": "train",
     "class_name": "bridge",
     "image_count": 700,
     "corrupt_count": 0,
@@ -9,11 +10,11 @@
     "max_height": 256,
     "most_common_size": "256x256",
     "color_modes": "RGB:700",
-    "min_file_kb": 5.43,
-    "max_file_kb": 78.79,
-    "avg_file_kb": 44.34
+    "formats": "JPEG:700",
+    "extensions": ".jpg:700"
   },
   {
+    "split": "train",
     "class_name": "freeway",
     "image_count": 700,
     "corrupt_count": 0,
@@ -23,11 +24,11 @@
     "max_height": 256,
     "most_common_size": "256x256",
     "color_modes": "RGB:700",
-    "min_file_kb": 12.21,
-    "max_file_kb": 20.01,
-    "avg_file_kb": 16.0
+    "formats": "JPEG:700",
+    "extensions": ".jpg:700"
   },
   {
+    "split": "train",
     "class_name": "overpass",
     "image_count": 700,
     "corrupt_count": 0,
@@ -37,11 +38,11 @@
     "max_height": 256,
     "most_common_size": "256x256",
     "color_modes": "RGB:700",
-    "min_file_kb": 15.9,
-    "max_file_kb": 27.61,
-    "avg_file_kb": 21.33
+    "formats": "JPEG:700",
+    "extensions": ".jpg:700"
   },
   {
+    "split": "train",
     "class_name": "railway",
     "image_count": 700,
     "corrupt_count": 0,
@@ -51,8 +52,63 @@
     "max_height": 256,
     "most_common_size": "256x256",
     "color_modes": "RGB:700",
-    "min_file_kb": 50.58,
-    "max_file_kb": 86.15,
-    "avg_file_kb": 68.77
+    "formats": "JPEG:700",
+    "extensions": ".jpg:700"
+  },
+  {
+    "split": "val",
+    "class_name": "bridge",
+    "image_count": 100,
+    "corrupt_count": 0,
+    "min_width": 256,
+    "max_width": 256,
+    "min_height": 256,
+    "max_height": 256,
+    "most_common_size": "256x256",
+    "color_modes": "RGB:100",
+    "formats": "JPEG:100",
+    "extensions": ".jpg:100"
+  },
+  {
+    "split": "val",
+    "class_name": "freeway",
+    "image_count": 100,
+    "corrupt_count": 0,
+    "min_width": 256,
+    "max_width": 256,
+    "min_height": 256,
+    "max_height": 256,
+    "most_common_size": "256x256",
+    "color_modes": "RGB:100",
+    "formats": "JPEG:100",
+    "extensions": ".jpg:100"
+  },
+  {
+    "split": "val",
+    "class_name": "overpass",
+    "image_count": 100,
+    "corrupt_count": 0,
+    "min_width": 256,
+    "max_width": 256,
+    "min_height": 256,
+    "max_height": 256,
+    "most_common_size": "256x256",
+    "color_modes": "RGB:100",
+    "formats": "JPEG:100",
+    "extensions": ".jpg:100"
+  },
+  {
+    "split": "val",
+    "class_name": "railway",
+    "image_count": 100,
+    "corrupt_count": 0,
+    "min_width": 256,
+    "max_width": 256,
+    "min_height": 256,
+    "max_height": 256,
+    "most_common_size": "256x256",
+    "color_modes": "RGB:100",
+    "formats": "JPEG:100",
+    "extensions": ".jpg:100"
   }
 ]

@@ -1,0 +1,63 @@
+{
+  "dedup_threshold": 5,
+  "nwpu_train_cap": 600,
+  "nwpu_ood_cap": 100,
+  "tune_ratio": 0.2,
+  "seed": 42,
+  "per_class": {
+    "bridge": {
+      "patternnet_train": 700,
+      "patternnet_val_holdout": 100,
+      "nwpu_total": 700,
+      "nwpu_dropped_qa": 0,
+      "nwpu_dropped_duplicate": 0,
+      "nwpu_kept": 700,
+      "nwpu_train": 600,
+      "nwpu_ood": 100,
+      "pool_train": 1040,
+      "pool_tune": 260
+    },
+    "freeway": {
+      "patternnet_train": 700,
+      "patternnet_val_holdout": 100,
+      "nwpu_total": 700,
+      "nwpu_dropped_qa": 0,
+      "nwpu_dropped_duplicate": 0,
+      "nwpu_kept": 700,
+      "nwpu_train": 600,
+      "nwpu_ood": 100,
+      "pool_train": 1040,
+      "pool_tune": 260
+    },
+    "overpass": {
+      "patternnet_train": 700,
+      "patternnet_val_holdout": 100,
+      "nwpu_total": 700,
+      "nwpu_dropped_qa": 0,
+      "nwpu_dropped_duplicate": 0,
+      "nwpu_kept": 700,
+      "nwpu_train": 600,
+      "nwpu_ood": 100,
+      "pool_train": 1040,
+      "pool_tune": 260
+    },
+    "railway": {
+      "patternnet_train": 700,
+      "patternnet_val_holdout": 100,
+      "nwpu_total": 700,
+      "nwpu_dropped_qa": 0,
+      "nwpu_dropped_duplicate": 0,
+      "nwpu_kept": 700,
+      "nwpu_train": 600,
+      "nwpu_ood": 100,
+      "pool_train": 1040,
+      "pool_tune": 260
+    }
+  },
+  "split_counts": {
+    "holdout": 400,
+    "tune": 1040,
+    "train": 4160,
+    "nwpu_ood": 400
+  }
+}

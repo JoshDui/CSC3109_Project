@@ -7,6 +7,7 @@ Current model files:
 - `swin_transformer.py` - reusable Swin-Tiny/Swin-Small classifier factories for the aerial scene classifier.
 - `timm_classifier.py` - generic `timm` classifier factory with DINOv2 aliases.
 - `resnet18_frozen.py` - frozen ResNet18 transfer-learning baseline.
+- `resnet18_finetune.py` - ResNet18 last-block fine-tuning helper.
 
 Suggested files for later phases:
 
@@ -39,3 +40,11 @@ Use `dinov2-small` first for a deployable self-supervised transformer baseline.
 - Replaces the final layer with a 4-class classifier.
 
 This is the first no-augmentation baseline before later augmentation or fine-tuning experiments.
+
+`resnet18_finetune.py` builds the controlled fine-tuning comparison:
+
+- Loads pretrained ResNet18.
+- Replaces the final layer with a 4-class classifier.
+- Keeps early ResNet layers frozen.
+- Unfreezes only `layer4` and `fc`.
+- Provides separate optimizer parameter groups for conservative backbone tuning and faster classifier learning.

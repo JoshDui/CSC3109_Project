@@ -1,0 +1,59 @@
+{
+  "accuracy": 1.0,
+  "precision_macro": 1.0,
+  "recall_macro": 1.0,
+  "f1_macro": 1.0,
+  "model": "resnet18",
+  "artifact_prefix": "resnet18_finetune_last_block_strict_seed999",
+  "training_strategy": "fine_tune_last_block",
+  "trainable_modules": [
+    "layer4",
+    "fc"
+  ],
+  "frozen_modules": [
+    "conv1",
+    "bn1",
+    "layer1",
+    "layer2",
+    "layer3"
+  ],
+  "data_augmentation": true,
+  "augmentation_config": {
+    "random_resized_crop": {
+      "scale": [
+        0.85,
+        1.0
+      ],
+      "ratio": [
+        0.9,
+        1.1
+      ]
+    },
+    "random_horizontal_flip": {
+      "p": 0.5
+    },
+    "random_rotation": {
+      "degrees": 10
+    },
+    "color_jitter": {
+      "brightness": 0.1,
+      "contrast": 0.1,
+      "saturation": 0.05,
+      "hue": 0.02
+    }
+  },
+  "best_val_accuracy": 1.0,
+  "best_epoch": 1,
+  "epochs": 10,
+  "batch_size": 32,
+  "layer4_learning_rate": 0.0001,
+  "classifier_learning_rate": 0.001,
+  "weight_decay": 0.01,
+  "parameter_summary": {
+    "layer4": 8393728,
+    "classifier": 2052,
+    "trainable": 8395780,
+    "total": 11178564
+  },
+  "checkpoint": "model/resnet18_finetune_last_block_strict_seed999.pt"
+}
