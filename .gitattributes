@@ -1,2 +1,5 @@
 reports/quantization/**/*.pt filter=lfs diff=lfs merge=lfs -text
 reports/quantization/**/*.pth filter=lfs diff=lfs merge=lfs -text
+model/semantic_guided_cgaf_*/**/*.pt filter=lfs diff=lfs merge=lfs -text
+model/semantic_guided_cgaf_*/**/*.pth filter=lfs diff=lfs merge=lfs -text
+model/semantic_guided_cgaf_*/**/*.onnx filter=lfs diff=lfs merge=lfs -text
