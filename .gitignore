@@ -42,5 +42,5 @@ Thumbs.db
 .jupyter/
 .jupyter_ystore.db
 .opencode/
-AGENTS.md
+/AGENTS.md
 opencode.json
