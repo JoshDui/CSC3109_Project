@@ -58,6 +58,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--onnx-fp32-path", type=Path, required=True)
     parser.add_argument("--onnx-int8-path", type=Path, required=True)
     parser.add_argument("--export-manifest", type=Path, default=None, help="Optional export_manifest.json for metadata validation/reporting.")
+    parser.add_argument(
+        "--awq-checkpoint-artifact",
+        type=Path,
+        default=None,
+        help="Optional exported AWQ-style W8A8 checkpoint artifact to evaluate on the same unseen split.",
+    )
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--mask-dir", type=Path, default=None)
     parser.add_argument("--mask-source", default="sam3_class_aware")
@@ -83,6 +89,8 @@ def validate_args(args: argparse.Namespace) -> None:
         raise FileNotFoundError(f"ONNX INT8 QDQ path not found: {args.onnx_int8_path}")
     if args.export_manifest is not None and not args.export_manifest.expanduser().exists():
         raise FileNotFoundError(f"Export manifest not found: {args.export_manifest}")
+    if args.awq_checkpoint_artifact is not None and not args.awq_checkpoint_artifact.expanduser().exists():
+        raise FileNotFoundError(f"AWQ checkpoint artifact not found: {args.awq_checkpoint_artifact}")
     if args.image_size <= 0:
         raise ValueError("--image-size must be positive")
     if args.batch_size <= 0:
@@ -302,7 +310,7 @@ def build_runtime_variants(args: argparse.Namespace, *, checkpoint: Any, model_c
     import torch
     from torch.amp import autocast
 
-    from tools.evaluate_semantic_guided_quant import build_and_load_model
+    from tools.evaluate_semantic_guided_quant import build_and_load_model, build_emulated_quant_model_from_checkpoint, load_checkpoint_payload
 
     providers = preferred_ort_providers(args.ort_provider, ort)
     model = build_and_load_model(checkpoint, model_config).to(device).eval()
@@ -312,6 +320,26 @@ def build_runtime_variants(args: argparse.Namespace, *, checkpoint: Any, model_c
         with torch.no_grad(), autocast(device_type=device.type, dtype=torch.bfloat16, enabled=use_bf16):
             outputs = model(images.to(device, non_blocking=True), return_scene=True)
         return outputs["segmentation_logits"].detach().float().cpu(), outputs["scene_logits"].detach().float().cpu()
+
+    awq_variant: RuntimeVariant | None = None
+    if args.awq_checkpoint_artifact is not None:
+        awq_payload = load_checkpoint_payload(args.awq_checkpoint_artifact.expanduser(), map_location=torch.device("cpu"))
+        awq_model, awq_config = build_emulated_quant_model_from_checkpoint(awq_payload)
+        validate_awq_model_config(reference_config=model_config, awq_config=awq_config)
+        awq_model = awq_model.to(device).eval()
+
+        def awq_output_fn(images):
+            with torch.no_grad():
+                outputs = awq_model(images.to(device, non_blocking=True), return_scene=True)
+            return outputs["segmentation_logits"].detach().float().cpu(), outputs["scene_logits"].detach().float().cpu()
+
+        awq_variant = RuntimeVariant(
+            "torch_awq_w8a8_emulated",
+            "torch",
+            "awq_w8a8_emulated",
+            args.awq_checkpoint_artifact.expanduser(),
+            awq_output_fn,
+        )
 
     fp32_session = ort.InferenceSession(str(args.onnx_fp32_path), providers=providers)
     int8_session = ort.InferenceSession(str(args.onnx_int8_path), providers=providers)
@@ -327,11 +355,29 @@ def build_runtime_variants(args: argparse.Namespace, *, checkpoint: Any, model_c
         return run
 
     torch_variant_name = f"torch_{args.torch_precision}"
-    return [
+    variants = [
         RuntimeVariant(torch_variant_name, "torch", args.torch_precision, args.checkpoint_path, torch_output_fn),
         RuntimeVariant("onnx_fp32", "onnxruntime", "fp32", args.onnx_fp32_path, make_onnx_output_fn(fp32_session)),
         RuntimeVariant("onnx_int8_qdq", "onnxruntime", "int8_qdq", args.onnx_int8_path, make_onnx_output_fn(int8_session)),
-    ], providers
+    ]
+    if awq_variant is not None:
+        variants.append(awq_variant)
+    return variants, providers
+
+
+def validate_awq_model_config(*, reference_config: Any, awq_config: Any) -> None:
+    mismatches: list[str] = []
+    for field in (
+        "num_segmentation_classes",
+        "num_scene_classes",
+        "segmentation_classes",
+        "scene_class_names",
+        "mask_source",
+    ):
+        if getattr(reference_config, field) != getattr(awq_config, field):
+            mismatches.append(f"{field}: reference={getattr(reference_config, field)!r}, awq={getattr(awq_config, field)!r}")
+    if mismatches:
+        raise ValueError("AWQ checkpoint artifact is not compatible with the selected FFT checkpoint: " + "; ".join(mismatches))
 
 
 def preferred_ort_providers(requested: list[str], ort_module: Any) -> list[str]:
@@ -358,6 +404,43 @@ def load_export_manifest(path: Path | None) -> dict[str, Any] | None:
     if path is None:
         return None
     return json.loads(path.expanduser().read_text(encoding="utf-8"))
+
+
+def validate_export_manifest(
+    manifest: dict[str, Any] | None,
+    *,
+    onnx_fp32_path: Path,
+    checkpoint_name: str,
+    image_size: int,
+    model_config: Any,
+) -> None:
+    if manifest is None:
+        return
+    if manifest.get("architecture") != MODEL_NAME:
+        raise ValueError(f"Export manifest architecture={manifest.get('architecture')!r}; expected {MODEL_NAME!r}")
+    if manifest.get("dynamic_batch") is not True:
+        raise ValueError("Export manifest must come from a dynamic-batch ONNX export")
+    manifest_checkpoint_name = manifest.get("checkpoint_name")
+    if manifest_checkpoint_name is not None and str(manifest_checkpoint_name) != checkpoint_name:
+        raise ValueError(f"Export manifest checkpoint_name={manifest_checkpoint_name!r}; expected {checkpoint_name!r}")
+    manifest_image_size = manifest.get("image_size")
+    if manifest_image_size is not None and int(manifest_image_size) != int(image_size):
+        raise ValueError(f"Export manifest image_size={manifest_image_size!r}; expected {image_size!r}")
+    manifest_onnx_path = manifest.get("onnx_fp32_path")
+    if manifest_onnx_path and not same_existing_path(Path(str(manifest_onnx_path)), onnx_fp32_path):
+        raise ValueError(f"Export manifest ONNX path={manifest_onnx_path!r}; expected {str(onnx_fp32_path)!r}")
+    manifest_config = manifest.get("model_config")
+    if isinstance(manifest_config, dict):
+        for field in ("scene_class_names", "segmentation_classes", "num_scene_classes", "num_segmentation_classes"):
+            if manifest_config.get(field) != getattr(model_config, field):
+                raise ValueError(f"Export manifest model_config.{field}={manifest_config.get(field)!r}; expected {getattr(model_config, field)!r}")
+
+
+def same_existing_path(left: Path, right: Path) -> bool:
+    try:
+        return left.expanduser().resolve(strict=True) == right.expanduser().resolve(strict=True)
+    except FileNotFoundError:
+        return left.expanduser() == right.expanduser()
 
 
 def tensor_to_rgb_image(image_tensor: Any):
@@ -645,6 +728,14 @@ def main() -> None:
     )
     for warning in checkpoint_validation["warnings"]:
         print(f"WARNING {checkpoint_name}: {warning}", file=sys.stderr, flush=True)
+    manifest_payload = load_export_manifest(args.export_manifest)
+    validate_export_manifest(
+        manifest_payload,
+        onnx_fp32_path=args.onnx_fp32_path,
+        checkpoint_name=checkpoint_name,
+        image_size=args.image_size,
+        model_config=model_config,
+    )
 
     variants, ort_providers = build_runtime_variants(args, checkpoint=checkpoint, model_config=model_config, device=device)
     reference_name = variants[0].name
@@ -767,7 +858,6 @@ def main() -> None:
         )
     summary_csv_path = args.output_dir / "summary.csv"
     write_dict_rows(summary_rows, summary_csv_path)
-    manifest_payload = load_export_manifest(args.export_manifest)
     summary_payload = {
         "run_id": args.run_id,
         "created_at": datetime.now(timezone.utc).isoformat(),

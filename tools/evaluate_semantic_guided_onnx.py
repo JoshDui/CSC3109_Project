@@ -119,7 +119,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--image-size", type=int, default=512)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--num-workers", type=int, default=0)
-    parser.add_argument("--calibration-batches", type=int, default=32)
+    parser.add_argument("--calibration-batches", default="32", help="Positive integer batch count or 'all' for the full calibration split.")
     parser.add_argument("--max-eval-batches", type=int, default=None)
     parser.add_argument("--latency-warmup-batches", type=int, default=1)
     parser.add_argument("--latency-measure-batches", type=int, default=None)
@@ -151,8 +151,12 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("--batch-size must be positive")
     if args.num_workers < 0:
         raise ValueError("--num-workers must be non-negative")
-    if args.calibration_batches <= 0:
-        raise ValueError("--calibration-batches must be positive")
+    if str(args.calibration_batches).strip().lower() != "all":
+        try:
+            if int(args.calibration_batches) <= 0:
+                raise ValueError
+        except ValueError as exc:
+            raise ValueError("--calibration-batches must be a positive integer or 'all'") from exc
     if args.max_eval_batches is not None and args.max_eval_batches <= 0:
         raise ValueError("--max-eval-batches must be positive when provided")
     if args.latency_warmup_batches < 0:
@@ -854,6 +858,17 @@ def slugify(value: str) -> str:
     return "".join(character if character.isalnum() else "_" for character in value.lower()).strip("_") or "selected"
 
 
+def resolve_calibration_batches(raw_value: str, loader: Any) -> int:
+    normalized = str(raw_value).strip().lower()
+    if normalized != "all":
+        return int(normalized)
+    dataset_size = len(loader.dataset)
+    batch_size = int(loader.batch_size or 1)
+    if dataset_size <= 0:
+        raise ValueError("Cannot use --calibration-batches all with an empty calibration dataset")
+    return (dataset_size + batch_size - 1) // batch_size
+
+
 def main() -> None:
     args = parse_args()
     validate_args(args)
@@ -913,6 +928,7 @@ def main() -> None:
     eval_loader = build_eval_loader(args, device=device)
     calibration_loader_for_awq = build_calibration_loader(args, device=device, shuffle=True)
     calibration_loader_for_onnx = build_calibration_loader(args, device=device, shuffle=False)
+    calibration_batches = resolve_calibration_batches(args.calibration_batches, calibration_loader_for_onnx)
 
     fp32_model = build_and_load_model(checkpoint, model_config).to(device).eval()
     param_count = sum(int(parameter.numel()) for parameter in fp32_model.parameters())
@@ -982,7 +998,7 @@ def main() -> None:
         eligible_modules=eligible_modules,
         skipped_names=skipped_names,
         device=device,
-        requested_batches=args.calibration_batches,
+        requested_batches=calibration_batches,
         desc=f"{checkpoint_name} AWQ calibration",
     )
     del awq_calibration_model
@@ -1038,7 +1054,7 @@ def main() -> None:
         output_model_path=onnx_int8_path,
         calibration_loader=calibration_loader_for_onnx,
         input_name="images",
-        calibration_batches=args.calibration_batches,
+        calibration_batches=calibration_batches,
         calibration_method=args.calibration_method,
     )
     fp32_session, fp32_session_summary = create_ort_session(args.onnx_fp32_path, ort_providers)

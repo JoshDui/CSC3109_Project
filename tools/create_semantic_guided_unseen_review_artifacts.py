@@ -24,6 +24,7 @@ DEFAULT_VARIANTS = ("torch_bf16", "onnx_fp32", "onnx_int8_qdq")
 DEFAULT_VARIANT_LABELS = {
     "torch_bf16": "Torch BF16",
     "torch_fp32": "Torch FP32",
+    "torch_awq_w8a8_emulated": "Torch AWQ-style W8A8",
     "onnx_fp32": "ONNX FP32",
     "onnx_int8_qdq": "ONNX INT8 QDQ",
 }
@@ -41,6 +42,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mask-dir", type=Path, required=True, help="Directory containing exported mask/color-mask PNGs referenced by per_image_predictions.csv.")
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--variant", action="append", default=[], help="Variant order to render. Defaults to torch_bf16, onnx_fp32, onnx_int8_qdq.")
+    parser.add_argument(
+        "--near-confusion-variant",
+        action="append",
+        default=[],
+        help="Variant(s) used for near-confusion tables. Defaults to ONNX variants present in --variant.",
+    )
+    parser.add_argument("--onnx-only-panels", action="store_true", help="Also render qualitative panels containing only ONNX FP32 and ONNX INT8 QDQ masks.")
     parser.add_argument("--sample-per-class", type=int, default=3)
     parser.add_argument("--max-contact-panels", type=int, default=12)
     return parser.parse_args()
@@ -67,6 +75,7 @@ def main() -> None:
     args = parse_args()
     validate_args(args)
     variants = tuple(args.variant or DEFAULT_VARIANTS)
+    near_confusion_variants = tuple(args.near_confusion_variant or [variant for variant in variants if variant.startswith("onnx_")])
     args.output_dir.mkdir(parents=True, exist_ok=True)
     plot_dir = args.output_dir / "plots"
     panel_dir = args.output_dir / "sample_panels"
@@ -140,6 +149,30 @@ def main() -> None:
         sample_per_class=args.sample_per_class,
         max_contact_panels=args.max_contact_panels,
     )
+    near_confusion_outputs = generate_near_confusion_artifacts(
+        prediction_rows,
+        variants=near_confusion_variants,
+        output_dir=args.output_dir,
+        plot_dir=plot_dir,
+        variant_labels=variant_labels,
+    )
+    plot_paths.extend(near_confusion_outputs["plots"])
+    onnx_only_panel_paths: list[str] = []
+    if args.onnx_only_panels:
+        onnx_variants = tuple(variant for variant in ("onnx_fp32", "onnx_int8_qdq") if variant in variants)
+        if len(onnx_variants) == 2:
+            onnx_only_panel_paths = generate_sample_panels(
+                prediction_rows,
+                variants=onnx_variants,
+                variant_labels=variant_labels,
+                class_names=class_names,
+                panel_dir=args.output_dir / "onnx_only_panels",
+                output_dir=args.output_dir,
+                sample_per_class=args.sample_per_class,
+                max_contact_panels=args.max_contact_panels,
+                contact_sheet_name="onnx_only_sample_panels_contact_sheet.png",
+                panel_filename_template="{stem}_onnx_fp32_int8_panel.png",
+            )
 
     manifest = {
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -154,6 +187,8 @@ def main() -> None:
         "misclassified_examples_csv": str(args.output_dir / "misclassified_examples.csv"),
         "plots": plot_paths,
         "sample_panels": panel_paths,
+        "onnx_only_sample_panels": onnx_only_panel_paths,
+        "near_confusion": near_confusion_outputs,
         "summary": overall_rows,
         "misclassified_count": len(misclassified_rows),
         "note": NO_SEGMENTATION_GT_NOTE,
@@ -343,10 +378,11 @@ def plot_per_class_confidence_correctness(rows: list[dict[str, Any]], *, variant
         ("mean_top1_confidence", "Mean top-1 confidence"),
         ("mean_true_class_probability", "Mean true-class probability"),
     ]
-    bar_width = 0.25
+    bar_width = min(0.8 / max(len(variants), 1), 0.25)
     class_positions = np.arange(len(class_names))
     for ax, (metric, title) in zip(axes, metrics):
-        for offset, variant in zip([-bar_width, 0.0, bar_width], variants):
+        offsets = [(index - (len(variants) - 1) / 2.0) * bar_width for index in range(len(variants))]
+        for offset, variant in zip(offsets, variants):
             values = [float(next(row[metric] for row in rows if row["variant"] == variant and row["class_name"] == class_name)) for class_name in class_names]
             ax.bar(class_positions + offset, values, bar_width, label=variant_labels[variant])
         ax.set_title(title)
@@ -360,7 +396,20 @@ def plot_per_class_confidence_correctness(rows: list[dict[str, Any]], *, variant
     return path
 
 
-def generate_sample_panels(prediction_rows: list[dict[str, str]], *, variants: tuple[str, ...], variant_labels: dict[str, str], class_names: list[str], panel_dir: Path, output_dir: Path, sample_per_class: int, max_contact_panels: int) -> list[str]:
+def generate_sample_panels(
+    prediction_rows: list[dict[str, str]],
+    *,
+    variants: tuple[str, ...],
+    variant_labels: dict[str, str],
+    class_names: list[str],
+    panel_dir: Path,
+    output_dir: Path,
+    sample_per_class: int,
+    max_contact_panels: int,
+    contact_sheet_name: str = "sample_panels_contact_sheet.png",
+    panel_filename_template: str | None = None,
+) -> list[str]:
+    panel_dir.mkdir(parents=True, exist_ok=True)
     rows_by_image: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
     for row in prediction_rows:
         rows_by_image[row["image_path"]][row["variant"]] = row
@@ -391,17 +440,221 @@ def generate_sample_panels(prediction_rows: list[dict[str, str]], *, variants: t
                 f"conf={float(row['top1_confidence']):.3f} correct={row['correct']}"
             )
             tiles.append(label_tile(mask_image, label, font=font))
-        panel = Image.new("RGB", (1024, 1096), (235, 238, 242))
+        columns = 2
+        rows = math.ceil(len(tiles) / columns)
+        panel = Image.new("RGB", (columns * 512, rows * 548), (235, 238, 242))
         for index, tile in enumerate(tiles):
             panel.paste(tile, ((index % 2) * 512, (index // 2) * 548))
-        panel_path = panel_dir / f"{slugify(true_class)}_{slugify(stem)}_comparison_panel.png"
+        if panel_filename_template is None:
+            panel_filename = f"{slugify(true_class)}_{slugify(stem)}_comparison_panel.png"
+        else:
+            panel_filename = panel_filename_template.format(true_class=slugify(true_class), stem=slugify(stem))
+        panel_path = panel_dir / panel_filename
         panel.save(panel_path)
         panel_paths.append(str(panel_path))
 
-    contact_sheet_path = write_contact_sheet(panel_paths[:max_contact_panels], output_dir / "sample_panels_contact_sheet.png")
+    contact_sheet_path = write_contact_sheet(panel_paths[:max_contact_panels], output_dir / contact_sheet_name)
     if contact_sheet_path is not None:
         panel_paths.append(str(contact_sheet_path))
     return panel_paths
+
+
+def generate_near_confusion_artifacts(
+    prediction_rows: list[dict[str, str]],
+    *,
+    variants: tuple[str, ...],
+    output_dir: Path,
+    plot_dir: Path,
+    variant_labels: dict[str, str],
+) -> dict[str, Any]:
+    if not variants:
+        return {"variants": [], "per_image_csv": None, "pair_summary_csv": None, "lowest_margin_csv": None, "margin_summary_csv": None, "plots": []}
+    rows = near_confusion_rows(prediction_rows, variants=variants)
+    per_image_path = output_dir / "onnx_near_confusion_per_image.csv"
+    pair_summary_path = output_dir / "onnx_near_confusion_pair_summary.csv"
+    lowest_margin_path = output_dir / "onnx_lowest_margin_top20.csv"
+    margin_summary_path = output_dir / "onnx_near_confusion_margin_summary.csv"
+    write_csv_dicts(rows, per_image_path)
+    pair_summary = summarize_near_confusion_pairs(rows)
+    margin_summary = summarize_near_confusion_margins(rows)
+    write_csv_dicts(pair_summary, pair_summary_path)
+    write_csv_dicts(sorted(rows, key=lambda row: float(row["margin"]))[:20], lowest_margin_path)
+    write_csv_dicts(margin_summary, margin_summary_path)
+    plot_paths = plot_near_confusion_summaries(margin_summary, plot_dir=plot_dir, variant_labels=variant_labels)
+    plot_paths.extend(plot_near_confusion_pair_summaries(pair_summary, plot_dir=plot_dir, variant_labels=variant_labels))
+    manifest = {
+        "variants": list(variants),
+        "per_image_csv": str(per_image_path),
+        "pair_summary_csv": str(pair_summary_path),
+        "lowest_margin_csv": str(lowest_margin_path),
+        "margin_summary_csv": str(margin_summary_path),
+        "plots": plot_paths,
+    }
+    (output_dir / "onnx_near_confusion_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+    return manifest
+
+
+def near_confusion_rows(prediction_rows: list[dict[str, str]], *, variants: tuple[str, ...]) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
+    for row in prediction_rows:
+        variant = row.get("variant", "")
+        if variant not in variants:
+            continue
+        probabilities = probability_values(row)
+        if probabilities:
+            predicted = row.get("predicted_class_name", "")
+            runner_up_class, runner_up_probability = runner_up_probability_for_row(probabilities, predicted)
+        else:
+            runner_up_class, runner_up_probability = "", None
+        selected.append(
+            {
+                "variant": variant,
+                "image_name": Path(row.get("image_path", "")).name,
+                "image_path": row.get("image_path", ""),
+                "true_class_name": row.get("true_class_name", ""),
+                "predicted_class_name": row.get("predicted_class_name", ""),
+                "correct": row.get("correct", ""),
+                "top1_confidence": row.get("top1_confidence", ""),
+                "top1_probability": row.get("top1_confidence", ""),
+                "true_class_probability": row.get("true_class_probability", ""),
+                "runner_up_class_name": runner_up_class,
+                "runner_up_probability": runner_up_probability,
+                "margin": float(row.get("margin") or 0.0),
+                "top1_top2_margin": float(row.get("margin") or 0.0),
+                "mask_path": row.get("mask_path", ""),
+                "color_mask_path": row.get("color_mask_path", ""),
+            }
+        )
+    return selected
+
+
+def probability_values(row: dict[str, str]) -> dict[str, float]:
+    values: dict[str, float] = {}
+    for key, raw_value in row.items():
+        if not key.startswith("prob_") or raw_value == "":
+            continue
+        values[key[len("prob_") :]] = float(raw_value)
+    return values
+
+
+def runner_up_probability_for_row(probabilities: dict[str, float], predicted_class: str) -> tuple[str, float | None]:
+    ranked = sorted(probabilities.items(), key=lambda item: item[1], reverse=True)
+    for class_name, probability in ranked:
+        if class_name != predicted_class:
+            return class_name, probability
+    return "", None
+
+
+def summarize_near_confusion_pairs(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        grouped[(row["variant"], row["true_class_name"], row["runner_up_class_name"])].append(row)
+    summary: list[dict[str, Any]] = []
+    for (variant, true_class, runner_up_class), group in sorted(grouped.items()):
+        margins = np.asarray([float(row["margin"]) for row in group], dtype=float)
+        runner_probs = np.asarray([float(row["runner_up_probability"]) for row in group if row["runner_up_probability"] not in (None, "")], dtype=float)
+        summary.append(
+            {
+                "variant": variant,
+                "true_class_name": true_class,
+                "runner_up_class_name": runner_up_class,
+                "count": len(group),
+                "min_margin": float(margins.min()) if margins.size else None,
+                "mean_margin": mean_or_none(margins),
+                "max_runner_up_probability": float(runner_probs.max()) if runner_probs.size else None,
+                "count_margin_lt_0_50": int((margins < 0.50).sum()) if margins.size else 0,
+                "count_margin_lt_0_35": int((margins < 0.35).sum()) if margins.size else 0,
+                "count_margin_lt_0_25": int((margins < 0.25).sum()) if margins.size else 0,
+            }
+        )
+    return summary
+
+
+def summarize_near_confusion_margins(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        grouped[row["variant"]].append(row)
+    summary: list[dict[str, Any]] = []
+    for variant, group in sorted(grouped.items()):
+        margins = np.asarray([float(row["margin"]) for row in group], dtype=float)
+        runner_probs = np.asarray([float(row["runner_up_probability"]) for row in group if row["runner_up_probability"] not in (None, "")], dtype=float)
+        lowest = min(group, key=lambda row: float(row["margin"])) if group else None
+        summary.append(
+            {
+                "variant": variant,
+                "images": len(group),
+                "min_margin": float(margins.min()) if margins.size else None,
+                "p01_margin": float(np.percentile(margins, 1.0)) if margins.size else None,
+                "p05_margin": float(np.percentile(margins, 5.0)) if margins.size else None,
+                "p10_margin": float(np.percentile(margins, 10.0)) if margins.size else None,
+                "median_margin": float(np.median(margins)) if margins.size else None,
+                "mean_margin": mean_or_none(margins),
+                "max_runner_up_probability": float(runner_probs.max()) if runner_probs.size else None,
+                "count_margin_lt_0_50": int((margins < 0.50).sum()) if margins.size else 0,
+                "count_margin_lt_0_35": int((margins < 0.35).sum()) if margins.size else 0,
+                "count_margin_lt_0_25": int((margins < 0.25).sum()) if margins.size else 0,
+                "lowest_margin_image_path": "" if lowest is None else lowest["image_path"],
+                "lowest_margin_true_class": "" if lowest is None else lowest["true_class_name"],
+                "lowest_margin_predicted_class": "" if lowest is None else lowest["predicted_class_name"],
+                "lowest_margin_runner_up_class": "" if lowest is None else lowest["runner_up_class_name"],
+            }
+        )
+    return summary
+
+
+def plot_near_confusion_summaries(rows: list[dict[str, Any]], *, plot_dir: Path, variant_labels: dict[str, str]) -> list[str]:
+    outputs: list[str] = []
+    if not rows:
+        return outputs
+    for metric, title, filename in (
+        ("min_margin", "Lowest scene-class margin", "near_confusion_min_margin.png"),
+        ("max_runner_up_probability", "Highest runner-up scene probability", "near_confusion_max_runner_up_probability.png"),
+    ):
+        fig, ax = plt.subplots(figsize=(8, 4.5), constrained_layout=True)
+        labels = [variant_labels.get(row["variant"], row["variant"]) for row in rows]
+        values = [float(row[metric]) if row[metric] not in (None, "") else 0.0 for row in rows]
+        ax.bar(np.arange(len(rows)), values)
+        ax.set_xticks(np.arange(len(rows)), labels, rotation=15, ha="right")
+        ax.set_ylim(0, max(1.0, max(values) * 1.15 if values else 1.0))
+        ax.set_title(f"ONNX near-confusion: {title}")
+        for index, value in enumerate(values):
+            ax.text(index, value + 0.02, f"{value:.3f}", ha="center", fontsize=9)
+        path = plot_dir / f"onnx_{filename}"
+        fig.savefig(path, dpi=180)
+        plt.close(fig)
+        outputs.append(str(path))
+    return outputs
+
+
+def plot_near_confusion_pair_summaries(rows: list[dict[str, Any]], *, plot_dir: Path, variant_labels: dict[str, str]) -> list[str]:
+    outputs: list[str] = []
+    rows_by_variant: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        rows_by_variant[str(row["variant"])].append(row)
+    for variant, variant_rows in rows_by_variant.items():
+        sorted_rows = sorted(variant_rows, key=lambda row: (str(row["true_class_name"]), str(row["runner_up_class_name"])))
+        labels = [f"{row['true_class_name']}→{row['runner_up_class_name']}" for row in sorted_rows]
+        for metric, title, filename in (
+            ("min_margin", "lowest margin by true/runner-up class", f"{variant}_near_confusion_min_margin.png"),
+            (
+                "max_runner_up_probability",
+                "highest runner-up probability by true/runner-up class",
+                f"{variant}_near_confusion_max_runner_up_probability.png",
+            ),
+        ):
+            values = [float(row[metric]) if row[metric] not in (None, "") else 0.0 for row in sorted_rows]
+            fig, ax = plt.subplots(figsize=(max(8, len(values) * 0.75), 4.8), constrained_layout=True)
+            ax.bar(np.arange(len(values)), values)
+            ax.set_xticks(np.arange(len(values)), labels, rotation=35, ha="right")
+            ax.set_ylim(0, max(1.0, max(values) * 1.15 if values else 1.0))
+            ax.set_title(f"{variant_labels.get(variant, variant)} near-confusion: {title}")
+            for index, value in enumerate(values):
+                ax.text(index, value + 0.02, f"{value:.3f}", ha="center", fontsize=8)
+            path = plot_dir / filename
+            fig.savefig(path, dpi=180)
+            plt.close(fig)
+            outputs.append(str(path))
+    return outputs
 
 
 def label_tile(image: Image.Image, label: str, *, font: ImageFont.ImageFont) -> Image.Image:

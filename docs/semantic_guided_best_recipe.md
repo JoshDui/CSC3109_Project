@@ -116,6 +116,29 @@ AWQ-style W8A8 mask exports and review panels
 Jupyter artifact manifest and summary
 ```
 
+The internal `internal_tune` split has `560` SAM3 pseudo-mask examples (`140` per class). Use it for segmentation agreement, Dice/mIoU against SAM3 pseudo-masks, FFT-vs-PEFT selection, and AWQ-style robustness probes. Do **not** present its `140/class` scene confusion matrices as unseen-set results.
+
+Final-facing confusion matrices should come from the held-out ImageFolder split:
+
+```text
+data/val 12
+400 images total
+100 images per scene class
+scene labels only; no segmentation ground truth and no val12 mIoU
+```
+
+The reproducible final artifact lane is:
+
+```text
+FFT BF16/QAT checkpoint
+→ FP32 ONNX export
+→ ONNX Runtime static INT8 QDQ/PTQ with MinMax train-split calibration
+→ val12 Torch BF16 / ONNX FP32 / ONNX INT8 QDQ / AWQ-style W8A8 scene-confusion evaluation
+→ ONNX-only qualitative panels, Johor OOD case study, AWQ-style vs ONNX INT8 case study
+```
+
+The AWQ-style val12 row is a PyTorch emulation/proxy for research comparison only; ONNX INT8 QDQ remains the deployment artifact.
+
 ## Dropout status
 
 Current explicit dropout is limited to the scene classification head:

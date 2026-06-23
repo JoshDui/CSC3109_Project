@@ -18,7 +18,25 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 DEFAULT_RUN_ID = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-STAGE_ORDER = ("split", "masks", "dataset", "loveda", "fft", "peft", "quant", "mask-export", "jupyter-artifacts")
+BEST_RECIPE_ID = "semantic_guided_bf16_qat_best_recipe_20260615"
+STAGE_ORDER = (
+    "split",
+    "masks",
+    "dataset",
+    "loveda",
+    "fft",
+    "peft",
+    "quant",
+    "mask-export",
+    "onnx-export",
+    "onnx-eval",
+    "onnx-delivery-size",
+    "unseen-val12",
+    "unseen-review",
+    "onnx-case-study",
+    "awq-onnx-case-study",
+    "jupyter-artifacts",
+)
 
 
 @dataclass(frozen=True)
@@ -38,6 +56,12 @@ def parse_args() -> argparse.Namespace:
         allow_abbrev=False,
     )
     parser.add_argument("--run-id", default=DEFAULT_RUN_ID)
+    parser.add_argument(
+        "--recipe",
+        choices=(BEST_RECIPE_ID,),
+        default=None,
+        help="Apply a known recipe preset before building commands. Explicitly omit to control every flag manually.",
+    )
     parser.add_argument("--stages", default="all", help="Comma-separated stages or 'all'.")
     parser.add_argument("--dry-run", action="store_true", help="Print commands without executing them or writing artifacts.")
     parser.add_argument("--python", default=sys.executable, help="Python executable to use on the target machine.")
@@ -165,6 +189,35 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--tables-dir", type=Path, default=None)
     parser.add_argument("--figures-dir", type=Path, default=None)
     parser.add_argument("--artifact-dir", type=Path, default=None)
+
+    parser.add_argument("--onnx-export-dir", type=Path, default=None)
+    parser.add_argument("--onnx-fp32-path", type=Path, default=None)
+    parser.add_argument("--onnx-export-manifest", type=Path, default=None)
+    parser.add_argument("--onnx-int8-dir", type=Path, default=None)
+    parser.add_argument("--onnx-int8-path", type=Path, default=None)
+    parser.add_argument("--onnx-eval-dir", type=Path, default=None)
+    parser.add_argument("--onnx-calibration-method", choices=("minmax", "entropy", "percentile"), default="minmax")
+    parser.add_argument("--onnx-calibration-batches", default="280", help="Calibration batches for ONNX INT8 QDQ; use 280 for full 2240-image train calibration at batch size 8.")
+    parser.add_argument("--onnx-max-eval-batches", type=int, default=None)
+    parser.add_argument("--onnx-ort-provider", action="append", default=[], help="Pinned ORT provider for ONNX export/eval stages; defaults to CPUExecutionProvider.")
+    parser.add_argument("--onnx-exporter", choices=("auto", "dynamo", "legacy"), default="auto")
+    parser.add_argument("--onnx-opset", type=int, default=18)
+
+    parser.add_argument("--onnx-delivery-size-summary", type=Path, default=None)
+    parser.add_argument("--onnx-delivery-size-summary-json", type=Path, default=None)
+
+    parser.add_argument("--unseen-data-dir", type=Path, default=PROJECT_ROOT / "data" / "val 12")
+    parser.add_argument("--unseen-output-dir", type=Path, default=None)
+    parser.add_argument("--unseen-mask-dir", type=Path, default=None)
+    parser.add_argument("--unseen-review-dir", type=Path, default=None)
+    parser.add_argument("--unseen-torch-precision", choices=("fp32", "bf16"), default="bf16")
+    parser.add_argument("--unseen-include-awq", action=argparse.BooleanOptionalAction, default=True)
+
+    parser.add_argument("--onnx-case-study-dir", type=Path, default=None)
+    parser.add_argument("--onnx-case-study-image", action="append", default=None, help="ONNX case image as NAME=PATH. Defaults to Johor screenshot when present.")
+    parser.add_argument("--awq-onnx-case-study-dir", type=Path, default=None)
+    parser.add_argument("--awq-onnx-case-study-image", action="append", default=None, help="AWQ-vs-ONNX case image as NAME=PATH. Defaults to railway701 and Johor screenshot.")
+
     parser.add_argument("--pipeline-manifest", type=Path, default=None)
     parser.add_argument("--pipeline-summary", type=Path, default=None)
     return parser.parse_args()
@@ -199,8 +252,72 @@ def resolve_paths(args: argparse.Namespace) -> None:
     args.mask_export_manifest = args.mask_export_manifest or args.mask_export_dir / "semantic_guided_cgaf_mask_export_manifest.csv"
     args.mask_export_summary = args.mask_export_summary or args.mask_export_dir / "semantic_guided_cgaf_mask_export_summary.json"
     args.mask_export_summary_csv = args.mask_export_summary_csv or args.mask_export_dir / "semantic_guided_cgaf_mask_export_summary.csv"
+    args.onnx_export_dir = args.onnx_export_dir or args.project_root / "model" / f"semantic_guided_cgaf_onnx_exports_final_{args.run_id}"
+    args.onnx_fp32_path = args.onnx_fp32_path or args.onnx_export_dir / "semantic_guided_cgaf_fft_fp32.onnx"
+    args.onnx_export_manifest = args.onnx_export_manifest or args.onnx_export_dir / "export_manifest.json"
+    args.onnx_int8_dir = args.onnx_int8_dir or args.project_root / "model" / f"semantic_guided_cgaf_onnx_int8_fullcalib_minmax_{args.run_id}"
+    args.onnx_int8_path = args.onnx_int8_path or args.onnx_int8_dir / "semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx"
+    args.onnx_eval_dir = args.onnx_eval_dir or args.project_root / "reports" / "tables" / f"semantic_guided_cgaf_onnx_eval_fullcalib_minmax_{args.run_id}"
+    args.unseen_output_dir = args.unseen_output_dir or args.project_root / "reports" / "tables" / f"semantic_guided_cgaf_unseen_val12_fullcalib_minmax_{args.run_id}"
+    args.unseen_mask_dir = args.unseen_mask_dir or args.project_root / "reports" / "figures" / f"semantic_guided_cgaf_unseen_val12_masks_fullcalib_minmax_{args.run_id}"
+    args.unseen_review_dir = args.unseen_review_dir or args.project_root / "reports" / "figures" / f"semantic_guided_cgaf_unseen_val12_review_fullcalib_minmax_{args.run_id}"
+    args.onnx_delivery_size_summary = args.onnx_delivery_size_summary or args.unseen_output_dir / "onnx_delivery_size_summary.csv"
+    args.onnx_delivery_size_summary_json = args.onnx_delivery_size_summary_json or args.unseen_output_dir / "onnx_delivery_size_summary.json"
+    args.onnx_case_study_dir = args.onnx_case_study_dir or args.project_root / "reports" / "figures" / f"semantic_guided_cgaf_johor_onnx_{args.run_id}"
+    args.awq_onnx_case_study_dir = args.awq_onnx_case_study_dir or args.project_root / "reports" / "figures" / f"semantic_guided_cgaf_awq_vs_onnx_int8_case_studies_{args.run_id}"
+    if args.onnx_case_study_image is None:
+        args.onnx_case_study_image = [f"johor={args.project_root / 'Screenshot_20260616_172913.png'}"]
+    if args.awq_onnx_case_study_image is None:
+        args.awq_onnx_case_study_image = [
+            f"railway701={args.project_root / 'data' / 'val 12' / 'railway' / 'railway701.jpg'}",
+            f"johor_ciq={args.project_root / 'Screenshot_20260616_172913.png'}",
+        ]
     args.pipeline_manifest = args.pipeline_manifest or artifact_dir / "semantic_guided_cgaf_pipeline_manifest.json"
     args.pipeline_summary = args.pipeline_summary or artifact_dir / "semantic_guided_cgaf_pipeline_summary.csv"
+
+
+def apply_recipe_preset(args: argparse.Namespace) -> None:
+    if args.recipe is None:
+        return
+    if args.recipe != BEST_RECIPE_ID:
+        raise ValueError(f"Unsupported recipe preset: {args.recipe}")
+    args.amp = True
+    args.amp_dtype = "bf16"
+    args.qat_mode = "w8a8"
+    args.qat_observer_warmup_epochs = 1
+    args.qat_freeze_observer_epoch = 0
+    args.epochs = 30
+    args.batch_size = 8
+    args.image_size = 512
+    args.lr = 1.0e-4
+    args.weight_decay = 0.05
+    args.loveda_scheduler = "cosine"
+    args.loveda_warmup_epochs = 3
+    args.loveda_min_lr = 0.0
+    args.loveda_encoder_lr_mult = 0.3
+    args.loveda_early_stopping_patience = 8
+    args.loveda_early_stopping_min_delta = 0.0
+    args.loveda_class_weight_mode = "inverse_sqrt"
+    args.loveda_focal_gamma = 1.0
+    args.transfer_scheduler = "cosine"
+    args.transfer_warmup_epochs = 1
+    args.transfer_min_lr = 0.0
+    args.transfer_encoder_lr_mult = 0.25
+    args.transfer_early_stopping_patience = 8
+    args.transfer_early_stopping_min_delta = 0.0
+    args.transfer_monitor = "macro_f1"
+    args.transfer_focal_gamma = 0.0
+    args.fft_freeze_backbone = False
+    args.fft_freeze_backbone_epochs = 3
+    args.peft_freeze_backbone = True
+    args.peft_freeze_backbone_epochs = 0
+    args.quant_modes = "fp32,awq_w8a8"
+    args.mask_export_quant_mode = "awq_w8a8"
+    args.mask_export_max_examples = 0
+    args.onnx_calibration_method = "minmax"
+    args.onnx_calibration_batches = "280"
+    args.unseen_torch_precision = "bf16"
+    args.unseen_include_awq = True
 
 
 def parse_stages(raw_stages: str) -> list[str]:
@@ -267,6 +384,19 @@ def validate_args(args: argparse.Namespace, stages: list[str]) -> None:
         raise ValueError("--mask-export-calibration-batches must be positive")
     if "mask-export" in stages and args.mask_export_quant_mode != "awq_w8a8":
         raise ValueError("--mask-export-quant-mode must be awq_w8a8 for review artifacts")
+    if args.onnx_opset <= 0:
+        raise ValueError("--onnx-opset must be positive")
+    if str(args.onnx_calibration_batches).strip().lower() != "all":
+        try:
+            if int(args.onnx_calibration_batches) <= 0:
+                raise ValueError
+        except ValueError as exc:
+            raise ValueError("--onnx-calibration-batches must be a positive integer or 'all'") from exc
+    if args.onnx_max_eval_batches is not None and args.onnx_max_eval_batches <= 0:
+        raise ValueError("--onnx-max-eval-batches must be positive when provided")
+    if args.unseen_include_awq and any(stage in stages for stage in ("unseen-val12", "awq-onnx-case-study")):
+        if not args.fft_awq_checkpoint.exists() and "quant" not in stages:
+            raise FileNotFoundError(f"AWQ FFT checkpoint artifact is required for val12/case-study AWQ outputs: {args.fft_awq_checkpoint}")
     if not stages:
         raise ValueError("No stages selected")
 
@@ -418,6 +548,20 @@ def build_commands(args: argparse.Namespace, stages: list[str]) -> list[Pipeline
         commands.append(PipelineCommand("quant", "evaluate quantization artifacts", quant_command, heavy=True))
     if "mask-export" in stages:
         commands.append(mask_export_command(args, py))
+    if "onnx-export" in stages:
+        commands.append(onnx_export_command(args, py))
+    if "onnx-eval" in stages:
+        commands.append(onnx_eval_command(args, py))
+    if "onnx-delivery-size" in stages:
+        commands.append(onnx_delivery_size_command(args, py))
+    if "unseen-val12" in stages:
+        commands.append(unseen_val12_command(args, py))
+    if "unseen-review" in stages:
+        commands.append(unseen_review_command(args, py))
+    if "onnx-case-study" in stages:
+        commands.append(onnx_case_study_command(args, py))
+    if "awq-onnx-case-study" in stages:
+        commands.append(awq_onnx_case_study_command(args, py))
     return commands
 
 
@@ -524,6 +668,236 @@ def mask_export_command(args: argparse.Namespace, py: str) -> PipelineCommand:
         str(args.device if args.device in {"auto", "cpu", "cuda"} else "auto"),
     ]
     return PipelineCommand("mask-export", "export FFT/PEFT masks and visual comparisons", command, heavy=True)
+
+
+def onnx_export_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    command = [
+        py,
+        str(args.project_root / "tools" / "export_semantic_guided_onnx.py"),
+        "--run-id",
+        str(args.run_id),
+        "--checkpoint",
+        f"fft={args.fft_checkpoint}",
+        "--output-dir",
+        str(args.onnx_export_dir),
+        "--onnx-fp32-output",
+        str(args.onnx_fp32_path),
+        "--export-manifest",
+        str(args.onnx_export_manifest),
+        "--mask-source",
+        str(args.mask_source),
+        "--image-size",
+        str(args.image_size),
+        "--batch-size",
+        "1",
+        "--opset",
+        str(args.onnx_opset),
+        "--dynamic-batch",
+        "--device",
+        str(args.device if args.device in {"auto", "cpu", "cuda"} else "auto"),
+        "--exporter",
+        str(args.onnx_exporter),
+        *ort_provider_args(args.onnx_ort_provider),
+    ]
+    return PipelineCommand("onnx-export", "export FFT FP32 ONNX", command, heavy=True)
+
+
+def onnx_eval_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    command = [
+        py,
+        str(args.project_root / "tools" / "evaluate_semantic_guided_onnx.py"),
+        "--run-id",
+        str(args.run_id),
+        "--checkpoint",
+        f"fft={args.fft_checkpoint}",
+        "--onnx-fp32-path",
+        str(args.onnx_fp32_path),
+        "--export-manifest",
+        str(args.onnx_export_manifest),
+        "--onnx-output-dir",
+        str(args.onnx_int8_dir),
+        "--onnx-int8-output",
+        str(args.onnx_int8_path),
+        "--manifest-path",
+        str(args.sam3_mask_manifest),
+        "--mask-source",
+        str(args.mask_source),
+        "--calibration-split",
+        "train",
+        "--eval-split",
+        "internal_tune",
+        "--output-dir",
+        str(args.onnx_eval_dir),
+        "--image-size",
+        str(args.image_size),
+        "--batch-size",
+        str(args.batch_size),
+        "--num-workers",
+        str(args.num_workers),
+        "--calibration-batches",
+        str(onnx_calibration_batches_value(args)),
+        "--calibration-method",
+        str(args.onnx_calibration_method),
+        "--device",
+        str(args.device if args.device in {"auto", "cpu", "cuda"} else "auto"),
+        *ort_provider_args(args.onnx_ort_provider),
+    ]
+    if args.onnx_max_eval_batches is not None:
+        command.extend(["--max-eval-batches", str(args.onnx_max_eval_batches)])
+    return PipelineCommand("onnx-eval", "calibrate/evaluate ONNX FP32 and INT8 QDQ", command, heavy=True)
+
+
+def onnx_delivery_size_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    return PipelineCommand(
+        "onnx-delivery-size",
+        "summarize ONNX delivery artifact sizes",
+        [
+            py,
+            str(args.project_root / "tools" / "summarize_artifact_delivery_sizes.py"),
+            "--run-id",
+            str(args.run_id),
+            "--artifact",
+            f"onnx_fp32={args.onnx_fp32_path}",
+            "--artifact",
+            f"onnx_int8_qdq_fullcalib_minmax={args.onnx_int8_path}",
+            "--output-csv",
+            str(args.onnx_delivery_size_summary),
+            "--output-json",
+            str(args.onnx_delivery_size_summary_json),
+            "--gzip",
+        ],
+        heavy=False,
+    )
+
+
+def unseen_val12_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    command = [
+        py,
+        str(args.project_root / "tools" / "evaluate_semantic_guided_unseen_imagefolder.py"),
+        "--run-id",
+        str(args.run_id),
+        "--data-dir",
+        str(args.unseen_data_dir),
+        "--checkpoint",
+        f"fft={args.fft_checkpoint}",
+        "--onnx-fp32-path",
+        str(args.onnx_fp32_path),
+        "--onnx-int8-path",
+        str(args.onnx_int8_path),
+        "--export-manifest",
+        str(args.onnx_export_manifest),
+        "--output-dir",
+        str(args.unseen_output_dir),
+        "--mask-dir",
+        str(args.unseen_mask_dir),
+        "--mask-source",
+        str(args.mask_source),
+        "--image-size",
+        str(args.image_size),
+        "--batch-size",
+        str(args.batch_size),
+        "--num-workers",
+        str(args.num_workers),
+        "--device",
+        str(args.device if args.device in {"auto", "cpu", "cuda"} else "auto"),
+        "--torch-precision",
+        str(args.unseen_torch_precision),
+        *ort_provider_args(args.onnx_ort_provider),
+    ]
+    if args.unseen_include_awq:
+        command.extend(["--awq-checkpoint-artifact", str(args.fft_awq_checkpoint)])
+    return PipelineCommand("unseen-val12", "evaluate final variants on unseen val12", command, heavy=True)
+
+
+def unseen_review_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    variants = [f"torch_{args.unseen_torch_precision}", "onnx_fp32", "onnx_int8_qdq"]
+    if args.unseen_include_awq:
+        variants.append("torch_awq_w8a8_emulated")
+    command = [
+        py,
+        str(args.project_root / "tools" / "create_semantic_guided_unseen_review_artifacts.py"),
+        "--table-dir",
+        str(args.unseen_output_dir),
+        "--mask-dir",
+        str(args.unseen_mask_dir),
+        "--output-dir",
+        str(args.unseen_review_dir),
+        "--onnx-only-panels",
+    ]
+    for variant in variants:
+        command.extend(["--variant", variant])
+    command.extend(["--near-confusion-variant", "onnx_fp32", "--near-confusion-variant", "onnx_int8_qdq"])
+    return PipelineCommand("unseen-review", "create unseen val12 review artifacts", command, heavy=False)
+
+
+def onnx_case_study_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    command = [
+        py,
+        str(args.project_root / "tools" / "run_semantic_guided_onnx_case_study.py"),
+        "--run-id",
+        str(args.run_id),
+        "--onnx-fp32-path",
+        str(args.onnx_fp32_path),
+        "--onnx-int8-path",
+        str(args.onnx_int8_path),
+        "--export-manifest",
+        str(args.onnx_export_manifest),
+        "--output-dir",
+        str(args.onnx_case_study_dir),
+        "--image-size",
+        str(args.image_size),
+        *ort_provider_args(args.onnx_ort_provider),
+    ]
+    for image_spec in args.onnx_case_study_image:
+        command.extend(["--image", str(image_spec)])
+    return PipelineCommand("onnx-case-study", "run ONNX qualitative case study", command, heavy=False)
+
+
+def awq_onnx_case_study_command(args: argparse.Namespace, py: str) -> PipelineCommand:
+    command = [
+        py,
+        str(args.project_root / "tools" / "compare_semantic_guided_case_studies.py"),
+        "--run-id",
+        str(args.run_id),
+        "--awq-checkpoint-artifact",
+        str(args.fft_awq_checkpoint),
+        "--onnx-fp32-path",
+        str(args.onnx_fp32_path),
+        "--onnx-int8-path",
+        str(args.onnx_int8_path),
+        "--export-manifest",
+        str(args.onnx_export_manifest),
+        "--output-dir",
+        str(args.awq_onnx_case_study_dir),
+        "--image-size",
+        str(args.image_size),
+        "--device",
+        str(args.device if args.device in {"auto", "cpu", "cuda"} else "auto"),
+        *ort_provider_args(args.onnx_ort_provider),
+    ]
+    for image_spec in args.awq_onnx_case_study_image:
+        command.extend(["--image", str(image_spec)])
+    return PipelineCommand("awq-onnx-case-study", "compare AWQ emulation with ONNX case studies", command, heavy=True)
+
+
+def ort_provider_args(providers: list[str]) -> list[str]:
+    values: list[str] = []
+    for provider in (providers or ["CPUExecutionProvider"]):
+        values.extend(["--ort-provider", str(provider)])
+    return values
+
+
+def onnx_calibration_batches_value(args: argparse.Namespace) -> int:
+    raw_value = str(args.onnx_calibration_batches).strip().lower()
+    if raw_value != "all":
+        return int(raw_value)
+    if not args.sam3_mask_manifest.exists():
+        raise FileNotFoundError(f"Cannot resolve --onnx-calibration-batches all without mask manifest: {args.sam3_mask_manifest}")
+    with args.sam3_mask_manifest.open(newline="", encoding="utf-8") as file:
+        count = sum(1 for row in csv.DictReader(file) if row.get("split") == "train")
+    if count <= 0:
+        raise ValueError(f"No train rows found in {args.sam3_mask_manifest}")
+    return (count + args.batch_size - 1) // args.batch_size
 
 
 def transfer_freeze_args(args: argparse.Namespace, *, mode: str) -> list[str]:
@@ -643,6 +1017,20 @@ def pipeline_outputs(args: argparse.Namespace) -> dict[str, str]:
         "mask_export_manifest": str(args.mask_export_manifest),
         "mask_export_summary": str(args.mask_export_summary),
         "mask_export_summary_csv": str(args.mask_export_summary_csv),
+        "onnx_export_dir": str(args.onnx_export_dir),
+        "onnx_fp32_path": str(args.onnx_fp32_path),
+        "onnx_export_manifest": str(args.onnx_export_manifest),
+        "onnx_int8_dir": str(args.onnx_int8_dir),
+        "onnx_int8_path": str(args.onnx_int8_path),
+        "onnx_eval_dir": str(args.onnx_eval_dir),
+        "onnx_delivery_size_summary": str(args.onnx_delivery_size_summary),
+        "onnx_delivery_size_summary_json": str(args.onnx_delivery_size_summary_json),
+        "unseen_data_dir": str(args.unseen_data_dir),
+        "unseen_output_dir": str(args.unseen_output_dir),
+        "unseen_mask_dir": str(args.unseen_mask_dir),
+        "unseen_review_dir": str(args.unseen_review_dir),
+        "onnx_case_study_dir": str(args.onnx_case_study_dir),
+        "awq_onnx_case_study_dir": str(args.awq_onnx_case_study_dir),
         "tables_dir": str(args.tables_dir),
         "figures_dir": str(args.figures_dir),
         "artifact_dir": str(args.artifact_dir),
@@ -661,11 +1049,11 @@ def validate_checkpoint_handoffs(args: argparse.Namespace, stages: list[str]) ->
     checkpoints: dict[str, Path] = {}
     if any(stage in stages for stage in ("loveda", "fft", "peft")):
         checkpoints["loveda_checkpoint"] = args.loveda_checkpoint
-    if any(stage in stages for stage in ("fft", "quant", "mask-export")):
+    if any(stage in stages for stage in ("fft", "quant", "mask-export", "onnx-export", "onnx-eval", "unseen-val12", "onnx-case-study", "awq-onnx-case-study")):
         checkpoints["fft_checkpoint"] = args.fft_checkpoint
     if any(stage in stages for stage in ("peft", "quant", "mask-export")):
         checkpoints["peft_checkpoint"] = args.peft_checkpoint
-    if "quant" in stages or "mask-export" in stages:
+    if "quant" in stages or "mask-export" in stages or "unseen-val12" in stages or "awq-onnx-case-study" in stages:
         checkpoints["fft_raw_checkpoint_export"] = args.fft_raw_checkpoint_export
         checkpoints["peft_raw_checkpoint_export"] = args.peft_raw_checkpoint_export
         checkpoints["fft_awq_checkpoint"] = args.fft_awq_checkpoint
@@ -725,6 +1113,15 @@ def write_jupyter_artifacts(
             "checkpoint_export_manifest": str(args.checkpoint_export_manifest),
             "mask_export_summary": str(args.mask_export_summary),
             "mask_export_summary_csv": str(args.mask_export_summary_csv),
+            "onnx_comparison_table": str(args.onnx_eval_dir / "comparison_table.csv"),
+            "onnx_runtime_summary": str(args.onnx_eval_dir / "runtime_summary.csv"),
+            "onnx_drift_summary": str(args.onnx_eval_dir / "drift_summary.csv"),
+            "onnx_delivery_size_summary": str(args.onnx_delivery_size_summary),
+            "unseen_val12_summary": str(args.unseen_output_dir / "summary.csv"),
+            "unseen_val12_per_image_predictions": str(args.unseen_output_dir / "per_image_predictions.csv"),
+            "unseen_review_manifest": str(args.unseen_review_dir / "review_manifest.json"),
+            "onnx_case_study_summary": str(args.onnx_case_study_dir / "onnx_case_study_summary.csv"),
+            "awq_onnx_case_study_summary": str(args.awq_onnx_case_study_dir / "fft_awq_vs_onnx_int8_case_summary.csv"),
             "pipeline_summary": str(args.pipeline_summary),
         },
     }
@@ -743,6 +1140,13 @@ def required_artifact_status(args: argparse.Namespace, stages: list[str]) -> lis
 
     quant_required = "quant" in stages or "jupyter-artifacts" in stages
     mask_export_required = "mask-export" in stages or "jupyter-artifacts" in stages
+    onnx_export_required = any(stage in stages for stage in ("onnx-export", "onnx-eval", "onnx-delivery-size", "unseen-val12", "onnx-case-study", "awq-onnx-case-study", "jupyter-artifacts"))
+    onnx_eval_required = any(stage in stages for stage in ("onnx-eval", "onnx-delivery-size", "unseen-val12", "onnx-case-study", "awq-onnx-case-study", "jupyter-artifacts"))
+    delivery_required = "onnx-delivery-size" in stages or "jupyter-artifacts" in stages
+    unseen_required = "unseen-val12" in stages or "jupyter-artifacts" in stages
+    unseen_review_required = "unseen-review" in stages or "jupyter-artifacts" in stages
+    onnx_case_required = "onnx-case-study" in stages or "jupyter-artifacts" in stages
+    awq_case_required = "awq-onnx-case-study" in stages or "jupyter-artifacts" in stages
     add("quant_summary", args.quant_summary, required=quant_required)
     add("model_size_summary", args.model_size_summary, required=quant_required)
     add("checkpoint_export_manifest", args.checkpoint_export_manifest, required=quant_required)
@@ -754,6 +1158,23 @@ def required_artifact_status(args: argparse.Namespace, stages: list[str]) -> lis
     add("mask_export_summary", args.mask_export_summary, required=mask_export_required)
     add("mask_export_summary_csv", args.mask_export_summary_csv, required=mask_export_required)
     add("mask_figure_dir", args.mask_figure_dir, required=mask_export_required)
+    add("onnx_fp32_path", args.onnx_fp32_path, required=onnx_export_required)
+    add("onnx_export_manifest", args.onnx_export_manifest, required=onnx_export_required)
+    add("onnx_int8_path", args.onnx_int8_path, required=onnx_eval_required)
+    add("onnx_eval_comparison_table", args.onnx_eval_dir / "comparison_table.csv", required=onnx_eval_required)
+    add("onnx_eval_runtime_summary", args.onnx_eval_dir / "runtime_summary.csv", required=onnx_eval_required)
+    add("onnx_eval_drift_summary", args.onnx_eval_dir / "drift_summary.csv", required=onnx_eval_required)
+    add("onnx_delivery_size_summary", args.onnx_delivery_size_summary, required=delivery_required)
+    add("onnx_delivery_size_summary_json", args.onnx_delivery_size_summary_json, required=delivery_required)
+    add("unseen_val12_summary", args.unseen_output_dir / "summary.csv", required=unseen_required)
+    add("unseen_val12_per_image_predictions", args.unseen_output_dir / "per_image_predictions.csv", required=unseen_required)
+    add("unseen_val12_mask_dir", args.unseen_mask_dir, required=unseen_required)
+    add("unseen_review_manifest", args.unseen_review_dir / "review_manifest.json", required=unseen_review_required)
+    add("onnx_near_confusion_pair_summary", args.unseen_review_dir / "onnx_near_confusion_pair_summary.csv", required=unseen_review_required)
+    add("onnx_lowest_margin_top20", args.unseen_review_dir / "onnx_lowest_margin_top20.csv", required=unseen_review_required)
+    add("onnx_only_sample_panels_contact_sheet", args.unseen_review_dir / "onnx_only_sample_panels_contact_sheet.png", required=unseen_review_required)
+    add("onnx_case_study_summary", args.onnx_case_study_dir / "onnx_case_study_summary.csv", required=onnx_case_required)
+    add("awq_onnx_case_study_summary", args.awq_onnx_case_study_dir / "fft_awq_vs_onnx_int8_case_summary.csv", required=awq_case_required)
     return rows
 
 
@@ -775,6 +1196,17 @@ def write_summary_csv(path: Path, args: argparse.Namespace) -> None:
         {"run_id": args.run_id, "artifact": "mask_export_summary", "path": str(args.mask_export_summary)},
         {"run_id": args.run_id, "artifact": "mask_export_summary_csv", "path": str(args.mask_export_summary_csv)},
         {"run_id": args.run_id, "artifact": "mask_figure_dir", "path": str(args.mask_figure_dir)},
+        {"run_id": args.run_id, "artifact": "onnx_fp32_path", "path": str(args.onnx_fp32_path)},
+        {"run_id": args.run_id, "artifact": "onnx_export_manifest", "path": str(args.onnx_export_manifest)},
+        {"run_id": args.run_id, "artifact": "onnx_int8_path", "path": str(args.onnx_int8_path)},
+        {"run_id": args.run_id, "artifact": "onnx_eval_dir", "path": str(args.onnx_eval_dir)},
+        {"run_id": args.run_id, "artifact": "onnx_delivery_size_summary", "path": str(args.onnx_delivery_size_summary)},
+        {"run_id": args.run_id, "artifact": "unseen_val12_summary", "path": str(args.unseen_output_dir / "summary.csv")},
+        {"run_id": args.run_id, "artifact": "unseen_val12_per_image_predictions", "path": str(args.unseen_output_dir / "per_image_predictions.csv")},
+        {"run_id": args.run_id, "artifact": "unseen_val12_mask_dir", "path": str(args.unseen_mask_dir)},
+        {"run_id": args.run_id, "artifact": "unseen_review_dir", "path": str(args.unseen_review_dir)},
+        {"run_id": args.run_id, "artifact": "onnx_case_study_dir", "path": str(args.onnx_case_study_dir)},
+        {"run_id": args.run_id, "artifact": "awq_onnx_case_study_dir", "path": str(args.awq_onnx_case_study_dir)},
     ]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as file:
@@ -794,6 +1226,7 @@ def quote_arg(value: str) -> str:
 
 def main() -> None:
     args = parse_args()
+    apply_recipe_preset(args)
     args.project_root = args.project_root.resolve()
     resolve_paths(args)
     stages = parse_stages(args.stages)
