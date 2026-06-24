@@ -9,7 +9,7 @@ Current corrected full-pipeline run:
 ```text
 run_id = semantic_guided_bf16_qat_best_recipe_20260615
 screen = semantic_bf16_qat_best_recipe
-log    = /home/lucas/CSC3109_Project_qat/logs/semantic_guided_bf16_qat_best_recipe_20260615.log
+log    = logs/semantic_guided_bf16_qat_best_recipe_20260615.log
 ```
 
 ## LoveDA pretraining

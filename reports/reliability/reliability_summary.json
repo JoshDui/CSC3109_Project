@@ -1,5 +1,5 @@
 {
-  "checkpoint": "/home/william/school_projects/CSC3109_Project/model/custom_cnn_small/best_model.pt",
+  "checkpoint": "model/custom_cnn_small/best_model.pt",
   "classes": [
     "bridge",
     "freeway",
