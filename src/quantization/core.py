@@ -11,7 +11,7 @@ import torch
 from torch import nn
 
 from src.config import CLASS_NAMES, IMAGE_SIZE
-from src.models import build_swin_classifier, build_timm_classifier, resolve_timm_model_name
+from src.models import build_custom_cnn, build_swin_classifier, build_timm_classifier, resolve_timm_model_name
 from src.models.resnet18_frozen import build_resnet18_frozen
 
 
@@ -105,6 +105,15 @@ def _coerce_preprocess(payload: dict[str, Any], model_name: str) -> dict[str, An
     if isinstance(preprocess, dict) and preprocess:
         return preprocess
 
+    normalization = payload.get("normalization")
+    if isinstance(normalization, dict) and normalization.get("mean") and normalization.get("std"):
+        return {
+            "input_size": (3, IMAGE_SIZE, IMAGE_SIZE),
+            "mean": tuple(normalization["mean"]),
+            "std": tuple(normalization["std"]),
+            "interpolation": str(normalization.get("interpolation", "bilinear")),
+        }
+
     if model_name == "resnet18":
         return {
             "input_size": (3, IMAGE_SIZE, IMAGE_SIZE),
@@ -150,6 +159,10 @@ def _extract_state_dict(payload: dict[str, Any]) -> dict[str, torch.Tensor]:
 def _detect_model_family(model_name: str, payload: dict[str, Any], state_dict: dict[str, torch.Tensor]) -> str:
     resolved = resolve_timm_model_name(model_name)
     lowered = f"{model_name} {resolved}".lower()
+    if "custom-cnn" in lowered or "custom_cnn" in lowered:
+        return "custom_cnn"
+    if "features.0.0.weight" in state_dict and "head.2.weight" in state_dict:
+        return "custom_cnn"
     if "swin_" in lowered or payload.get("variant") in {"tiny", "small"}:
         return "swin"
     if "resnet18" in lowered:
@@ -192,6 +205,13 @@ def load_checkpoint_bundle(path: Path) -> CheckpointBundle:
 
 def build_model_from_bundle(bundle: CheckpointBundle) -> nn.Module:
     num_classes = len(bundle.class_to_idx)
+    if bundle.model_family == "custom_cnn":
+        return build_custom_cnn(
+            num_classes=num_classes,
+            base_channels=int(bundle.args.get("base_channels", 32) or 32),
+            dropout=float(bundle.args.get("dropout", 0.30) or 0.30),
+        )
+
     if bundle.model_family == "resnet18_frozen":
         return build_resnet18_frozen(num_classes=num_classes)
 

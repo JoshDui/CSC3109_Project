@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1",
+  "model": {
+    "id": "focalnet_tiny_srf_int8_qdq_20260624",
+    "family": "focalnet_tiny_srf",
+    "variant": "int8_qdq",
+    "format": "onnx",
+    "url": "/models/focalnet_tiny_srf_int8_qdq.onnx",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "bytes": 28954694,
+    "expiresAt": "2026-12-31T23:59:59Z"
+  },
+  "runtime": {
+    "executionProvider": "wasm",
+    "wasmPaths": "/ort/",
+    "ortVersion": "1.27.0"
+  },
+  "labels": ["bridge", "freeway", "overpass", "railway"],
+  "preprocessing": {
+    "imageSize": 224,
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225],
+    "colorSpace": "RGB"
+  }
+}
