@@ -25,6 +25,7 @@ dependencies = [
     "onnx>=1.22.0",
     "onnxruntime>=1.27.0",
     "onnxscript>=0.7.0",
+    "peft>=0.19.1",
 ]
 
 [tool.uv]

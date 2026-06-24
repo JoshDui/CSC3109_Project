@@ -28,10 +28,12 @@ from src.models.custom_cnn import (
     CustomCnnSpec,
     build_custom_cnn,
 )
-from src.models.resnet18_finetune import (
+from src.models.resnet import (
+    build_resnet18_frozen,
     build_resnet18_finetune_last_block,
     last_block_parameter_groups,
     trainable_parameter_summary,
+    trainable_parameters as resnet_trainable_parameters,
 )
 from src.models.timm_classifier import (
     CONVNEXTV2_TINY,
@@ -83,6 +85,7 @@ __all__ = [
     "build_semantic_guided_cgaf_cnn",
     "build_custom_cnn",
     "build_resnet18_finetune_last_block",
+    "build_resnet18_frozen",
     "build_swin_classifier",
     "build_swin_tiny_classifier",
     "build_timm_classifier",
@@ -92,4 +95,5 @@ __all__ = [
     "slugify_model_name",
     "trainable_parameter_summary",
     "trainable_parameters",
+    "resnet_trainable_parameters",
 ]

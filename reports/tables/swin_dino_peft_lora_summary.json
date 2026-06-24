@@ -1,0 +1,413 @@
+{
+  "summary": [
+    {
+      "run": "DINOv2 ViT-S/14 linear probe",
+      "family": "dinov2",
+      "method": "legacy_linear_probe",
+      "runtime": "torch_fp32",
+      "model_name": null,
+      "accuracy": 0.985,
+      "macro_precision": 0.9854368932038835,
+      "macro_recall": 0.985,
+      "macro_f1": 0.9849966242404541,
+      "errors": 6,
+      "samples_evaluated": null,
+      "tune_accuracy": null,
+      "tune_macro_f1": null,
+      "best_epoch": null,
+      "total_parameters": null,
+      "trainable_parameters": null,
+      "trainable_percent": null,
+      "onnx_size_bytes": null,
+      "average_batch_latency_seconds": null,
+      "metrics_path": "reports/vit_small_patch14_dinov2_lvd142m_linear_probe_eval/metrics.json",
+      "run_dir": "model/vit_small_patch14_dinov2_lvd142m_linear_probe"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 full fine-tune",
+      "family": "dinov2",
+      "method": "legacy_full_finetune",
+      "runtime": "torch_fp32",
+      "model_name": null,
+      "accuracy": 0.9975,
+      "macro_precision": 0.9975247524752475,
+      "macro_recall": 0.9975,
+      "macro_f1": 0.9974999374984375,
+      "errors": 1,
+      "samples_evaluated": null,
+      "tune_accuracy": null,
+      "tune_macro_f1": null,
+      "best_epoch": null,
+      "total_parameters": null,
+      "trainable_parameters": null,
+      "trainable_percent": null,
+      "onnx_size_bytes": null,
+      "average_batch_latency_seconds": null,
+      "metrics_path": "reports/vit_small_patch14_dinov2_lvd142m_eval/metrics.json",
+      "run_dir": "model/vit_small_patch14_dinov2_lvd142m_finetune"
+    },
+    {
+      "run": "Swin-Tiny full fine-tune",
+      "family": "swin",
+      "method": "legacy_full_finetune",
+      "runtime": "torch_fp32",
+      "model_name": null,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "errors": 0,
+      "samples_evaluated": null,
+      "tune_accuracy": null,
+      "tune_macro_f1": null,
+      "best_epoch": null,
+      "total_parameters": null,
+      "trainable_parameters": null,
+      "trainable_percent": null,
+      "onnx_size_bytes": null,
+      "average_batch_latency_seconds": null,
+      "metrics_path": "reports/swin_tiny_eval/metrics.json",
+      "run_dir": "model/swin_tiny"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA",
+      "family": "dinov2",
+      "method": "peft_lora",
+      "runtime": "torch_peft_adapter",
+      "model_name": "vit_small_patch14_dinov2.lvd142m",
+      "accuracy": 0.995,
+      "macro_precision": 0.9950980392156863,
+      "macro_recall": 0.995,
+      "macro_f1": 0.9950121896611772,
+      "errors": 2,
+      "samples_evaluated": 400,
+      "tune_accuracy": 1.0,
+      "tune_macro_f1": 1.0,
+      "best_epoch": 3,
+      "total_parameters": 22221704,
+      "trainable_parameters": 591364,
+      "trainable_percent": 2.66120005918538,
+      "onnx_size_bytes": null,
+      "average_batch_latency_seconds": null,
+      "metrics_path": "reports/vit_small_patch14_dinov2_lvd142m_lora_eval/metrics.json",
+      "run_dir": "model/vit_small_patch14_dinov2_lvd142m_lora"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "family": "dinov2",
+      "method": "peft_lora",
+      "runtime": "onnxruntime_fp32",
+      "model_name": "vit_small_patch14_dinov2.lvd142m",
+      "accuracy": 0.995,
+      "macro_precision": 0.9950980392156863,
+      "macro_recall": 0.995,
+      "macro_f1": 0.9950121896611772,
+      "errors": 2,
+      "samples_evaluated": 400,
+      "tune_accuracy": 1.0,
+      "tune_macro_f1": 1.0,
+      "best_epoch": 3,
+      "total_parameters": 22221704,
+      "trainable_parameters": 591364,
+      "trainable_percent": 2.66120005918538,
+      "onnx_size_bytes": 87609868,
+      "average_batch_latency_seconds": 0.6136261181673035,
+      "metrics_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/eval/metrics.json",
+      "run_dir": "model/vit_small_patch14_dinov2_lvd142m_lora"
+    },
+    {
+      "run": "Swin-Tiny LoRA",
+      "family": "swin",
+      "method": "peft_lora",
+      "runtime": "torch_peft_adapter",
+      "model_name": "swin_tiny_patch4_window7_224",
+      "accuracy": 0.99,
+      "macro_precision": 0.9903846153846154,
+      "macro_recall": 0.99,
+      "macro_f1": 0.9900346512096664,
+      "errors": 4,
+      "samples_evaluated": 400,
+      "tune_accuracy": 1.0,
+      "tune_macro_f1": 1.0,
+      "best_epoch": 2,
+      "total_parameters": 28090754,
+      "trainable_parameters": 568324,
+      "trainable_percent": 2.023171040549499,
+      "onnx_size_bytes": null,
+      "average_batch_latency_seconds": null,
+      "metrics_path": "reports/swin_tiny_lora_eval/metrics.json",
+      "run_dir": "model/swin_tiny_lora"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "family": "swin",
+      "method": "peft_lora",
+      "runtime": "onnxruntime_fp32",
+      "model_name": "swin_tiny_patch4_window7_224",
+      "accuracy": 0.99,
+      "macro_precision": 0.9903846153846154,
+      "macro_recall": 0.99,
+      "macro_f1": 0.9900346512096664,
+      "errors": 4,
+      "samples_evaluated": 400,
+      "tune_accuracy": 1.0,
+      "tune_macro_f1": 1.0,
+      "best_epoch": 2,
+      "total_parameters": 28090754,
+      "trainable_parameters": 568324,
+      "trainable_percent": 2.023171040549499,
+      "onnx_size_bytes": 113949899,
+      "average_batch_latency_seconds": 0.597441965250861,
+      "metrics_path": "reports/onnx/swin_tiny_lora/eval/metrics.json",
+      "run_dir": "model/swin_tiny_lora"
+    }
+  ],
+  "artifacts": [
+    {
+      "run": "DINOv2 ViT-S/14 linear probe",
+      "kind": "metrics",
+      "exists": true,
+      "path": "reports/vit_small_patch14_dinov2_lvd142m_linear_probe_eval/metrics.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 linear probe",
+      "kind": "run_dir",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_linear_probe"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 linear probe",
+      "kind": "run_manifest",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_linear_probe/run_manifest.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 linear probe",
+      "kind": "adapter_dir",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_linear_probe/adapter"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 linear probe",
+      "kind": "merged_checkpoint",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_linear_probe/merged_model.pt"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 full fine-tune",
+      "kind": "metrics",
+      "exists": true,
+      "path": "reports/vit_small_patch14_dinov2_lvd142m_eval/metrics.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 full fine-tune",
+      "kind": "run_dir",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_finetune"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 full fine-tune",
+      "kind": "run_manifest",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_finetune/run_manifest.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 full fine-tune",
+      "kind": "adapter_dir",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_finetune/adapter"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 full fine-tune",
+      "kind": "merged_checkpoint",
+      "exists": false,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_finetune/merged_model.pt"
+    },
+    {
+      "run": "Swin-Tiny full fine-tune",
+      "kind": "metrics",
+      "exists": true,
+      "path": "reports/swin_tiny_eval/metrics.json"
+    },
+    {
+      "run": "Swin-Tiny full fine-tune",
+      "kind": "run_dir",
+      "exists": false,
+      "path": "model/swin_tiny"
+    },
+    {
+      "run": "Swin-Tiny full fine-tune",
+      "kind": "run_manifest",
+      "exists": false,
+      "path": "model/swin_tiny/run_manifest.json"
+    },
+    {
+      "run": "Swin-Tiny full fine-tune",
+      "kind": "adapter_dir",
+      "exists": false,
+      "path": "model/swin_tiny/adapter"
+    },
+    {
+      "run": "Swin-Tiny full fine-tune",
+      "kind": "merged_checkpoint",
+      "exists": false,
+      "path": "model/swin_tiny/merged_model.pt"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA",
+      "kind": "metrics",
+      "exists": true,
+      "path": "reports/vit_small_patch14_dinov2_lvd142m_lora_eval/metrics.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA",
+      "kind": "run_dir",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA",
+      "kind": "run_manifest",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA",
+      "kind": "adapter_dir",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/adapter"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA",
+      "kind": "merged_checkpoint",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "metrics",
+      "exists": true,
+      "path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/eval/metrics.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "run_dir",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "run_manifest",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "adapter_dir",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/adapter"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "merged_checkpoint",
+      "exists": true,
+      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "onnx_export_manifest",
+      "exists": true,
+      "path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/export_manifest.json"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "onnx_model",
+      "exists": true,
+      "path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "onnx_external_data",
+      "exists": true,
+      "path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx.data"
+    },
+    {
+      "run": "Swin-Tiny LoRA",
+      "kind": "metrics",
+      "exists": true,
+      "path": "reports/swin_tiny_lora_eval/metrics.json"
+    },
+    {
+      "run": "Swin-Tiny LoRA",
+      "kind": "run_dir",
+      "exists": true,
+      "path": "model/swin_tiny_lora"
+    },
+    {
+      "run": "Swin-Tiny LoRA",
+      "kind": "run_manifest",
+      "exists": true,
+      "path": "model/swin_tiny_lora/run_manifest.json"
+    },
+    {
+      "run": "Swin-Tiny LoRA",
+      "kind": "adapter_dir",
+      "exists": true,
+      "path": "model/swin_tiny_lora/adapter"
+    },
+    {
+      "run": "Swin-Tiny LoRA",
+      "kind": "merged_checkpoint",
+      "exists": true,
+      "path": "model/swin_tiny_lora/merged_model.pt"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "metrics",
+      "exists": true,
+      "path": "reports/onnx/swin_tiny_lora/eval/metrics.json"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "run_dir",
+      "exists": true,
+      "path": "model/swin_tiny_lora"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "run_manifest",
+      "exists": true,
+      "path": "model/swin_tiny_lora/run_manifest.json"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "adapter_dir",
+      "exists": true,
+      "path": "model/swin_tiny_lora/adapter"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "merged_checkpoint",
+      "exists": true,
+      "path": "model/swin_tiny_lora/merged_model.pt"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "onnx_export_manifest",
+      "exists": true,
+      "path": "reports/onnx/swin_tiny_lora/export_manifest.json"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "onnx_model",
+      "exists": true,
+      "path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "onnx_external_data",
+      "exists": true,
+      "path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx.data"
+    }
+  ]
+}

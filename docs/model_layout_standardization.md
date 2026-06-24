@@ -97,16 +97,23 @@ notebook manifest/path discovery has compatibility support.
 
 ### ResNet
 
-- `src/models/resnet18_frozen.py`
-- `src/models/resnet18_finetune.py`
-- `src/training/train_resnet18_frozen.py`
-- `src/training/train_resnet18_frozen_augmented.py`
-- `src/training/train_resnet18_finetune_last_block.py`
+- `src/models/resnet18_frozen.py` - compatibility wrapper
+- `src/models/resnet18_finetune.py` - compatibility wrapper
+- `src/models/resnet/frozen.py`
+- `src/models/resnet/finetune.py`
+- `src/training/train_resnet18_frozen.py` - compatibility wrapper
+- `src/training/train_resnet18_frozen_augmented.py` - compatibility wrapper
+- `src/training/train_resnet18_finetune_last_block.py` - compatibility wrapper
+- `src/training/resnet/frozen.py`
+- `src/training/resnet/frozen_augmented.py`
+- `src/training/resnet/finetune_last_block.py`
+- `src/evaluation/evaluate_resnet18_finetune.py` - compatibility wrapper
+- `src/evaluation/resnet/evaluate_finetune.py`
 - `src/data/resnet_augmented_dataloaders.py`
 
-These should eventually move to `src/models/resnet/`,
-`src/training/resnet/`, and model-family evaluation/tool/config folders with
-wrappers for old import paths.
+ResNet source has moved to owner folders with wrappers for old import paths.
+The data-loader helper remains under shared `src/data/` because split/preprocess
+helpers are still shared project infrastructure.
 
 ### Scratch CNN
 
@@ -118,15 +125,23 @@ These should eventually move to `src/models/scratch_cnn/` and
 
 ### Swin and DINO
 
+- `src/models/swin_and_dino/peft_lora.py`
+- `src/training/swin_and_dino/train_peft_lora.py`
+- `src/evaluation/swin_and_dino/evaluate_peft_lora.py`
+- `tools/swin_and_dino/export_peft_lora_onnx.py`
+- `tools/swin_and_dino/evaluate_peft_lora_onnx.py`
+- `tools/swin_and_dino/collate_peft_lora_results.py`
 - `src/models/swin_transformer.py`
 - `src/models/timm_classifier.py`
 - `src/training/train_swin.py`
 - `src/training/train_timm_classifier.py`
 - `src/quantization/*`
 
-These currently share generic timm abstractions. Split carefully so Swin and DINO
-can share common timm utilities without forcing FocalNet or CLIP into the same
-folder.
+New PEFT/LoRA training, evaluation, ONNX export, and collation live in the
+Swin/DINO owner folders. Legacy full fine-tuning still shares generic timm
+abstractions. Split the remaining legacy files carefully so Swin and DINO can
+share common timm utilities without forcing FocalNet, ConvNeXt, or CLIP into the
+same folder.
 
 ### FocalNet
 

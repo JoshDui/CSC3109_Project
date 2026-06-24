@@ -1,11 +1,13 @@
 # ResNet models
 
-Target home for ResNet transfer-learning and fine-tuning model definitions.
+Owner-scoped home for ResNet transfer-learning and fine-tuning model definitions.
 
-Current candidates to migrate gradually:
+Canonical modules:
 
-- `src/models/resnet18_frozen.py`
-- `src/models/resnet18_finetune.py`
+- `src.models.resnet.frozen` - frozen ResNet18 feature-extractor baseline.
+- `src.models.resnet.finetune` - ResNet18 last-block fine-tuning helper.
 
-Keep root-level compatibility modules until notebooks, scripts, and reports have
-moved to the package paths.
+Compatibility wrappers remain at:
+
+- `src.models.resnet18_frozen`
+- `src.models.resnet18_finetune`

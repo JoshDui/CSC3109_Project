@@ -1,12 +1,20 @@
 # ResNet training
 
-Target home for ResNet baseline and fine-tuning training entrypoints.
+Owner-scoped home for ResNet baseline and fine-tuning training entrypoints.
 
-Current candidates to migrate gradually:
+Canonical commands:
 
-- `src/training/train_resnet18_frozen.py`
-- `src/training/train_resnet18_frozen_augmented.py`
-- `src/training/train_resnet18_finetune_last_block.py`
+```bash
+python -m src.training.resnet.frozen
+python -m src.training.resnet.frozen_augmented --epochs 10 --batch-size 32
+python -m src.training.resnet.finetune_last_block --epochs 10 --batch-size 32
+```
+
+Compatibility wrappers remain at:
+
+- `src.training.train_resnet18_frozen`
+- `src.training.train_resnet18_frozen_augmented`
+- `src.training.train_resnet18_finetune_last_block`
 
 Related data-loader helper:
 

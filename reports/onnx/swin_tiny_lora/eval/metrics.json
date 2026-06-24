@@ -1,0 +1,134 @@
+{
+  "accuracy": 0.99,
+  "macro_precision": 0.9903846153846154,
+  "macro_recall": 0.99,
+  "macro_f1": 0.9900346512096664,
+  "classification_report": {
+    "bridge": {
+      "precision": 1.0,
+      "recall": 0.97,
+      "f1-score": 0.9847715736040609,
+      "support": 100.0
+    },
+    "freeway": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 100.0
+    },
+    "overpass": {
+      "precision": 0.9615384615384616,
+      "recall": 1.0,
+      "f1-score": 0.9803921568627451,
+      "support": 100.0
+    },
+    "railway": {
+      "precision": 1.0,
+      "recall": 0.99,
+      "f1-score": 0.9949748743718593,
+      "support": 100.0
+    },
+    "accuracy": 0.99,
+    "macro avg": {
+      "precision": 0.9903846153846154,
+      "recall": 0.99,
+      "f1-score": 0.9900346512096664,
+      "support": 400.0
+    },
+    "weighted avg": {
+      "precision": 0.9903846153846154,
+      "recall": 0.99,
+      "f1-score": 0.990034651209666,
+      "support": 400.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      97,
+      0,
+      3,
+      0
+    ],
+    [
+      0,
+      100,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      100,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      99
+    ]
+  ],
+  "average_batch_latency_seconds": 0.597441965250861,
+  "average_image_latency_seconds": 0.018670061414089407,
+  "timed_batches": 12,
+  "evaluation": {
+    "runtime": "onnxruntime_fp32",
+    "onnx_path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx",
+    "export_manifest": "reports/onnx/swin_tiny_lora/export_manifest.json",
+    "data_dir": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/raw/val",
+    "samples_evaluated": 400,
+    "batch_size": 32,
+    "max_batches": null,
+    "onnxruntime_version": "1.27.0",
+    "providers": [
+      "CPUExecutionProvider"
+    ]
+  },
+  "model": {
+    "family": "swin",
+    "model_name": "swin_tiny_patch4_window7_224",
+    "resolved_model_name": "swin_tiny_patch4_window7_224",
+    "variant": "tiny",
+    "image_size": 224,
+    "class_names": [
+      "bridge",
+      "freeway",
+      "overpass",
+      "railway"
+    ],
+    "preprocess": {
+      "input_size": [
+        3,
+        224,
+        224
+      ],
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ],
+      "interpolation": "bicubic"
+    },
+    "parameter_summary": {
+      "total_parameters": 28090754,
+      "trainable_parameters": 568324,
+      "trainable_percent": 2.023171040549499,
+      "lora_trainable_parameters": 565248,
+      "modules_to_save_trainable_parameters": 3076
+    }
+  },
+  "onnx_export": {
+    "opset": 18,
+    "exporter_used": "dynamo",
+    "onnx_size_bytes": 113949899,
+    "onnx_graph_size_bytes": 1686731,
+    "onnx_external_data_size_bytes": 112263168,
+    "onnx_total_size_bytes": 113949899,
+    "dynamic_batch": true
+  }
+}
