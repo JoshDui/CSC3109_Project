@@ -1,0 +1,29 @@
+run,family,method,runtime,class,precision,recall,f1,support
+DINOv2 ViT-S/14 linear probe,dinov2,legacy_linear_probe,torch_fp32,bridge,1.0,0.97,0.9847715736040609,100.0
+DINOv2 ViT-S/14 linear probe,dinov2,legacy_linear_probe,torch_fp32,freeway,1.0,0.97,0.9847715736040609,100.0
+DINOv2 ViT-S/14 linear probe,dinov2,legacy_linear_probe,torch_fp32,overpass,0.970873786407767,1.0,0.9852216748768473,100.0
+DINOv2 ViT-S/14 linear probe,dinov2,legacy_linear_probe,torch_fp32,railway,0.970873786407767,1.0,0.9852216748768473,100.0
+DINOv2 ViT-S/14 full fine-tune,dinov2,legacy_full_finetune,torch_fp32,bridge,1.0,0.99,0.9949748743718593,100.0
+DINOv2 ViT-S/14 full fine-tune,dinov2,legacy_full_finetune,torch_fp32,freeway,1.0,1.0,1.0,100.0
+DINOv2 ViT-S/14 full fine-tune,dinov2,legacy_full_finetune,torch_fp32,overpass,0.9900990099009901,1.0,0.9950248756218906,100.0
+DINOv2 ViT-S/14 full fine-tune,dinov2,legacy_full_finetune,torch_fp32,railway,1.0,1.0,1.0,100.0
+Swin-Tiny full fine-tune,swin,legacy_full_finetune,torch_fp32,bridge,1.0,1.0,1.0,100.0
+Swin-Tiny full fine-tune,swin,legacy_full_finetune,torch_fp32,freeway,1.0,1.0,1.0,100.0
+Swin-Tiny full fine-tune,swin,legacy_full_finetune,torch_fp32,overpass,1.0,1.0,1.0,100.0
+Swin-Tiny full fine-tune,swin,legacy_full_finetune,torch_fp32,railway,1.0,1.0,1.0,100.0
+DINOv2 ViT-S/14 LoRA,dinov2,peft_lora,torch_peft_adapter,bridge,1.0,0.99,0.9949748743718593,100.0
+DINOv2 ViT-S/14 LoRA,dinov2,peft_lora,torch_peft_adapter,freeway,1.0,0.99,0.9949748743718593,100.0
+DINOv2 ViT-S/14 LoRA,dinov2,peft_lora,torch_peft_adapter,overpass,0.9803921568627451,1.0,0.9900990099009901,100.0
+DINOv2 ViT-S/14 LoRA,dinov2,peft_lora,torch_peft_adapter,railway,1.0,1.0,1.0,100.0
+DINOv2 ViT-S/14 LoRA ONNX,dinov2,peft_lora,onnxruntime_fp32,bridge,1.0,0.99,0.9949748743718593,100.0
+DINOv2 ViT-S/14 LoRA ONNX,dinov2,peft_lora,onnxruntime_fp32,freeway,1.0,0.99,0.9949748743718593,100.0
+DINOv2 ViT-S/14 LoRA ONNX,dinov2,peft_lora,onnxruntime_fp32,overpass,0.9803921568627451,1.0,0.9900990099009901,100.0
+DINOv2 ViT-S/14 LoRA ONNX,dinov2,peft_lora,onnxruntime_fp32,railway,1.0,1.0,1.0,100.0
+Swin-Tiny LoRA,swin,peft_lora,torch_peft_adapter,bridge,1.0,0.97,0.9847715736040609,100.0
+Swin-Tiny LoRA,swin,peft_lora,torch_peft_adapter,freeway,1.0,1.0,1.0,100.0
+Swin-Tiny LoRA,swin,peft_lora,torch_peft_adapter,overpass,0.9615384615384616,1.0,0.9803921568627451,100.0
+Swin-Tiny LoRA,swin,peft_lora,torch_peft_adapter,railway,1.0,0.99,0.9949748743718593,100.0
+Swin-Tiny LoRA ONNX,swin,peft_lora,onnxruntime_fp32,bridge,1.0,0.97,0.9847715736040609,100.0
+Swin-Tiny LoRA ONNX,swin,peft_lora,onnxruntime_fp32,freeway,1.0,1.0,1.0,100.0
+Swin-Tiny LoRA ONNX,swin,peft_lora,onnxruntime_fp32,overpass,0.9615384615384616,1.0,0.9803921568627451,100.0
+Swin-Tiny LoRA ONNX,swin,peft_lora,onnxruntime_fp32,railway,1.0,0.99,0.9949748743718593,100.0

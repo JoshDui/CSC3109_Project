@@ -12,7 +12,7 @@ from torch import nn
 
 from src.config import CLASS_NAMES, IMAGE_SIZE
 from src.models import build_swin_classifier, build_timm_classifier, resolve_timm_model_name
-from src.models.resnet18_frozen import build_resnet18_frozen
+from src.models.resnet import build_resnet18_frozen
 
 
 @dataclass(frozen=True)

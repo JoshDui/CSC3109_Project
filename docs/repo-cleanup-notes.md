@@ -41,6 +41,10 @@ Action: recover source from git history or delete the orphaned bytecode.
   (`vit_small_patch14_dinov2_lvd142m_*`).
 Action: one subdir per model; pick one naming convention (aliases preferred).
 
+Note: the ResNet source modules have since moved into owner-scoped packages under
+`src/models/resnet/`, `src/training/resnet/`, and `src/evaluation/resnet/` with
+root-level compatibility wrappers. The artifact-layout cleanup remains separate.
+
 ### P4 — Documentation is sprawled / partly stale
 Notes live in root `README.md`, `AGENTS.md`, `project_requirements.md`, `docs/*`,
 six `src/**/README.md`, `model/README.md`, `notebooks/README.md`,

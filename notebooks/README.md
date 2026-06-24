@@ -10,8 +10,8 @@ Current notebooks:
   - `reports/tables/dataset_summary.csv`
   - `reports/tables/dataset_summary.json`
   - `reports/figures/class_distribution.png`
-- `02_swin_tiny_results_summary.ipynb` — Swin-Tiny training and held-out
-  validation summary.
+- `02_swin_tiny_results_summary.ipynb` — Swin-Tiny and DINOv2 PEFT/LoRA,
+  legacy baseline, and ONNX FP32 deployment artifact summary.
 - `03_focalnet_training_and_evaluation.ipynb` — notebook-first FocalNet-Tiny
   SRF training, internal tune evaluation, and guarded held-out validation
   evaluation.

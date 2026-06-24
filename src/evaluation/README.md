@@ -11,7 +11,7 @@ Current evaluation files:
   creates an INT8 QDQ artifact, and evaluates FP32/INT8 ONNX outputs.
 - `export_clip_onnx_int8_qdq.py` — compatibility wrapper for the CLIP exporter.
 
-- `evaluate_resnet18_finetune.py` - evaluates the fine-tuned ResNet18 last-block checkpoint.
+- `resnet/evaluate_finetune.py` - evaluates the fine-tuned ResNet18 last-block checkpoint.
 
 Evaluate the trained Swin-Tiny checkpoint:
 
@@ -68,12 +68,15 @@ Evaluate the fine-tuned ResNet18 last-block checkpoint on the newer held-out
 validation folder:
 
 ```powershell
-python -m src.evaluation.evaluate_resnet18_finetune `
+python -m src.evaluation.resnet.evaluate_finetune `
   --checkpoint model/resnet18_finetune_last_block.pt `
   --data-dir data/raw/val `
   --output-dir reports/resnet18_finetune_last_block_raw_val_eval `
   --device cuda
 ```
+
+The old `src.evaluation.evaluate_resnet18_finetune` command remains a
+compatibility wrapper for existing scripts.
 
 This evaluator writes:
 
