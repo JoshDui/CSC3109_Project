@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/model-manifest.schema.json",
+  "title": "EdgeModelManifest",
+  "type": "object",
+  "required": ["schemaVersion", "model", "runtime", "labels", "preprocessing"],
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1" },
+    "model": {
+      "type": "object",
+      "required": ["id", "family", "variant", "format", "url", "sha256", "bytes"],
+      "properties": {
+        "id": { "type": "string" },
+        "family": { "type": "string" },
+        "variant": { "type": "string" },
+        "format": { "type": "string", "enum": ["onnx"] },
+        "url": { "type": "string", "format": "uri-reference" },
+        "sha256": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["executionProvider", "wasmPaths"],
+      "properties": {
+        "executionProvider": { "type": "string", "enum": ["wasm", "webgpu", "webnn"] },
+        "wasmPaths": { "type": "string" },
+        "ortVersion": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "labels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "preprocessing": {
+      "type": "object",
+      "required": ["imageSize", "mean", "std"],
+      "properties": {
+        "imageSize": { "type": "integer", "minimum": 1 },
+        "mean": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "std": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "colorSpace": { "type": "string", "default": "RGB" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

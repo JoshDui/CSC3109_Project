@@ -1,0 +1,49 @@
+openapi: 3.1.0
+info:
+  title: CSC3109 Edge Model Manifest API
+  version: 0.1.0
+  description: Authenticated manifest endpoint for CDN-served ONNX edge inference.
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Backend is reachable
+  /api/model-manifest:
+    get:
+      summary: Return an authorized model manifest
+      description: Returns metadata and a CDN URL for a versioned ONNX model. The backend does not perform inference.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: model
+          in: query
+          required: false
+          schema:
+            type: string
+            example: focalnet_tiny_srf
+        - name: variant
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [int8_qdq, fp32]
+            default: int8_qdq
+      responses:
+        "200":
+          description: Authorized model manifest
+          content:
+            application/json:
+              schema:
+                $ref: "./model-manifest.schema.json"
+        "401":
+          description: Missing or invalid authentication
+        "403":
+          description: Caller is not authorized for the requested model
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
