@@ -18,6 +18,8 @@ if str(PROJECT_ROOT) not in sys.path:
 TABLES_DIR = PROJECT_ROOT / "reports" / "tables"
 FIGURES_DIR = PROJECT_ROOT / "reports" / "figures"
 CLASS_NAMES = ["bridge", "freeway", "overpass", "railway"]
+DINO_LORA_RUN_DIR = PROJECT_ROOT / "model" / "swin_and_dino" / "dino" / "vit_small_patch14_dinov2_lvd142m_lora"
+SWIN_LORA_RUN_DIR = PROJECT_ROOT / "model" / "swin_and_dino" / "swin" / "swin_tiny_lora"
 
 
 RUN_DEFINITIONS = [
@@ -54,7 +56,7 @@ RUN_DEFINITIONS = [
         "method": "peft_lora",
         "runtime": "torch_peft_adapter",
         "metrics_path": PROJECT_ROOT / "reports" / "vit_small_patch14_dinov2_lvd142m_lora_eval" / "metrics.json",
-        "run_dir": PROJECT_ROOT / "model" / "vit_small_patch14_dinov2_lvd142m_lora",
+        "run_dir": DINO_LORA_RUN_DIR,
         "onnx": False,
     },
     {
@@ -63,7 +65,7 @@ RUN_DEFINITIONS = [
         "method": "peft_lora",
         "runtime": "onnxruntime_fp32",
         "metrics_path": PROJECT_ROOT / "reports" / "onnx" / "vit_small_patch14_dinov2_lvd142m_lora" / "eval" / "metrics.json",
-        "run_dir": PROJECT_ROOT / "model" / "vit_small_patch14_dinov2_lvd142m_lora",
+        "run_dir": DINO_LORA_RUN_DIR,
         "onnx": True,
     },
     {
@@ -72,7 +74,7 @@ RUN_DEFINITIONS = [
         "method": "peft_lora",
         "runtime": "torch_peft_adapter",
         "metrics_path": PROJECT_ROOT / "reports" / "swin_tiny_lora_eval" / "metrics.json",
-        "run_dir": PROJECT_ROOT / "model" / "swin_tiny_lora",
+        "run_dir": SWIN_LORA_RUN_DIR,
         "onnx": False,
     },
     {
@@ -81,7 +83,7 @@ RUN_DEFINITIONS = [
         "method": "peft_lora",
         "runtime": "onnxruntime_fp32",
         "metrics_path": PROJECT_ROOT / "reports" / "onnx" / "swin_tiny_lora" / "eval" / "metrics.json",
-        "run_dir": PROJECT_ROOT / "model" / "swin_tiny_lora",
+        "run_dir": SWIN_LORA_RUN_DIR,
         "onnx": True,
     },
 ]
@@ -98,7 +100,7 @@ def write_csv(rows: list[dict[str, Any]], path: Path) -> None:
         return
     fieldnames = list(rows[0].keys())
     with path.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -198,9 +200,11 @@ def artifact_rows() -> list[dict[str, Any]]:
         }
         if defn["onnx"]:
             export_dir = PROJECT_ROOT / "reports" / "onnx" / run_dir.name
+            onnx_dir = run_dir / "onnx"
             candidates["onnx_export_manifest"] = export_dir / "export_manifest.json"
-            candidates["onnx_model"] = export_dir / f"{run_dir.name}_fp32.onnx"
-            candidates["onnx_external_data"] = export_dir / f"{run_dir.name}_fp32.onnx.data"
+            candidates["onnx_model"] = onnx_dir / f"{run_dir.name}_fp32.onnx"
+            candidates["onnx_external_data"] = onnx_dir / f"{run_dir.name}_fp32.onnx.data"
+            candidates["onnx_int8_qdq_model"] = onnx_dir / f"{run_dir.name}_int8_qdq.onnx"
         for kind, path in candidates.items():
             rows.append({"run": defn["run"], "kind": kind, "exists": Path(path).exists(), "path": relative(Path(path))})
     return rows

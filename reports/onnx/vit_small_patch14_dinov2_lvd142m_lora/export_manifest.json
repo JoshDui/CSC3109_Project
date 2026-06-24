@@ -1,8 +1,8 @@
 {
   "artifact_format": "swin_dino_peft_lora_onnx_export_manifest_v1",
   "created_at_utc": "2026-06-24T07:59:58.433340+00:00",
-  "run_dir": "model/vit_small_patch14_dinov2_lvd142m_lora",
-  "source_artifact": "model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt",
+  "run_dir": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora",
+  "source_artifact": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt",
   "source_mode": "merged_checkpoint",
   "run_config": {
     "family": "dinov2",
@@ -60,10 +60,10 @@
     "lora_trainable_parameters": 589824,
     "modules_to_save_trainable_parameters": 1540
   },
-  "onnx_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx",
+  "onnx_path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx",
   "onnx_size_bytes": 87609868,
   "onnx_graph_size_bytes": 1036812,
-  "onnx_external_data_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx.data",
+  "onnx_external_data_path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx.data",
   "onnx_external_data_size_bytes": 86573056,
   "onnx_total_size_bytes": 87609868,
   "opset": 18,

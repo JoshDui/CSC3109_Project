@@ -19,7 +19,13 @@ if str(PROJECT_ROOT) not in sys.path:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Export Swin/DINO PEFT-LoRA model to ONNX.", allow_abbrev=False)
     parser.add_argument("--run-dir", type=Path, required=True)
-    parser.add_argument("--output-dir", type=Path, default=None)
+    parser.add_argument("--output-dir", type=Path, default=None, help="Report directory for export_manifest.json.")
+    parser.add_argument(
+        "--model-output-dir",
+        type=Path,
+        default=None,
+        help="Directory for deployable ONNX files. Defaults to <run-dir>/onnx.",
+    )
     parser.add_argument("--onnx-output", default=None)
     parser.add_argument("--export-manifest", default="export_manifest.json")
     parser.add_argument("--adapter-subdir", default="adapter")
@@ -206,11 +212,14 @@ def main() -> None:
     import torch
     from src.models.swin_and_dino import run_config_to_jsonable
 
-    model, config, source_artifact, source_mode = load_merged_or_adapter_model(args.run_dir, args.adapter_subdir)
-    output_dir = args.output_dir or (PROJECT_ROOT / "reports" / "onnx" / Path(args.run_dir).name)
+    run_dir = Path(args.run_dir)
+    model, config, source_artifact, source_mode = load_merged_or_adapter_model(run_dir, args.adapter_subdir)
+    output_dir = args.output_dir or (PROJECT_ROOT / "reports" / "onnx" / run_dir.name)
+    model_output_dir = args.model_output_dir or (run_dir / "onnx")
     output_dir.mkdir(parents=True, exist_ok=True)
-    model_slug = slugify(Path(args.run_dir).name)
-    onnx_path = resolve_output_path(output_dir, args.onnx_output, default_name=f"{model_slug}_fp32.onnx")
+    model_output_dir.mkdir(parents=True, exist_ok=True)
+    model_slug = slugify(run_dir.name)
+    onnx_path = resolve_output_path(model_output_dir, args.onnx_output, default_name=f"{model_slug}_fp32.onnx")
     manifest_path = resolve_output_path(output_dir, args.export_manifest, default_name="export_manifest.json")
     dummy = torch.randn(args.batch_size, 3, config.image_size, config.image_size, dtype=torch.float32)
     onnx_path.parent.mkdir(parents=True, exist_ok=True)

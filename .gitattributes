@@ -2,6 +2,7 @@ reports/quantization/**/*.pt filter=lfs diff=lfs merge=lfs -text
 reports/quantization/**/*.pth filter=lfs diff=lfs merge=lfs -text
 model/**/*.pt filter=lfs diff=lfs merge=lfs -text
 model/**/*.pth filter=lfs diff=lfs merge=lfs -text
+model/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
 model/**/*.onnx filter=lfs diff=lfs merge=lfs -text
 model/**/*.onnx.data filter=lfs diff=lfs merge=lfs -text
 model/**/*.onnx.gz filter=lfs diff=lfs merge=lfs -text

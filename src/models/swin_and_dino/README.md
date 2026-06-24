@@ -18,8 +18,8 @@ Main public helpers:
   `run_manifest.json`.
 - `merge_lora_model(...)` and `save_merged_checkpoint_from_run(...)` - merge the
   adapter into the base FP32 model for self-contained evaluation/export.
-- `default_lora_output_dir(...)` - resolves the default `model/*_lora/` output
-  path.
+- `default_lora_output_dir(...)` - resolves the default
+  `model/swin_and_dino/{swin,dino}/*_lora/` output path.
 
 Default LoRA targets:
 

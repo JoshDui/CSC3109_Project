@@ -9,16 +9,18 @@ Evaluate a saved LoRA adapter run on the official held-out split:
 
 ```bash
 uv run python -m src.evaluation.swin_and_dino.evaluate_peft_lora \
-  --run-dir model/vit_small_patch14_dinov2_lvd142m_lora \
+  --run-dir model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora \
   --output-dir reports/vit_small_patch14_dinov2_lvd142m_lora_eval
 
 uv run python -m src.evaluation.swin_and_dino.evaluate_peft_lora \
-  --run-dir model/swin_tiny_lora \
+  --run-dir model/swin_and_dino/swin/swin_tiny_lora \
   --output-dir reports/swin_tiny_lora_eval
 ```
 
 The evaluator loads `run_manifest.json`, restores the PEFT adapter, applies the
-recorded preprocessing, and writes:
+recorded preprocessing, and writes report/eval outputs. `--device auto` prefers
+CUDA when available, then Apple MPS, then CPU; pass `--device cuda` or
+`--device mps` to force a target accelerator.
 
 ```text
 metrics.json

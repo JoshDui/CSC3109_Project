@@ -27,6 +27,9 @@ from src.models import (
 
 
 SUPPORTED_FAMILIES = {"dinov2", "swin"}
+SWIN_DINO_MODEL_DIR = MODEL_DIR / "swin_and_dino"
+SWIN_LORA_MODEL_DIR = SWIN_DINO_MODEL_DIR / "swin"
+DINO_LORA_MODEL_DIR = SWIN_DINO_MODEL_DIR / "dino"
 
 DEFAULT_LORA_TARGETS: dict[str, dict[str, Any]] = {
     "dinov2": {
@@ -100,8 +103,8 @@ def default_lora_output_dir(*, family: str, model_name: str = DINOV2_SMALL.alias
 
     family = validate_family(family)
     if family == "dinov2":
-        return MODEL_DIR / f"{slugify_model_name(model_name)}_lora"
-    return MODEL_DIR / f"swin_{variant}_lora"
+        return DINO_LORA_MODEL_DIR / f"{slugify_model_name(model_name)}_lora"
+    return SWIN_LORA_MODEL_DIR / f"swin_{variant}_lora"
 
 
 def default_preprocess(*, family: str, model_name: str, variant: str, image_size: int) -> dict[str, Any]:
