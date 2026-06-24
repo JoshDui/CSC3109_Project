@@ -20,7 +20,6 @@ import csv
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-import sys
 import time
 from typing import Any
 
@@ -329,7 +328,6 @@ def main() -> None:
     interpolation = str(preprocess.get("interpolation", "bilinear"))
     class_to_idx = {str(k): int(v) for k, v in (manifest.get("class_to_idx") or bundle.class_to_idx).items()}
     class_names = class_names_from_mapping(class_to_idx)
-    num_classes = len(class_names)
 
     fp32_onnx_path = args.onnx_fp32_path or Path(manifest["onnx_fp32_path"])
     if not fp32_onnx_path.exists():
