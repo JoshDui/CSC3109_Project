@@ -1,0 +1,99 @@
+{
+  "artifact_size_bytes": 4799215,
+  "checkpoint_path": "model/custom_cnn_small_20260624/best_model.pt",
+  "class_to_idx": {
+    "bridge": 0,
+    "freeway": 1,
+    "overpass": 2,
+    "railway": 3
+  },
+  "consolidated_single_file": true,
+  "created_at": "2026-06-24T06:45:20.192579+00:00",
+  "device": "cpu",
+  "dynamic_batch": true,
+  "exporter": "dynamo",
+  "external_data_size_bytes": null,
+  "image_size": 224,
+  "input_names": [
+    "images"
+  ],
+  "model_family": "custom_cnn",
+  "model_name": "custom-cnn-small",
+  "num_classes": 4,
+  "onnx_check": {
+    "checked": true,
+    "inputs": {
+      "images": [
+        "batch",
+        3,
+        224,
+        224
+      ]
+    },
+    "ir_version": 10,
+    "opsets": {
+      "ai.onnx": 18
+    },
+    "outputs": {
+      "logits": [
+        "batch",
+        4
+      ]
+    }
+  },
+  "onnx_external_data_path": null,
+  "onnx_fp32_path": "model/custom_cnn_small_onnx/custom_cnn_small_fp32.onnx",
+  "onnx_fp32_preprocessed_path": null,
+  "opset": 18,
+  "ort_check": {
+    "checked": true,
+    "logits_shape": [
+      1,
+      4
+    ],
+    "providers": [
+      "CPUExecutionProvider"
+    ]
+  },
+  "output_names": [
+    "logits"
+  ],
+  "preprocess": {
+    "interpolation": "bilinear",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "resolved_model_name": "custom-cnn-small",
+  "run_id": "20260624_064518",
+  "versions": {
+    "onnx": {
+      "available": true,
+      "version": "1.22.0"
+    },
+    "onnxruntime": {
+      "available": true,
+      "available_providers": [
+        "AzureExecutionProvider",
+        "CPUExecutionProvider"
+      ],
+      "version": "1.27.0"
+    },
+    "onnxscript": {
+      "available": true,
+      "version": "0.7.0"
+    },
+    "python": "3.12.12 (main, Jan 14 2026, 19:35:58) [Clang 21.1.4 ]",
+    "torch": {
+      "available": true,
+      "version": "2.12.0+cu130"
+    }
+  }
+}
