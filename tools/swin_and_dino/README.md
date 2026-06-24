@@ -9,13 +9,13 @@ Export merged PEFT/LoRA checkpoints to ONNX:
 
 ```bash
 uv run python -m tools.swin_and_dino.export_peft_lora_onnx \
-  --run-dir model/vit_small_patch14_dinov2_lvd142m_lora \
+  --run-dir model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora \
   --output-dir reports/onnx/vit_small_patch14_dinov2_lvd142m_lora \
   --batch-size 1 \
   --opset 18
 
 uv run python -m tools.swin_and_dino.export_peft_lora_onnx \
-  --run-dir model/swin_tiny_lora \
+  --run-dir model/swin_and_dino/swin/swin_tiny_lora \
   --output-dir reports/onnx/swin_tiny_lora \
   --batch-size 1 \
   --opset 18
@@ -37,9 +37,11 @@ uv run python -m tools.swin_and_dino.evaluate_peft_lora_onnx \
   --warmup-batches 1
 ```
 
-The PyTorch dynamo ONNX exporter writes external-data artifacts for these
-transformers. Keep the `.onnx` graph and matching `.onnx.data` tensor file
-together for deployment.
+The export manifest stays under `reports/onnx/<run>/` with the evaluation
+outputs, while the deployable ONNX files are written under each model run's
+`onnx/` folder. The PyTorch dynamo ONNX exporter writes external-data artifacts
+for these transformers. Keep the `.onnx` graph and matching `.onnx.data` tensor
+file together for deployment.
 
 ## Result collation
 

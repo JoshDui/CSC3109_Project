@@ -4,7 +4,7 @@
   "accuracy_onnx_int8_qdq": 0.9925,
   "calibration_dir": "data/raw/train",
   "calibration_images": 512,
-  "checkpoint": "model/swin_tiny_lora/merged_model.pt",
+  "checkpoint": "model/swin_and_dino/swin/swin_tiny_lora/merged_model.pt",
   "class_names": [
     "bridge",
     "freeway",
@@ -42,8 +42,8 @@
   "macro_f1_onnx_int8_qdq": 0.9924738647817354,
   "model_family": "swin",
   "model_name": "swin_tiny_patch4_window7_224",
-  "onnx_fp32_path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx",
-  "onnx_int8_qdq_path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_int8_qdq.onnx",
+  "onnx_fp32_path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx",
+  "onnx_int8_qdq_path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_int8_qdq.onnx",
   "onnxruntime_version": "1.27.0",
   "quantization": {
     "activation_type": "QInt8",
@@ -59,7 +59,7 @@
   "run_id": "20260624_093124",
   "runtime": {
     "onnx_fp32": {
-      "artifact_path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx",
+      "artifact_path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx",
       "artifact_size_bytes": 1686731,
       "latency_mean_ms": 635.4564898332077,
       "latency_measured_batches": 12,
@@ -68,7 +68,7 @@
       "runtime": "onnxruntime"
     },
     "onnx_int8_qdq": {
-      "artifact_path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_int8_qdq.onnx",
+      "artifact_path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_int8_qdq.onnx",
       "artifact_size_bytes": 31842698,
       "latency_mean_ms": 525.5667289996685,
       "latency_measured_batches": 12,
@@ -88,7 +88,7 @@
       "runtime": "onnxruntime"
     },
     "torch_fp32": {
-      "artifact_path": "model/swin_tiny_lora/merged_model.pt",
+      "artifact_path": "model/swin_and_dino/swin/swin_tiny_lora/merged_model.pt",
       "artifact_size_bytes": 110157284,
       "latency_mean_ms": 328.2768785011285,
       "latency_measured_batches": 12,

@@ -69,7 +69,7 @@
     ]
   ],
   "evaluation": {
-    "run_dir": "model/vit_small_patch14_dinov2_lvd142m_lora",
+    "run_dir": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora",
     "adapter_subdir": "adapter",
     "data_dir": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/raw/val",
     "device": "mps",

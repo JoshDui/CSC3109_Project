@@ -132,7 +132,7 @@ def evaluate_model(
     prediction_rows: list[dict[str, Any]] = []
     sample_offset = 0
     for batch_index, (images, labels) in enumerate(tqdm(loader, desc="Evaluating", leave=False), start=1):
-        images = images.to(device)
+        images = images.to(device, non_blocking=device.type == "cuda")
         logits = model(images)
         probabilities = torch.softmax(logits, dim=1).detach().cpu()
         predictions = probabilities.argmax(dim=1).tolist()
@@ -165,6 +165,7 @@ def evaluate_model(
 
 def main() -> None:
     args = parse_args()
+    device = resolve_device(args.device)
     run_config = load_lora_run_config(args.run_dir)
     class_names = class_names_from_mapping(run_config.class_to_idx)
     dataset = build_dataset(args.data_dir, run_config.image_size, run_config.preprocess)
@@ -173,8 +174,13 @@ def main() -> None:
             "Dataset class mapping does not match LoRA run: "
             f"dataset={dataset.class_to_idx}, run={run_config.class_to_idx}"
         )
-    loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=False)
-    device = resolve_device(args.device)
+    loader = DataLoader(
+        dataset,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=args.num_workers,
+        pin_memory=device.type == "cuda",
+    )
     model, _ = load_peft_lora_model_from_run(
         args.run_dir,
         adapter_subdir=args.adapter_subdir,

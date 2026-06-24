@@ -10,9 +10,12 @@ Current canonical owner entrypoint:
 Example commands:
 
 ```bash
-python -m src.training.swin_and_dino.train_peft_lora --family dinov2 --device mps
-python -m src.training.swin_and_dino.train_peft_lora --family swin --variant tiny --device mps
+python -m src.training.swin_and_dino.train_peft_lora --family dinov2 --device auto
+python -m src.training.swin_and_dino.train_peft_lora --family swin --variant tiny --device auto
 ```
+
+`--device auto` prefers CUDA when available, then Apple MPS, then CPU. Use
+`--device cuda` or `--device mps` to force a specific accelerator.
 
 Legacy full fine-tuning remains at the original paths for now because the timm
 helpers are still shared with other model families:

@@ -15,28 +15,30 @@ Swin-Tiny full fine-tune,run_manifest,False,model/swin_tiny/run_manifest.json
 Swin-Tiny full fine-tune,adapter_dir,False,model/swin_tiny/adapter
 Swin-Tiny full fine-tune,merged_checkpoint,False,model/swin_tiny/merged_model.pt
 DINOv2 ViT-S/14 LoRA,metrics,True,reports/vit_small_patch14_dinov2_lvd142m_lora_eval/metrics.json
-DINOv2 ViT-S/14 LoRA,run_dir,True,model/vit_small_patch14_dinov2_lvd142m_lora
-DINOv2 ViT-S/14 LoRA,run_manifest,True,model/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json
-DINOv2 ViT-S/14 LoRA,adapter_dir,True,model/vit_small_patch14_dinov2_lvd142m_lora/adapter
-DINOv2 ViT-S/14 LoRA,merged_checkpoint,True,model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt
+DINOv2 ViT-S/14 LoRA,run_dir,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora
+DINOv2 ViT-S/14 LoRA,run_manifest,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json
+DINOv2 ViT-S/14 LoRA,adapter_dir,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/adapter
+DINOv2 ViT-S/14 LoRA,merged_checkpoint,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt
 DINOv2 ViT-S/14 LoRA ONNX,metrics,True,reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/eval/metrics.json
-DINOv2 ViT-S/14 LoRA ONNX,run_dir,True,model/vit_small_patch14_dinov2_lvd142m_lora
-DINOv2 ViT-S/14 LoRA ONNX,run_manifest,True,model/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json
-DINOv2 ViT-S/14 LoRA ONNX,adapter_dir,True,model/vit_small_patch14_dinov2_lvd142m_lora/adapter
-DINOv2 ViT-S/14 LoRA ONNX,merged_checkpoint,True,model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt
+DINOv2 ViT-S/14 LoRA ONNX,run_dir,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora
+DINOv2 ViT-S/14 LoRA ONNX,run_manifest,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json
+DINOv2 ViT-S/14 LoRA ONNX,adapter_dir,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/adapter
+DINOv2 ViT-S/14 LoRA ONNX,merged_checkpoint,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt
 DINOv2 ViT-S/14 LoRA ONNX,onnx_export_manifest,True,reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/export_manifest.json
-DINOv2 ViT-S/14 LoRA ONNX,onnx_model,True,reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx
-DINOv2 ViT-S/14 LoRA ONNX,onnx_external_data,True,reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx.data
+DINOv2 ViT-S/14 LoRA ONNX,onnx_model,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx
+DINOv2 ViT-S/14 LoRA ONNX,onnx_external_data,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx.data
+DINOv2 ViT-S/14 LoRA ONNX,onnx_int8_qdq_model,True,model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_int8_qdq.onnx
 Swin-Tiny LoRA,metrics,True,reports/swin_tiny_lora_eval/metrics.json
-Swin-Tiny LoRA,run_dir,True,model/swin_tiny_lora
-Swin-Tiny LoRA,run_manifest,True,model/swin_tiny_lora/run_manifest.json
-Swin-Tiny LoRA,adapter_dir,True,model/swin_tiny_lora/adapter
-Swin-Tiny LoRA,merged_checkpoint,True,model/swin_tiny_lora/merged_model.pt
+Swin-Tiny LoRA,run_dir,True,model/swin_and_dino/swin/swin_tiny_lora
+Swin-Tiny LoRA,run_manifest,True,model/swin_and_dino/swin/swin_tiny_lora/run_manifest.json
+Swin-Tiny LoRA,adapter_dir,True,model/swin_and_dino/swin/swin_tiny_lora/adapter
+Swin-Tiny LoRA,merged_checkpoint,True,model/swin_and_dino/swin/swin_tiny_lora/merged_model.pt
 Swin-Tiny LoRA ONNX,metrics,True,reports/onnx/swin_tiny_lora/eval/metrics.json
-Swin-Tiny LoRA ONNX,run_dir,True,model/swin_tiny_lora
-Swin-Tiny LoRA ONNX,run_manifest,True,model/swin_tiny_lora/run_manifest.json
-Swin-Tiny LoRA ONNX,adapter_dir,True,model/swin_tiny_lora/adapter
-Swin-Tiny LoRA ONNX,merged_checkpoint,True,model/swin_tiny_lora/merged_model.pt
+Swin-Tiny LoRA ONNX,run_dir,True,model/swin_and_dino/swin/swin_tiny_lora
+Swin-Tiny LoRA ONNX,run_manifest,True,model/swin_and_dino/swin/swin_tiny_lora/run_manifest.json
+Swin-Tiny LoRA ONNX,adapter_dir,True,model/swin_and_dino/swin/swin_tiny_lora/adapter
+Swin-Tiny LoRA ONNX,merged_checkpoint,True,model/swin_and_dino/swin/swin_tiny_lora/merged_model.pt
 Swin-Tiny LoRA ONNX,onnx_export_manifest,True,reports/onnx/swin_tiny_lora/export_manifest.json
-Swin-Tiny LoRA ONNX,onnx_model,True,reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx
-Swin-Tiny LoRA ONNX,onnx_external_data,True,reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx.data
+Swin-Tiny LoRA ONNX,onnx_model,True,model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx
+Swin-Tiny LoRA ONNX,onnx_external_data,True,model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx.data
+Swin-Tiny LoRA ONNX,onnx_int8_qdq_model,True,model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_int8_qdq.onnx
