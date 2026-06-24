@@ -10,6 +10,32 @@ Phase 1: project setup, dataset confirmation, team roles, and experiment plannin
 
 Build, evaluate, and deploy a deep-learning image classifier for the assigned 4-class aerial-imagery dataset partition.
 
+## Current Model Results Snapshot
+
+The table below records the current final-facing held-out results and deployment
+artifact sizes available in the repository. Classification metrics are macro
+averages unless noted otherwise. GMACs are approximate per-image multiply-adds at
+the model's evaluation input size: 224×224 for ResNet18, FocalNet, and Custom
+CNN; 512×512 for Semantic-Guided CG-AF CNN.
+
+| Model | Reported variant | Accuracy | Precision | Recall | F1 | Quantised Size (MiB) | GMACs | Parameter Size (M params) |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| ResNet18 last-block fine-tune | PyTorch FP32 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | N/A | 1.814 | 11.179 |
+| FocalNet-Tiny SRF | ONNX INT8 QDQ | 0.9950 | 0.9951 | 0.9950 | 0.9950 | 27.61 | 4.403 | 27.661 |
+| Semantic-Guided CG-AF CNN | ONNX INT8 QDQ | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.96 | 27.107 | 28.453 |
+| Custom CNN small | PyTorch FP32 | 0.9625 | 0.9642 | 0.9625 | 0.9625 | N/A | 2.587 | 1.174 |
+
+Metric sources:
+
+- ResNet18: `reports/tables/resnet18_finetune_last_block_metrics.json`.
+- FocalNet: `reports/focalnet_tiny_srf_onnx_int8_qdq/comparison_metrics.csv`.
+- Semantic-Guided CG-AF CNN: `reports/tables/semantic_guided_cgaf_unseen_val12_fullcalib_minmax_20260616/summary.csv`.
+- Custom CNN: `reports/custom_cnn_small_20260624_eval/metrics.json`.
+
+Quantised size is listed only for models with current quantized deployment
+artifacts in this closeout branch. ResNet18 and Custom CNN are left as N/A here
+because no current quantized artifact is being reported for them.
+
 ## Folder Structure
 
 ```text
