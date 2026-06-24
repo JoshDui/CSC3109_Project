@@ -1,0 +1,101 @@
+{
+  "accuracy_delta_int8_minus_fp32": -0.040000000000000036,
+  "accuracy_fp32_torch": 0.995,
+  "accuracy_onnx_int8_qdq": 0.955,
+  "calibration_dir": "data/raw/train",
+  "calibration_images": 512,
+  "checkpoint": "model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt",
+  "class_names": [
+    "bridge",
+    "freeway",
+    "overpass",
+    "railway"
+  ],
+  "comparison": [
+    {
+      "accuracy": 0.995,
+      "macro_f1": 0.9950121896611772,
+      "macro_precision": 0.9950980392156863,
+      "macro_recall": 0.995,
+      "samples": 400,
+      "variant": "torch_fp32"
+    },
+    {
+      "accuracy": 0.995,
+      "macro_f1": 0.9950121896611772,
+      "macro_precision": 0.9950980392156863,
+      "macro_recall": 0.995,
+      "samples": 400,
+      "variant": "onnx_fp32"
+    },
+    {
+      "accuracy": 0.955,
+      "macro_f1": 0.9547645319610281,
+      "macro_precision": 0.9592197072838666,
+      "macro_recall": 0.9550000000000001,
+      "samples": 400,
+      "variant": "onnx_int8_qdq"
+    }
+  ],
+  "export_manifest": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/export_manifest.json",
+  "macro_f1_fp32_torch": 0.9950121896611772,
+  "macro_f1_onnx_int8_qdq": 0.9547645319610281,
+  "model_family": "timm",
+  "model_name": "dinov2-small",
+  "onnx_fp32_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx",
+  "onnx_int8_qdq_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_int8_qdq.onnx",
+  "onnxruntime_version": "1.27.0",
+  "quantization": {
+    "activation_type": "QInt8",
+    "calibration_method": "minmax",
+    "elapsed_seconds": 97.7052170839961,
+    "observed_batches": 16,
+    "observed_images": 512,
+    "per_channel": true,
+    "quant_format": "QDQ",
+    "requested_batches": 16,
+    "weight_type": "QInt8"
+  },
+  "run_id": "20260624_093139",
+  "runtime": {
+    "onnx_fp32": {
+      "artifact_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx",
+      "artifact_size_bytes": 1036812,
+      "latency_mean_ms": 745.5736421670736,
+      "latency_measured_batches": 12,
+      "latency_p50_ms": 681.9355420011561,
+      "provider": "CPUExecutionProvider",
+      "runtime": "onnxruntime"
+    },
+    "onnx_int8_qdq": {
+      "artifact_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_int8_qdq.onnx",
+      "artifact_size_bytes": 23102886,
+      "latency_mean_ms": 471.91102766676823,
+      "latency_measured_batches": 12,
+      "latency_p50_ms": 453.37333399947966,
+      "provider": "CPUExecutionProvider",
+      "quantization": {
+        "activation_type": "QInt8",
+        "calibration_method": "minmax",
+        "elapsed_seconds": 97.7052170839961,
+        "observed_batches": 16,
+        "observed_images": 512,
+        "per_channel": true,
+        "quant_format": "QDQ",
+        "requested_batches": 16,
+        "weight_type": "QInt8"
+      },
+      "runtime": "onnxruntime"
+    },
+    "torch_fp32": {
+      "artifact_path": "model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt",
+      "artifact_size_bytes": 86587693,
+      "latency_mean_ms": 241.66324324930125,
+      "latency_measured_batches": 12,
+      "latency_p50_ms": 247.02166699717054,
+      "provider": "cpu",
+      "runtime": "torch"
+    }
+  },
+  "validation_dir": "data/raw/val"
+}

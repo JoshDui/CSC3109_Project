@@ -16,8 +16,8 @@ The table below records the current final-facing held-out results and deployment
 artifact sizes available in the repository. Classification metrics are macro
 averages unless noted otherwise. GMACs are architecture-level dense multiply-add
 estimates at the model's evaluation input size, not QDQ-kernel-adjusted runtime
-operation counts: 224×224 for ResNet18, FocalNet, and Custom CNN; 512×512 for
-Semantic-Guided CG-AF CNN.
+operation counts: 224×224 for ResNet18, FocalNet, Custom CNN, Swin-Tiny, and
+DINOv2; 512×512 for Semantic-Guided CG-AF CNN.
 
 | Model | Reported variant | Accuracy | Precision | Recall | F1 | Quantised Size (MiB) | GMACs | Parameter Size (M params) |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -25,6 +25,8 @@ Semantic-Guided CG-AF CNN.
 | FocalNet-Tiny SRF | ONNX INT8 QDQ | 0.9950 | 0.9951 | 0.9950 | 0.9950 | 27.61 | 4.403 | 27.661 |
 | Semantic-Guided CG-AF CNN | ONNX INT8 QDQ | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.96 | 27.107 | 28.453 |
 | Custom CNN small | ONNX INT8 QDQ | 0.9625 | 0.9643 | 0.9625 | 0.9625 | 1.26 | 2.587 | 1.174 |
+| Swin-Tiny LoRA | ONNX INT8 QDQ | 0.9925 | 0.9926 | 0.9925 | 0.9925 | 30.37 | 4.508 | 28.091 |
+| DINOv2 ViT-S/14 LoRA | ONNX INT8 QDQ | 0.9550 | 0.9592 | 0.9550 | 0.9548 | 22.03 | 5.527 | 22.222 |
 
 Metric sources:
 
@@ -32,6 +34,7 @@ Metric sources:
 - FocalNet: `reports/focalnet_tiny_srf_onnx_int8_qdq/comparison_metrics.csv`.
 - Semantic-Guided CG-AF CNN: `notebooks/05_semantic_guided_cgaf_quantisation.ipynb` and `docs/semantic_guided_best_recipe.md`.
 - Custom CNN: `reports/custom_cnn_small_onnx_int8_qdq/comparison_metrics.csv`.
+- Swin-Tiny and DINOv2 PEFT LoRA: `reports/tables/swin_dino_peft_lora_summary.csv`, `notebooks/02_swin_tiny_results_summary.ipynb`, and respective `reports/*_onnx_int8_qdq/comparison_metrics.csv` files.
 
 Quantised size is listed only for models with current quantized deployment
 artifacts in this closeout branch. ResNet18 is left as N/A because no current
