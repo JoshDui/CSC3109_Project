@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import "./styles.css";
 import {
   fetchModelCatalog,
-  formatBytes,
   type ModelConfig,
 } from "./onnx/modelRegistry";
 import {
@@ -323,11 +322,7 @@ export function App() {
                 >
                   <span>
                     <strong>{model.displayName}</strong>
-                    <small>{model.id === "clip_fft_int8" ? "CLIP classifier" : "classifier"}</small>
-                  </span>
-                  <span className="model-meta">
-                    {formatBytes(model.sizeBytes)}
-                    {model.accuracy ? ` · ${(model.accuracy * 100).toFixed(2)}%` : ""}
+                    <small>{model.description}</small>
                   </span>
                 </button>
               ))}

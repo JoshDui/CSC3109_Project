@@ -6,37 +6,43 @@
       "id": "custom_cnn_small_int8",
       "displayName": "Custom CNN Small (INT8)",
       "description": "From-scratch tiny CNN. Smallest payload when RF airtime is scarce.",
-      "url": "/models/custom_cnn_small_int8_qdq.onnx"
+      "url": "/models/custom_cnn_small_int8_qdq.onnx",
+      "runtimeProfile": "imagenet-224-bilinear-classifier"
     },
     {
       "id": "focalnet_tiny_srf_int8",
       "displayName": "FocalNet-Tiny SRF (INT8)",
       "description": "Best accuracy-per-byte classifier. Recommended default.",
-      "url": "/models/focalnet_tiny_srf_int8_qdq.onnx"
+      "url": "/models/focalnet_tiny_srf_int8_qdq.onnx",
+      "runtimeProfile": "imagenet-224-bicubic-classifier"
     },
     {
       "id": "vit_dinov2_lora_int8",
       "displayName": "ViT-S DINOv2 LoRA (INT8)",
       "description": "Smallest transformer payload after INT8 quantization.",
-      "url": "/models/vit_dinov2_lora_int8_qdq.onnx"
+      "url": "/models/vit_dinov2_lora_int8_qdq.onnx",
+      "runtimeProfile": "imagenet-224-bicubic-classifier"
     },
     {
       "id": "swin_tiny_lora_int8",
       "displayName": "Swin-Tiny LoRA (INT8)",
       "description": "LoRA Swin transformer with high accuracy and static-deployable payload.",
-      "url": "/models/swin_tiny_lora_int8_qdq.onnx"
+      "url": "/models/swin_tiny_lora_int8_qdq.onnx",
+      "runtimeProfile": "imagenet-224-bicubic-classifier"
     },
     {
       "id": "clip_fft_int8",
       "displayName": "CLIP ViT-B/32 FFT Classifier (INT8)",
       "description": "Fine-tuned CLIP image encoder plus classifier head. Large payload, included for comparison.",
-      "url": "/models/clip_fft_int8_qdq.onnx"
+      "url": "/models/clip_fft_int8_qdq.onnx",
+      "runtimeProfile": "clip-224-classifier"
     },
     {
       "id": "semantic_guided_cgaf_int8",
       "displayName": "Semantic-Guided CG-AF (INT8)",
       "description": "Hidden overlay model. The UI runs it from the Overlay toggle, not the classifier picker.",
-      "url": "/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx"
+      "url": "/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx",
+      "runtimeProfile": "semantic-cgaf-512-overlay"
     }
   ]
 }

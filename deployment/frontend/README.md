@@ -29,10 +29,22 @@ bunx vite --host 0.0.0.0 --port 5173
 The SPA is driven by a lightweight static catalog — no server API or manifest
 versioning required for the static dev demo. `public/models.json` is deliberately
 small: it contains shared labels plus each model's ID, display name,
-description, and artifact URL. ONNX runtime details that are tied to the
-frontend implementation — input/output tensor names, preprocessing, payload
-size, accuracy, and execution-provider preference — live in
+description, artifact URL, and `runtimeProfile`. ONNX runtime details that are
+tied to the frontend implementation — task type, input/output tensor names,
+preprocessing, and execution-provider preference — live in
 `src/onnx/modelRegistry.ts`.
+
+Example entry:
+
+```json
+{
+  "id": "focalnet_tiny_srf_int8",
+  "displayName": "FocalNet-Tiny SRF (INT8)",
+  "description": "Best accuracy-per-byte classifier. Recommended default.",
+  "url": "/models/focalnet_tiny_srf_int8_qdq.onnx",
+  "runtimeProfile": "imagenet-224-bicubic-classifier"
+}
+```
 
 | Model | Payload (INT8) | Val acc | Interp | Notes |
 | --- | --- | --- | --- | --- |
@@ -49,7 +61,9 @@ Most classifiers stretch-resize to 224×224, `/255`, ImageNet mean/std, NCHW
 shortest-edge center crop, and CLIP mean/std. The Semantic-Guided CG-AF model
 uses 512×512 image input and returns `segmentation_logits` plus scene logits.
 The transformer INT8 artifacts (swin, vit) were produced by the same QDQ static
-quantization used elsewhere — see `../edge-inference-benchmarks.md`.
+quantization used elsewhere — see `../edge-inference-benchmarks.md`. Accuracy
+and payload numbers are documentation/report metadata; they are not needed by
+the runtime app and are not stored in `models.json`.
 
 A **Benchmark latency (×30)** button runs repeated inference on the loaded image
 and reports the real in-browser median latency / fps for the active execution
