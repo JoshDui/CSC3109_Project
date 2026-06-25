@@ -1,7 +1,7 @@
 {
   "checkpoint": "reports/quantization/focalnet_fp16/focalnet_tiny_srf_fp16.pt",
-  "calibration_dir": "data/set 12",
-  "validation_dir": "data/val 12",
+  "calibration_dir": "data/raw/train",
+  "validation_dir": "data/raw/val",
   "calibration_images": 512,
   "onnx_fp32_path": "model/focalnet_tiny_srf_onnx/focalnet_tiny_srf_fp32.onnx",
   "onnx_int8_qdq_path": "model/focalnet_tiny_srf_onnx/focalnet_tiny_srf_int8_qdq.onnx",

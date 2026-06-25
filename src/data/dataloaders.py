@@ -65,9 +65,11 @@ def load_manifest_records(manifest_path: Path, split: str) -> list[ManifestRecor
                 continue
 
             image_path = PROJECT_ROOT / row["image_path"]
+            # Legacy compatibility: manifests created before the canonical
+            # data/raw/train layout used the data/set 12/ prefix.
             if not image_path.exists() and row["image_path"].startswith("data/set 12/"):
                 relative_suffix = row["image_path"].removeprefix("data/set 12/")
-                image_path = PROJECT_ROOT / "data" / "raw" / split / relative_suffix
+                image_path = PROJECT_ROOT / "data" / "raw" / "train" / relative_suffix
 
             records.append(
                 ManifestRecord(

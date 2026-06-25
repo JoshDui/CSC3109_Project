@@ -206,7 +206,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--onnx-delivery-size-summary", type=Path, default=None)
     parser.add_argument("--onnx-delivery-size-summary-json", type=Path, default=None)
 
-    parser.add_argument("--unseen-data-dir", type=Path, default=PROJECT_ROOT / "data" / "val 12")
+    parser.add_argument("--unseen-data-dir", type=Path, default=PROJECT_ROOT / "data" / "raw" / "val")
     parser.add_argument("--unseen-output-dir", type=Path, default=None)
     parser.add_argument("--unseen-mask-dir", type=Path, default=None)
     parser.add_argument("--unseen-review-dir", type=Path, default=None)
@@ -269,7 +269,7 @@ def resolve_paths(args: argparse.Namespace) -> None:
         args.onnx_case_study_image = [f"johor={args.project_root / 'Screenshot_20260616_172913.png'}"]
     if args.awq_onnx_case_study_image is None:
         args.awq_onnx_case_study_image = [
-            f"railway701={args.project_root / 'data' / 'val 12' / 'railway' / 'railway701.jpg'}",
+            f"railway701={args.project_root / 'data' / 'raw' / 'val' / 'railway' / 'railway701.jpg'}",
             f"johor_ciq={args.project_root / 'Screenshot_20260616_172913.png'}",
         ]
     args.pipeline_manifest = args.pipeline_manifest or artifact_dir / "semantic_guided_cgaf_pipeline_manifest.json"
@@ -396,7 +396,7 @@ def validate_args(args: argparse.Namespace, stages: list[str]) -> None:
         raise ValueError("--onnx-max-eval-batches must be positive when provided")
     if args.unseen_include_awq and any(stage in stages for stage in ("unseen-val12", "awq-onnx-case-study")):
         if not args.fft_awq_checkpoint.exists() and "quant" not in stages:
-            raise FileNotFoundError(f"AWQ FFT checkpoint artifact is required for val12/case-study AWQ outputs: {args.fft_awq_checkpoint}")
+            raise FileNotFoundError(f"AWQ FFT checkpoint artifact is required for unseen/case-study AWQ outputs: {args.fft_awq_checkpoint}")
     if not stages:
         raise ValueError("No stages selected")
 
@@ -806,7 +806,7 @@ def unseen_val12_command(args: argparse.Namespace, py: str) -> PipelineCommand:
     ]
     if args.unseen_include_awq:
         command.extend(["--awq-checkpoint-artifact", str(args.fft_awq_checkpoint)])
-    return PipelineCommand("unseen-val12", "evaluate final variants on unseen val12", command, heavy=True)
+    return PipelineCommand("unseen-val12", "evaluate final variants on canonical raw validation split", command, heavy=True)
 
 
 def unseen_review_command(args: argparse.Namespace, py: str) -> PipelineCommand:
@@ -827,7 +827,7 @@ def unseen_review_command(args: argparse.Namespace, py: str) -> PipelineCommand:
     for variant in variants:
         command.extend(["--variant", variant])
     command.extend(["--near-confusion-variant", "onnx_fp32", "--near-confusion-variant", "onnx_int8_qdq"])
-    return PipelineCommand("unseen-review", "create unseen val12 review artifacts", command, heavy=False)
+    return PipelineCommand("unseen-review", "create unseen validation review artifacts", command, heavy=False)
 
 
 def onnx_case_study_command(args: argparse.Namespace, py: str) -> PipelineCommand:

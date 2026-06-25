@@ -52,12 +52,12 @@
   },
   "training_args": {
     "family": "dinov2",
-    "train_dir": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/raw/train",
+    "train_dir": "data/raw/train",
     "val_dir": null,
     "tune_ratio": 0.2,
     "model_name": "dinov2-small",
     "variant": "tiny",
-    "output_dir": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora",
+    "output_dir": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora",
     "image_size": 224,
     "epochs": 20,
     "batch_size": 16,
@@ -83,7 +83,7 @@
     "max_val_batches": null,
     "save_merged_checkpoint": true
   },
-  "validation_source": "internal 20% split from /Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/raw/train",
+  "validation_source": "internal 20% split from data/raw/train",
   "train_images": 2240,
   "tune_images": 560,
   "parameter_summary": {
@@ -223,10 +223,10 @@
     "selection_value": 1.0
   },
   "outputs": {
-    "adapter_dir": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/adapter",
-    "history_csv": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/history.csv",
-    "best_tune_metrics": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/best_tune_metrics.json",
-    "best_tune_confusion_matrix": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/best_tune_confusion_matrix.png",
-    "merged_checkpoint": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
+    "adapter_dir": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/adapter",
+    "history_csv": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/history.csv",
+    "best_tune_metrics": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/best_tune_metrics.json",
+    "best_tune_confusion_matrix": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/best_tune_confusion_matrix.png",
+    "merged_checkpoint": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
   }
 }

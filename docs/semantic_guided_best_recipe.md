@@ -121,10 +121,10 @@ The internal `internal_tune` split has `560` SAM3 pseudo-mask examples (`140` pe
 Final-facing confusion matrices should come from the held-out ImageFolder split:
 
 ```text
-data/val 12
+data/raw/val
 400 images total
 100 images per scene class
-scene labels only; no segmentation ground truth and no val12 mIoU
+scene labels only; no segmentation ground truth and no raw-val mIoU
 ```
 
 The reproducible final artifact lane is:
@@ -133,11 +133,11 @@ The reproducible final artifact lane is:
 FFT BF16/QAT checkpoint
 → FP32 ONNX export
 → ONNX Runtime static INT8 QDQ/PTQ with MinMax train-split calibration
-→ val12 Torch BF16 / ONNX FP32 / ONNX INT8 QDQ / AWQ-style W8A8 scene-confusion evaluation
+→ canonical raw-validation Torch BF16 / ONNX FP32 / ONNX INT8 QDQ / AWQ-style W8A8 scene-confusion evaluation
 → ONNX-only qualitative panels, Johor OOD case study, AWQ-style vs ONNX INT8 case study
 ```
 
-The AWQ-style val12 row is a PyTorch emulation/proxy for research comparison only; ONNX INT8 QDQ remains the deployment artifact.
+The AWQ-style raw-validation row is a PyTorch emulation/proxy for research comparison only; ONNX INT8 QDQ remains the deployment artifact.
 
 ## Dropout status
 

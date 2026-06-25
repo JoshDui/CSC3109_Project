@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Evaluate Semantic-Guided CG-AF variants on labelled unseen ImageFolder data.
 
-This tool is for held-out scene folders such as ``data/val 12`` where scene
+This tool is for held-out scene folders such as ``data/raw/val`` where scene
 labels are available from directory names but segmentation masks are not. It
 therefore reports classification confusion/confidence summaries and exports
 predicted segmentation masks without reporting mIoU.
@@ -52,7 +52,7 @@ def parse_args() -> argparse.Namespace:
         allow_abbrev=False,
     )
     parser.add_argument("--run-id", default=DEFAULT_RUN_ID)
-    parser.add_argument("--data-dir", type=Path, default=PROJECT_ROOT / "data" / "val 12")
+    parser.add_argument("--data-dir", type=Path, default=PROJECT_ROOT / "data" / "raw" / "val")
     parser.add_argument("--checkpoint", required=True, help="Checkpoint path or NAME=PATH; NAME defaults to fft.")
     parser.add_argument("--checkpoint-name", default=None)
     parser.add_argument("--onnx-fp32-path", type=Path, required=True)

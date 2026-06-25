@@ -18,6 +18,7 @@ Current model-family notebook owners:
 - `resnet`: ResNet / ConvNeXt summary notebook.
 - `swin_and_dino`: Swin and ViT/DINO notebooks.
 - `focalnet`: FocalNet notebook-first workflow.
+- `hetmcl`: HETMCL-lite artifact-first quantisation notebook.
 - `clip`: CLIP notebooks if merged later.
 - `scratch_cnn`: scratch CNN baseline notebooks if added later.
 - `semantic_guided`: Semantic-Guided CG-AF CNN notebook.
