@@ -16,12 +16,13 @@ The table below records the current final-facing held-out results and deployment
 artifact sizes available in the repository. Classification metrics are macro
 averages unless noted otherwise. GMACs are architecture-level dense multiply-add
 estimates at the model's evaluation input size, not QDQ-kernel-adjusted runtime
-operation counts: 224×224 for ResNet18, FocalNet, Custom CNN, Swin-Tiny, and
-DINOv2; 512×512 for Semantic-Guided CG-AF CNN.
+operation counts: 224×224 for ResNet18, HETMCL-lite, FocalNet, Custom CNN,
+Swin-Tiny, and DINOv2; 512×512 for Semantic-Guided CG-AF CNN.
 
 | Model | Reported variant | Accuracy | Precision | Recall | F1 | Quantised Size (MiB) | GMACs | Parameter Size (M params) |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | ResNet18 last-block fine-tune | PyTorch FP32 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | N/A | 1.814 | 11.179 |
+| HETMCL-lite ResNet18 hybrid | ONNX INT8 QDQ | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 12.09 | 2.982 | 12.066 |
 | FocalNet-Tiny SRF | ONNX INT8 QDQ | 0.9950 | 0.9951 | 0.9950 | 0.9950 | 27.61 | 4.403 | 27.661 |
 | Semantic-Guided CG-AF CNN | ONNX INT8 QDQ | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.96 | 27.107 | 28.453 |
 | Custom CNN small | ONNX INT8 QDQ | 0.9625 | 0.9643 | 0.9625 | 0.9625 | 1.26 | 2.587 | 1.174 |
@@ -31,6 +32,9 @@ DINOv2; 512×512 for Semantic-Guided CG-AF CNN.
 Metric sources:
 
 - ResNet18: `reports/tables/resnet18_finetune_last_block_metrics.json`.
+- HETMCL-lite: `reports/hetmcl_lite_onnx_int8_qdq/comparison_metrics.csv`,
+  `reports/hetmcl_lite_onnx_int8_qdq/summary.json`, and
+  `notebooks/08_hetmcl_lite_quantisation.ipynb`.
 - FocalNet: `reports/focalnet_tiny_srf_onnx_int8_qdq/comparison_metrics.csv`.
 - Semantic-Guided CG-AF CNN: `notebooks/05_semantic_guided_cgaf_quantisation.ipynb` and `docs/semantic_guided_best_recipe.md`.
 - Custom CNN: `reports/custom_cnn_small_onnx_int8_qdq/comparison_metrics.csv`.

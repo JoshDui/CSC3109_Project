@@ -10,7 +10,9 @@ from typing import Any, Mapping
 import torch
 from torch import nn
 
+from src.config import CLASS_NAMES, IMAGE_SIZE
 from src.models import build_custom_cnn, build_swin_classifier, build_timm_classifier, resolve_timm_model_name
+from src.models.hetmcl import build_hetmcl_classifier
 from src.models.resnet import build_resnet18_frozen
 
 
@@ -156,8 +158,12 @@ def _extract_state_dict(payload: dict[str, Any]) -> dict[str, torch.Tensor]:
 
 
 def _detect_model_family(model_name: str, payload: dict[str, Any], state_dict: dict[str, torch.Tensor]) -> str:
+    if payload.get("model_type") == "hetmcl_classifier":
+        return "hetmcl"
     resolved = resolve_timm_model_name(model_name)
     lowered = f"{model_name} {resolved}".lower()
+    if "hetmcl" in lowered:
+        return "hetmcl"
     if "custom-cnn" in lowered or "custom_cnn" in lowered:
         return "custom_cnn"
     if "features.0.0.weight" in state_dict and "head.2.weight" in state_dict:
@@ -204,6 +210,26 @@ def load_checkpoint_bundle(path: Path) -> CheckpointBundle:
 
 def build_model_from_bundle(bundle: CheckpointBundle) -> nn.Module:
     num_classes = len(bundle.class_to_idx)
+    if bundle.model_family == "hetmcl":
+        architecture = dict(bundle.payload.get("architecture", {}))
+        return build_hetmcl_classifier(
+            num_classes=num_classes,
+            pretrained_backbone=False,
+            fpn_channels=int(architecture.get("fpn_channels", bundle.args.get("fpn_channels", 128)) or 128),
+            dropout=float(architecture.get("dropout", bundle.args.get("dropout", 0.10)) or 0.10),
+            use_affm=bool(architecture.get("use_affm", not bool(bundle.args.get("disable_affm", False)))),
+            hfie_mode=str(architecture.get("hfie_mode", bundle.args.get("hfie_mode", "full"))),
+            mcaa_mode=str(architecture.get("mcaa_mode", bundle.args.get("mcaa_mode", "full"))),
+            hlftm_depth=int(architecture.get("hlftm_depth", bundle.args.get("hlftm_depth", 1)) or 1),
+            num_heads=int(architecture.get("num_heads", bundle.args.get("num_heads", 4)) or 4),
+            mlp_ratio=float(architecture.get("mlp_ratio", bundle.args.get("mlp_ratio", 4.0)) or 4.0),
+            low_frequency_ratio=float(
+                architecture.get("low_frequency_ratio", bundle.args.get("low_frequency_ratio", 0.5)) or 0.5
+            ),
+            dfe_split_ratio=float(architecture.get("dfe_split_ratio", bundle.args.get("dfe_split_ratio", 0.5)) or 0.5),
+            kv_pool_ratio=int(architecture.get("kv_pool_ratio", bundle.args.get("kv_pool_ratio", 2)) or 2),
+        )
+
     if bundle.model_family == "custom_cnn":
         return build_custom_cnn(
             num_classes=num_classes,

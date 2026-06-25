@@ -24,6 +24,8 @@ Current notebooks:
   workflow and validation artifact summary.
 - `07_clip_peft_fft_comparison.ipynb` — CLIP PEFT-vs-FFT comparison and
   deployment-oriented result summary.
+- `08_hetmcl_lite_quantisation.ipynb` — HETMCL-inspired ResNet18 hybrid,
+  reliability checks, ONNX FP32 export, and ONNX INT8 QDQ deployment summary.
 
 Shared reusable code should still live under `src/`, but the notebook itself is
 the source of truth when a workflow is intentionally notebook-first.
