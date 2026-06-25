@@ -65,20 +65,11 @@ def load_manifest_records(manifest_path: Path, split: str) -> list[ManifestRecor
                 continue
 
             image_path = PROJECT_ROOT / row["image_path"]
-            # Deprecated compatibility for archived manifests created before
-            # the canonical `data/raw/train` / `data/raw/val` layout existed.
-            if not image_path.exists():
-                for legacy_prefix in ("data/set 12/set 12/", "data/set 12/"):
-                    if row["image_path"].startswith(legacy_prefix):
-                        relative_suffix = row["image_path"].removeprefix(legacy_prefix)
-                        image_path = PROJECT_ROOT / "data" / "raw" / "train" / relative_suffix
-                        break
-                else:
-                    for legacy_prefix in ("data/val 12/val 12/", "data/val 12/"):
-                        if row["image_path"].startswith(legacy_prefix):
-                            relative_suffix = row["image_path"].removeprefix(legacy_prefix)
-                            image_path = PROJECT_ROOT / "data" / "raw" / "val" / relative_suffix
-                            break
+            # Legacy compatibility: manifests created before the canonical
+            # data/raw/train layout used the data/set 12/ prefix.
+            if not image_path.exists() and row["image_path"].startswith("data/set 12/"):
+                relative_suffix = row["image_path"].removeprefix("data/set 12/")
+                image_path = PROJECT_ROOT / "data" / "raw" / "train" / relative_suffix
 
             records.append(
                 ManifestRecord(
