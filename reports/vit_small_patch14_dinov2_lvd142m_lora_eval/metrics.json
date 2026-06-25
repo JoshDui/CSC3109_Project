@@ -71,7 +71,7 @@
   "evaluation": {
     "run_dir": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora",
     "adapter_subdir": "adapter",
-    "data_dir": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/raw/val",
+    "data_dir": "data/raw/val",
     "device": "mps",
     "samples_evaluated": 400,
     "batch_size": 32,

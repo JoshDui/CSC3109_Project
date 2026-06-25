@@ -19,7 +19,7 @@ Evaluate the trained Swin-Tiny checkpoint:
 python -m src.evaluation.evaluate_swin --checkpoint model/swin_tiny/best_model.pt
 ```
 
-This is the step that should be used for the official held-out `data/val` split.
+This is the step that should be used for the official held-out `data/raw/val` split.
 
 Evaluate a trained DINOv2/timm checkpoint:
 
@@ -46,17 +46,17 @@ Export and evaluate the CLIP FFT ONNX artifacts:
 ```bash
 python -m src.evaluation.clip.export_onnx_int8_qdq \
   --checkpoint reports/clip_training/clip_fft_augmented/model_state.pt \
-  --train-dir "data/set 12/set 12" \
-  --val-dir "data/val 12/val 12"
+  --train-dir "data/raw/train" \
+  --val-dir "data/raw/val"
 ```
 
-If the official held-out validation folder is not available yet, `data/set 12`
-may be used only for internal sanity checks:
+If an official held-out validation folder is not available in a local workspace,
+an internal split from `data/raw/train` may be used only for sanity checks:
 
 ```powershell
 python -m src.evaluation.evaluate_timm_classifier `
   --checkpoint model/convnextv2_tiny_fcmae_ft_in1k_linear_probe/best_model.pt `
-  --data-dir "data/set 12" `
+  --data-dir "data/raw/train" `
   --output-dir reports/convnextv2_tiny_internal_eval `
   --device cuda
 ```

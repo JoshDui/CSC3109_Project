@@ -1,401 +1,401 @@
 path,true_idx,pred_idx,true_label,pred_label,confidence,correct
-data\val 12\val 12\bridge\bridge701.jpg,0,0,bridge,bridge,0.9104206562042236,True
-data\val 12\val 12\bridge\bridge702.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge703.jpg,0,0,bridge,bridge,0.9099594950675964,True
-data\val 12\val 12\bridge\bridge704.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge705.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge706.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge707.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge708.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge709.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge710.jpg,0,0,bridge,bridge,0.9104206562042236,True
-data\val 12\val 12\bridge\bridge711.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge712.jpg,0,0,bridge,bridge,0.9104206562042236,True
-data\val 12\val 12\bridge\bridge713.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge714.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge715.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge716.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge717.jpg,0,0,bridge,bridge,0.9095063209533691,True
-data\val 12\val 12\bridge\bridge718.jpg,0,0,bridge,bridge,0.9095063209533691,True
-data\val 12\val 12\bridge\bridge719.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge720.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge721.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge722.jpg,0,0,bridge,bridge,0.9094984531402588,True
-data\val 12\val 12\bridge\bridge723.jpg,0,0,bridge,bridge,0.9095063209533691,True
-data\val 12\val 12\bridge\bridge724.jpg,0,0,bridge,bridge,0.9108747243881226,True
-data\val 12\val 12\bridge\bridge725.jpg,0,0,bridge,bridge,0.9108747243881226,True
-data\val 12\val 12\bridge\bridge726.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge727.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge728.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge729.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge730.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge731.jpg,0,0,bridge,bridge,0.9108670949935913,True
-data\val 12\val 12\bridge\bridge732.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge733.jpg,0,0,bridge,bridge,0.9108747243881226,True
-data\val 12\val 12\bridge\bridge734.jpg,0,0,bridge,bridge,0.9108747243881226,True
-data\val 12\val 12\bridge\bridge735.jpg,0,0,bridge,bridge,0.9094984531402588,True
-data\val 12\val 12\bridge\bridge736.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge737.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge738.jpg,0,0,bridge,bridge,0.9108747243881226,True
-data\val 12\val 12\bridge\bridge739.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge740.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge741.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge742.jpg,0,0,bridge,bridge,0.9113368988037109,True
-data\val 12\val 12\bridge\bridge743.jpg,0,0,bridge,bridge,0.9117842316627502,True
-data\val 12\val 12\bridge\bridge744.jpg,0,0,bridge,bridge,0.9094598889350891,True
-data\val 12\val 12\bridge\bridge745.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge746.jpg,0,0,bridge,bridge,0.9104206562042236,True
-data\val 12\val 12\bridge\bridge747.jpg,0,0,bridge,bridge,0.9099594950675964,True
-data\val 12\val 12\bridge\bridge748.jpg,0,0,bridge,bridge,0.9072450399398804,True
-data\val 12\val 12\bridge\bridge749.jpg,0,0,bridge,bridge,0.9092689752578735,True
-data\val 12\val 12\bridge\bridge750.jpg,0,0,bridge,bridge,0.9072146415710449,True
-data\val 12\val 12\bridge\bridge751.jpg,0,2,bridge,overpass,0.9077435731887817,False
-data\val 12\val 12\bridge\bridge752.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge753.jpg,0,0,bridge,bridge,0.9094984531402588,True
-data\val 12\val 12\bridge\bridge754.jpg,0,0,bridge,bridge,0.9094984531402588,True
-data\val 12\val 12\bridge\bridge755.jpg,0,0,bridge,bridge,0.9094984531402588,True
-data\val 12\val 12\bridge\bridge756.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge757.jpg,0,0,bridge,bridge,0.9104054570198059,True
-data\val 12\val 12\bridge\bridge758.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge759.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge760.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge761.jpg,0,0,bridge,bridge,0.9094677567481995,True
-data\val 12\val 12\bridge\bridge762.jpg,0,0,bridge,bridge,0.9094677567481995,True
-data\val 12\val 12\bridge\bridge763.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge764.jpg,0,0,bridge,bridge,0.9094677567481995,True
-data\val 12\val 12\bridge\bridge765.jpg,0,0,bridge,bridge,0.9094677567481995,True
-data\val 12\val 12\bridge\bridge766.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge767.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge768.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge769.jpg,0,0,bridge,bridge,0.9104054570198059,True
-data\val 12\val 12\bridge\bridge770.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge771.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge772.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge773.jpg,0,0,bridge,bridge,0.9099363684654236,True
-data\val 12\val 12\bridge\bridge774.jpg,0,0,bridge,bridge,0.9099594950675964,True
-data\val 12\val 12\bridge\bridge775.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge776.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge777.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge778.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge779.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge780.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge781.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge782.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge783.jpg,0,0,bridge,bridge,0.9104206562042236,True
-data\val 12\val 12\bridge\bridge784.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge785.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge786.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge787.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge788.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge789.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge790.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge791.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge792.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge793.jpg,0,0,bridge,bridge,0.9108443856239319,True
-data\val 12\val 12\bridge\bridge794.jpg,0,0,bridge,bridge,0.9108670949935913,True
-data\val 12\val 12\bridge\bridge795.jpg,0,0,bridge,bridge,0.9113216400146484,True
-data\val 12\val 12\bridge\bridge796.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge797.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge798.jpg,0,0,bridge,bridge,0.9099670648574829,True
-data\val 12\val 12\bridge\bridge799.jpg,0,0,bridge,bridge,0.9099515676498413,True
-data\val 12\val 12\bridge\bridge800.jpg,0,0,bridge,bridge,0.9094984531402588,True
-data\val 12\val 12\freeway\freeway701.jpg,1,1,freeway,freeway,0.9129306077957153,True
-data\val 12\val 12\freeway\freeway702.jpg,1,1,freeway,freeway,0.9126675724983215,True
-data\val 12\val 12\freeway\freeway703.jpg,1,1,freeway,freeway,0.9124327301979065,True
-data\val 12\val 12\freeway\freeway704.jpg,1,1,freeway,freeway,0.9124327301979065,True
-data\val 12\val 12\freeway\freeway705.jpg,1,1,freeway,freeway,0.9127684831619263,True
-data\val 12\val 12\freeway\freeway706.jpg,1,1,freeway,freeway,0.9010334610939026,True
-data\val 12\val 12\freeway\freeway707.jpg,1,1,freeway,freeway,0.912132203578949,True
-data\val 12\val 12\freeway\freeway708.jpg,1,1,freeway,freeway,0.805376410484314,True
-data\val 12\val 12\freeway\freeway709.jpg,1,1,freeway,freeway,0.9126675724983215,True
-data\val 12\val 12\freeway\freeway710.jpg,1,1,freeway,freeway,0.9127614498138428,True
-data\val 12\val 12\freeway\freeway711.jpg,1,1,freeway,freeway,0.9117437601089478,True
-data\val 12\val 12\freeway\freeway712.jpg,1,1,freeway,freeway,0.9118801355361938,True
-data\val 12\val 12\freeway\freeway713.jpg,1,1,freeway,freeway,0.9142596125602722,True
-data\val 12\val 12\freeway\freeway714.jpg,1,1,freeway,freeway,0.9129921793937683,True
-data\val 12\val 12\freeway\freeway715.jpg,1,1,freeway,freeway,0.9129235744476318,True
-data\val 12\val 12\freeway\freeway716.jpg,1,1,freeway,freeway,0.9129921793937683,True
-data\val 12\val 12\freeway\freeway717.jpg,1,1,freeway,freeway,0.912504255771637,True
-data\val 12\val 12\freeway\freeway718.jpg,1,1,freeway,freeway,0.9128537178039551,True
-data\val 12\val 12\freeway\freeway719.jpg,1,1,freeway,freeway,0.9129306077957153,True
-data\val 12\val 12\freeway\freeway720.jpg,1,1,freeway,freeway,0.5938092470169067,True
-data\val 12\val 12\freeway\freeway721.jpg,1,1,freeway,freeway,0.894015371799469,True
-data\val 12\val 12\freeway\freeway722.jpg,1,0,freeway,bridge,0.7146457433700562,False
-data\val 12\val 12\freeway\freeway723.jpg,1,0,freeway,bridge,0.8730420470237732,False
-data\val 12\val 12\freeway\freeway724.jpg,1,2,freeway,overpass,0.7926084995269775,False
-data\val 12\val 12\freeway\freeway725.jpg,1,1,freeway,freeway,0.9112100601196289,True
-data\val 12\val 12\freeway\freeway726.jpg,1,1,freeway,freeway,0.9122276306152344,True
-data\val 12\val 12\freeway\freeway727.jpg,1,1,freeway,freeway,0.9126259684562683,True
-data\val 12\val 12\freeway\freeway728.jpg,1,1,freeway,freeway,0.9127614498138428,True
-data\val 12\val 12\freeway\freeway729.jpg,1,1,freeway,freeway,0.9124345183372498,True
-data\val 12\val 12\freeway\freeway730.jpg,1,1,freeway,freeway,0.9129306077957153,True
-data\val 12\val 12\freeway\freeway731.jpg,1,1,freeway,freeway,0.9118937253952026,True
-data\val 12\val 12\freeway\freeway732.jpg,1,1,freeway,freeway,0.9125511050224304,True
-data\val 12\val 12\freeway\freeway733.jpg,1,1,freeway,freeway,0.9124345183372498,True
-data\val 12\val 12\freeway\freeway734.jpg,1,1,freeway,freeway,0.9094708561897278,True
-data\val 12\val 12\freeway\freeway735.jpg,1,1,freeway,freeway,0.9117437601089478,True
-data\val 12\val 12\freeway\freeway736.jpg,1,1,freeway,freeway,0.9114618301391602,True
-data\val 12\val 12\freeway\freeway737.jpg,1,1,freeway,freeway,0.9115779399871826,True
-data\val 12\val 12\freeway\freeway738.jpg,1,1,freeway,freeway,0.9126536846160889,True
-data\val 12\val 12\freeway\freeway739.jpg,1,1,freeway,freeway,0.8116927742958069,True
-data\val 12\val 12\freeway\freeway740.jpg,1,1,freeway,freeway,0.902477502822876,True
-data\val 12\val 12\freeway\freeway741.jpg,1,1,freeway,freeway,0.9116024971008301,True
-data\val 12\val 12\freeway\freeway742.jpg,1,2,freeway,overpass,0.4628574848175049,False
-data\val 12\val 12\freeway\freeway743.jpg,1,1,freeway,freeway,0.4987078905105591,True
-data\val 12\val 12\freeway\freeway744.jpg,1,1,freeway,freeway,0.5660086870193481,True
-data\val 12\val 12\freeway\freeway745.jpg,1,1,freeway,freeway,0.9107735753059387,True
-data\val 12\val 12\freeway\freeway746.jpg,1,1,freeway,freeway,0.9124345183372498,True
-data\val 12\val 12\freeway\freeway747.jpg,1,2,freeway,overpass,0.5537416338920593,False
-data\val 12\val 12\freeway\freeway748.jpg,1,1,freeway,freeway,0.9120277762413025,True
-data\val 12\val 12\freeway\freeway749.jpg,1,1,freeway,freeway,0.9117437601089478,True
-data\val 12\val 12\freeway\freeway750.jpg,1,1,freeway,freeway,0.9088431596755981,True
-data\val 12\val 12\freeway\freeway751.jpg,1,1,freeway,freeway,0.9021634459495544,True
-data\val 12\val 12\freeway\freeway752.jpg,1,1,freeway,freeway,0.9124498963356018,True
-data\val 12\val 12\freeway\freeway753.jpg,1,1,freeway,freeway,0.9120209217071533,True
-data\val 12\val 12\freeway\freeway754.jpg,1,1,freeway,freeway,0.9125579595565796,True
-data\val 12\val 12\freeway\freeway755.jpg,1,1,freeway,freeway,0.9120209217071533,True
-data\val 12\val 12\freeway\freeway756.jpg,1,1,freeway,freeway,0.9118937253952026,True
-data\val 12\val 12\freeway\freeway757.jpg,1,1,freeway,freeway,0.9125511050224304,True
-data\val 12\val 12\freeway\freeway758.jpg,1,1,freeway,freeway,0.9092738628387451,True
-data\val 12\val 12\freeway\freeway759.jpg,1,1,freeway,freeway,0.9090668559074402,True
-data\val 12\val 12\freeway\freeway760.jpg,1,1,freeway,freeway,0.9096696972846985,True
-data\val 12\val 12\freeway\freeway761.jpg,1,1,freeway,freeway,0.9124274253845215,True
-data\val 12\val 12\freeway\freeway762.jpg,1,1,freeway,freeway,0.9117504954338074,True
-data\val 12\val 12\freeway\freeway763.jpg,1,1,freeway,freeway,0.9126675724983215,True
-data\val 12\val 12\freeway\freeway764.jpg,1,3,freeway,railway,0.5780196785926819,False
-data\val 12\val 12\freeway\freeway765.jpg,1,1,freeway,freeway,0.9089331030845642,True
-data\val 12\val 12\freeway\freeway766.jpg,1,2,freeway,overpass,0.8661165237426758,False
-data\val 12\val 12\freeway\freeway767.jpg,1,1,freeway,freeway,0.9068167209625244,True
-data\val 12\val 12\freeway\freeway768.jpg,1,1,freeway,freeway,0.6384075880050659,True
-data\val 12\val 12\freeway\freeway769.jpg,1,2,freeway,overpass,0.9127689599990845,False
-data\val 12\val 12\freeway\freeway770.jpg,1,2,freeway,overpass,0.8625741004943848,False
-data\val 12\val 12\freeway\freeway771.jpg,1,1,freeway,freeway,0.8905545473098755,True
-data\val 12\val 12\freeway\freeway772.jpg,1,1,freeway,freeway,0.6034272313117981,True
-data\val 12\val 12\freeway\freeway773.jpg,1,2,freeway,overpass,0.8711147904396057,False
-data\val 12\val 12\freeway\freeway774.jpg,1,2,freeway,overpass,0.9000998139381409,False
-data\val 12\val 12\freeway\freeway775.jpg,1,1,freeway,freeway,0.9097695350646973,True
-data\val 12\val 12\freeway\freeway776.jpg,1,1,freeway,freeway,0.7519360184669495,True
-data\val 12\val 12\freeway\freeway777.jpg,1,2,freeway,overpass,0.5113178491592407,False
-data\val 12\val 12\freeway\freeway778.jpg,1,2,freeway,overpass,0.7027698159217834,False
-data\val 12\val 12\freeway\freeway779.jpg,1,2,freeway,overpass,0.8865518569946289,False
-data\val 12\val 12\freeway\freeway780.jpg,1,1,freeway,freeway,0.9096106886863708,True
-data\val 12\val 12\freeway\freeway781.jpg,1,2,freeway,overpass,0.9022160172462463,False
-data\val 12\val 12\freeway\freeway782.jpg,1,1,freeway,freeway,0.8929306864738464,True
-data\val 12\val 12\freeway\freeway783.jpg,1,2,freeway,overpass,0.9121178984642029,False
-data\val 12\val 12\freeway\freeway784.jpg,1,1,freeway,freeway,0.9121460914611816,True
-data\val 12\val 12\freeway\freeway785.jpg,1,1,freeway,freeway,0.909853458404541,True
-data\val 12\val 12\freeway\freeway786.jpg,1,1,freeway,freeway,0.8999540209770203,True
-data\val 12\val 12\freeway\freeway787.jpg,1,1,freeway,freeway,0.9113461971282959,True
-data\val 12\val 12\freeway\freeway788.jpg,1,1,freeway,freeway,0.9117504954338074,True
-data\val 12\val 12\freeway\freeway789.jpg,1,2,freeway,overpass,0.7613767981529236,False
-data\val 12\val 12\freeway\freeway790.jpg,1,2,freeway,overpass,0.7148616313934326,False
-data\val 12\val 12\freeway\freeway791.jpg,1,1,freeway,freeway,0.9020780920982361,True
-data\val 12\val 12\freeway\freeway792.jpg,1,1,freeway,freeway,0.6309640407562256,True
-data\val 12\val 12\freeway\freeway793.jpg,1,1,freeway,freeway,0.9074133634567261,True
-data\val 12\val 12\freeway\freeway794.jpg,1,2,freeway,overpass,0.8532926440238953,False
-data\val 12\val 12\freeway\freeway795.jpg,1,2,freeway,overpass,0.8968381285667419,False
-data\val 12\val 12\freeway\freeway796.jpg,1,2,freeway,overpass,0.9126280546188354,False
-data\val 12\val 12\freeway\freeway797.jpg,1,2,freeway,overpass,0.8944348096847534,False
-data\val 12\val 12\freeway\freeway798.jpg,1,2,freeway,overpass,0.8939730525016785,False
-data\val 12\val 12\freeway\freeway799.jpg,1,1,freeway,freeway,0.9075585603713989,True
-data\val 12\val 12\freeway\freeway800.jpg,1,1,freeway,freeway,0.9121925830841064,True
-data\val 12\val 12\overpass\overpass701.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass702.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass703.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass704.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass705.jpg,2,2,overpass,overpass,0.9146519899368286,True
-data\val 12\val 12\overpass\overpass706.jpg,2,2,overpass,overpass,0.9147741794586182,True
-data\val 12\val 12\overpass\overpass707.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass708.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass709.jpg,2,2,overpass,overpass,0.9143085479736328,True
-data\val 12\val 12\overpass\overpass710.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass711.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass712.jpg,2,2,overpass,overpass,0.9138587117195129,True
-data\val 12\val 12\overpass\overpass713.jpg,2,2,overpass,overpass,0.9156335592269897,True
-data\val 12\val 12\overpass\overpass714.jpg,2,2,overpass,overpass,0.9160774946212769,True
-data\val 12\val 12\overpass\overpass715.jpg,2,2,overpass,overpass,0.9156762361526489,True
-data\val 12\val 12\overpass\overpass716.jpg,2,2,overpass,overpass,0.9143085479736328,True
-data\val 12\val 12\overpass\overpass717.jpg,2,2,overpass,overpass,0.9152325391769409,True
-data\val 12\val 12\overpass\overpass718.jpg,2,2,overpass,overpass,0.914367139339447,True
-data\val 12\val 12\overpass\overpass719.jpg,2,2,overpass,overpass,0.9143085479736328,True
-data\val 12\val 12\overpass\overpass720.jpg,2,2,overpass,overpass,0.9143085479736328,True
-data\val 12\val 12\overpass\overpass721.jpg,2,2,overpass,overpass,0.9147741794586182,True
-data\val 12\val 12\overpass\overpass722.jpg,2,2,overpass,overpass,0.9156762361526489,True
-data\val 12\val 12\overpass\overpass723.jpg,2,2,overpass,overpass,0.914367139339447,True
-data\val 12\val 12\overpass\overpass724.jpg,2,2,overpass,overpass,0.9147741794586182,True
-data\val 12\val 12\overpass\overpass725.jpg,2,2,overpass,overpass,0.9134858250617981,True
-data\val 12\val 12\overpass\overpass726.jpg,2,2,overpass,overpass,0.9063472151756287,True
-data\val 12\val 12\overpass\overpass727.jpg,2,2,overpass,overpass,0.9156335592269897,True
-data\val 12\val 12\overpass\overpass728.jpg,2,2,overpass,overpass,0.914367139339447,True
-data\val 12\val 12\overpass\overpass729.jpg,2,2,overpass,overpass,0.9081922173500061,True
-data\val 12\val 12\overpass\overpass730.jpg,2,2,overpass,overpass,0.9139747023582458,True
-data\val 12\val 12\overpass\overpass731.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass732.jpg,2,0,overpass,bridge,0.583236813545227,False
-data\val 12\val 12\overpass\overpass733.jpg,2,2,overpass,overpass,0.9141941666603088,True
-data\val 12\val 12\overpass\overpass734.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass735.jpg,2,2,overpass,overpass,0.9141941666603088,True
-data\val 12\val 12\overpass\overpass736.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass737.jpg,2,2,overpass,overpass,0.9141075611114502,True
-data\val 12\val 12\overpass\overpass738.jpg,2,2,overpass,overpass,0.9141941666603088,True
-data\val 12\val 12\overpass\overpass739.jpg,2,2,overpass,overpass,0.915576696395874,True
-data\val 12\val 12\overpass\overpass740.jpg,2,2,overpass,overpass,0.9146519899368286,True
-data\val 12\val 12\overpass\overpass741.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass742.jpg,2,2,overpass,overpass,0.9138509631156921,True
-data\val 12\val 12\overpass\overpass743.jpg,2,2,overpass,overpass,0.9146519899368286,True
-data\val 12\val 12\overpass\overpass744.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass745.jpg,2,2,overpass,overpass,0.9140839576721191,True
-data\val 12\val 12\overpass\overpass746.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass747.jpg,2,2,overpass,overpass,0.9123448133468628,True
-data\val 12\val 12\overpass\overpass748.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass749.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass750.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass751.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass752.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass753.jpg,2,2,overpass,overpass,0.9136975407600403,True
-data\val 12\val 12\overpass\overpass754.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass755.jpg,2,2,overpass,overpass,0.9146519899368286,True
-data\val 12\val 12\overpass\overpass756.jpg,2,2,overpass,overpass,0.9146519899368286,True
-data\val 12\val 12\overpass\overpass757.jpg,2,2,overpass,overpass,0.9141471982002258,True
-data\val 12\val 12\overpass\overpass758.jpg,2,2,overpass,overpass,0.9136975407600403,True
-data\val 12\val 12\overpass\overpass759.jpg,2,2,overpass,overpass,0.9141471982002258,True
-data\val 12\val 12\overpass\overpass760.jpg,2,2,overpass,overpass,0.9141075611114502,True
-data\val 12\val 12\overpass\overpass761.jpg,2,2,overpass,overpass,0.9156182408332825,True
-data\val 12\val 12\overpass\overpass762.jpg,2,2,overpass,overpass,0.9136975407600403,True
-data\val 12\val 12\overpass\overpass763.jpg,2,2,overpass,overpass,0.9144878387451172,True
-data\val 12\val 12\overpass\overpass764.jpg,2,2,overpass,overpass,0.9146519899368286,True
-data\val 12\val 12\overpass\overpass765.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass766.jpg,2,2,overpass,overpass,0.9112870693206787,True
-data\val 12\val 12\overpass\overpass767.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass768.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass769.jpg,2,2,overpass,overpass,0.915217399597168,True
-data\val 12\val 12\overpass\overpass770.jpg,2,2,overpass,overpass,0.9142351746559143,True
-data\val 12\val 12\overpass\overpass771.jpg,2,2,overpass,overpass,0.9135417342185974,True
-data\val 12\val 12\overpass\overpass772.jpg,2,2,overpass,overpass,0.9141075611114502,True
-data\val 12\val 12\overpass\overpass773.jpg,2,2,overpass,overpass,0.9145653247833252,True
-data\val 12\val 12\overpass\overpass774.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass775.jpg,2,2,overpass,overpass,0.9139747023582458,True
-data\val 12\val 12\overpass\overpass776.jpg,2,2,overpass,overpass,0.913785457611084,True
-data\val 12\val 12\overpass\overpass777.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass778.jpg,2,2,overpass,overpass,0.9138587117195129,True
-data\val 12\val 12\overpass\overpass779.jpg,2,2,overpass,overpass,0.9138010740280151,True
-data\val 12\val 12\overpass\overpass780.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass781.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass782.jpg,2,2,overpass,overpass,0.9141784906387329,True
-data\val 12\val 12\overpass\overpass783.jpg,2,2,overpass,overpass,0.9142661690711975,True
-data\val 12\val 12\overpass\overpass784.jpg,2,2,overpass,overpass,0.9141941666603088,True
-data\val 12\val 12\overpass\overpass785.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass786.jpg,2,2,overpass,overpass,0.9147741794586182,True
-data\val 12\val 12\overpass\overpass787.jpg,2,2,overpass,overpass,0.913785457611084,True
-data\val 12\val 12\overpass\overpass788.jpg,2,2,overpass,overpass,0.9141941666603088,True
-data\val 12\val 12\overpass\overpass789.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass790.jpg,2,2,overpass,overpass,0.9138587117195129,True
-data\val 12\val 12\overpass\overpass791.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass792.jpg,2,2,overpass,overpass,0.9138010740280151,True
-data\val 12\val 12\overpass\overpass793.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass794.jpg,2,2,overpass,overpass,0.9142661690711975,True
-data\val 12\val 12\overpass\overpass795.jpg,2,2,overpass,overpass,0.9142661690711975,True
-data\val 12\val 12\overpass\overpass796.jpg,2,2,overpass,overpass,0.9138010740280151,True
-data\val 12\val 12\overpass\overpass797.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\overpass\overpass798.jpg,2,2,overpass,overpass,0.914367139339447,True
-data\val 12\val 12\overpass\overpass799.jpg,2,2,overpass,overpass,0.9143238663673401,True
-data\val 12\val 12\overpass\overpass800.jpg,2,2,overpass,overpass,0.9142585396766663,True
-data\val 12\val 12\railway\railway701.jpg,3,3,railway,railway,0.9098118543624878,True
-data\val 12\val 12\railway\railway702.jpg,3,3,railway,railway,0.9094359278678894,True
-data\val 12\val 12\railway\railway703.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway704.jpg,3,3,railway,railway,0.9099363684654236,True
-data\val 12\val 12\railway\railway705.jpg,3,3,railway,railway,0.9099363684654236,True
-data\val 12\val 12\railway\railway706.jpg,3,3,railway,railway,0.9103748202323914,True
-data\val 12\val 12\railway\railway707.jpg,3,3,railway,railway,0.9094598293304443,True
-data\val 12\val 12\railway\railway708.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway709.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway710.jpg,3,3,railway,railway,0.9098342657089233,True
-data\val 12\val 12\railway\railway711.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway712.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway713.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway714.jpg,3,3,railway,railway,0.9066446423530579,True
-data\val 12\val 12\railway\railway715.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway716.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway717.jpg,3,3,railway,railway,0.9098978638648987,True
-data\val 12\val 12\railway\railway718.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway719.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway720.jpg,3,3,railway,railway,0.9098439812660217,True
-data\val 12\val 12\railway\railway721.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway722.jpg,3,3,railway,railway,0.9094293117523193,True
-data\val 12\val 12\railway\railway723.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway724.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway725.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway726.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway727.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway728.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway729.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway730.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway731.jpg,3,3,railway,railway,0.8723154664039612,True
-data\val 12\val 12\railway\railway732.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway733.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway734.jpg,3,3,railway,railway,0.9095063209533691,True
-data\val 12\val 12\railway\railway735.jpg,3,3,railway,railway,0.9099670648574829,True
-data\val 12\val 12\railway\railway736.jpg,3,3,railway,railway,0.8726921677589417,True
-data\val 12\val 12\railway\railway737.jpg,3,3,railway,railway,0.9098600149154663,True
-data\val 12\val 12\railway\railway738.jpg,3,0,railway,bridge,0.8901776671409607,False
-data\val 12\val 12\railway\railway739.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway740.jpg,3,0,railway,bridge,0.6938265562057495,False
-data\val 12\val 12\railway\railway741.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway742.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway743.jpg,3,3,railway,railway,0.9099670648574829,True
-data\val 12\val 12\railway\railway744.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway745.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway746.jpg,3,3,railway,railway,0.9099670648574829,True
-data\val 12\val 12\railway\railway747.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway748.jpg,3,3,railway,railway,0.9099205732345581,True
-data\val 12\val 12\railway\railway749.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway750.jpg,3,3,railway,railway,0.9095063209533691,True
-data\val 12\val 12\railway\railway751.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway752.jpg,3,3,railway,railway,0.9098978638648987,True
-data\val 12\val 12\railway\railway753.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway754.jpg,3,3,railway,railway,0.9095063209533691,True
-data\val 12\val 12\railway\railway755.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway756.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway757.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway758.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway759.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway760.jpg,3,0,railway,bridge,0.9043805599212646,False
-data\val 12\val 12\railway\railway761.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway762.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway763.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway764.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway765.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway766.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway767.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway768.jpg,3,3,railway,railway,0.9099670648574829,True
-data\val 12\val 12\railway\railway769.jpg,3,3,railway,railway,0.9099670648574829,True
-data\val 12\val 12\railway\railway770.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway771.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway772.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway773.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway774.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway775.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway776.jpg,3,3,railway,railway,0.9099670648574829,True
-data\val 12\val 12\railway\railway777.jpg,3,3,railway,railway,0.9104206562042236,True
-data\val 12\val 12\railway\railway778.jpg,3,3,railway,railway,0.9099363684654236,True
-data\val 12\val 12\railway\railway779.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway780.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway781.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway782.jpg,3,3,railway,railway,0.9094750881195068,True
-data\val 12\val 12\railway\railway783.jpg,3,3,railway,railway,0.9099363684654236,True
-data\val 12\val 12\railway\railway784.jpg,3,3,railway,railway,0.9094677567481995,True
-data\val 12\val 12\railway\railway785.jpg,3,3,railway,railway,0.8795585632324219,True
-data\val 12\val 12\railway\railway786.jpg,3,3,railway,railway,0.9094598293304443,True
-data\val 12\val 12\railway\railway787.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway788.jpg,3,3,railway,railway,0.9099363684654236,True
-data\val 12\val 12\railway\railway789.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway790.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway791.jpg,3,3,railway,railway,0.9094677567481995,True
-data\val 12\val 12\railway\railway792.jpg,3,3,railway,railway,0.6476490497589111,True
-data\val 12\val 12\railway\railway793.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway794.jpg,3,3,railway,railway,0.9099363684654236,True
-data\val 12\val 12\railway\railway795.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway796.jpg,3,3,railway,railway,0.9099515676498413,True
-data\val 12\val 12\railway\railway797.jpg,3,3,railway,railway,0.9094293117523193,True
-data\val 12\val 12\railway\railway798.jpg,3,3,railway,railway,0.9099594950675964,True
-data\val 12\val 12\railway\railway799.jpg,3,3,railway,railway,0.9094908833503723,True
-data\val 12\val 12\railway\railway800.jpg,3,3,railway,railway,0.9099363684654236,True
+data\raw\val\bridge\bridge701.jpg,0,0,bridge,bridge,0.9104206562042236,True
+data\raw\val\bridge\bridge702.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge703.jpg,0,0,bridge,bridge,0.9099594950675964,True
+data\raw\val\bridge\bridge704.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge705.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge706.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge707.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge708.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge709.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge710.jpg,0,0,bridge,bridge,0.9104206562042236,True
+data\raw\val\bridge\bridge711.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge712.jpg,0,0,bridge,bridge,0.9104206562042236,True
+data\raw\val\bridge\bridge713.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge714.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge715.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge716.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge717.jpg,0,0,bridge,bridge,0.9095063209533691,True
+data\raw\val\bridge\bridge718.jpg,0,0,bridge,bridge,0.9095063209533691,True
+data\raw\val\bridge\bridge719.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge720.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge721.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge722.jpg,0,0,bridge,bridge,0.9094984531402588,True
+data\raw\val\bridge\bridge723.jpg,0,0,bridge,bridge,0.9095063209533691,True
+data\raw\val\bridge\bridge724.jpg,0,0,bridge,bridge,0.9108747243881226,True
+data\raw\val\bridge\bridge725.jpg,0,0,bridge,bridge,0.9108747243881226,True
+data\raw\val\bridge\bridge726.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge727.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge728.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge729.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge730.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge731.jpg,0,0,bridge,bridge,0.9108670949935913,True
+data\raw\val\bridge\bridge732.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge733.jpg,0,0,bridge,bridge,0.9108747243881226,True
+data\raw\val\bridge\bridge734.jpg,0,0,bridge,bridge,0.9108747243881226,True
+data\raw\val\bridge\bridge735.jpg,0,0,bridge,bridge,0.9094984531402588,True
+data\raw\val\bridge\bridge736.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge737.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge738.jpg,0,0,bridge,bridge,0.9108747243881226,True
+data\raw\val\bridge\bridge739.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge740.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge741.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge742.jpg,0,0,bridge,bridge,0.9113368988037109,True
+data\raw\val\bridge\bridge743.jpg,0,0,bridge,bridge,0.9117842316627502,True
+data\raw\val\bridge\bridge744.jpg,0,0,bridge,bridge,0.9094598889350891,True
+data\raw\val\bridge\bridge745.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge746.jpg,0,0,bridge,bridge,0.9104206562042236,True
+data\raw\val\bridge\bridge747.jpg,0,0,bridge,bridge,0.9099594950675964,True
+data\raw\val\bridge\bridge748.jpg,0,0,bridge,bridge,0.9072450399398804,True
+data\raw\val\bridge\bridge749.jpg,0,0,bridge,bridge,0.9092689752578735,True
+data\raw\val\bridge\bridge750.jpg,0,0,bridge,bridge,0.9072146415710449,True
+data\raw\val\bridge\bridge751.jpg,0,2,bridge,overpass,0.9077435731887817,False
+data\raw\val\bridge\bridge752.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge753.jpg,0,0,bridge,bridge,0.9094984531402588,True
+data\raw\val\bridge\bridge754.jpg,0,0,bridge,bridge,0.9094984531402588,True
+data\raw\val\bridge\bridge755.jpg,0,0,bridge,bridge,0.9094984531402588,True
+data\raw\val\bridge\bridge756.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge757.jpg,0,0,bridge,bridge,0.9104054570198059,True
+data\raw\val\bridge\bridge758.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge759.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge760.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge761.jpg,0,0,bridge,bridge,0.9094677567481995,True
+data\raw\val\bridge\bridge762.jpg,0,0,bridge,bridge,0.9094677567481995,True
+data\raw\val\bridge\bridge763.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge764.jpg,0,0,bridge,bridge,0.9094677567481995,True
+data\raw\val\bridge\bridge765.jpg,0,0,bridge,bridge,0.9094677567481995,True
+data\raw\val\bridge\bridge766.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge767.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge768.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge769.jpg,0,0,bridge,bridge,0.9104054570198059,True
+data\raw\val\bridge\bridge770.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge771.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge772.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge773.jpg,0,0,bridge,bridge,0.9099363684654236,True
+data\raw\val\bridge\bridge774.jpg,0,0,bridge,bridge,0.9099594950675964,True
+data\raw\val\bridge\bridge775.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge776.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge777.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge778.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge779.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge780.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge781.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge782.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge783.jpg,0,0,bridge,bridge,0.9104206562042236,True
+data\raw\val\bridge\bridge784.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge785.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge786.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge787.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge788.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge789.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge790.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge791.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge792.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge793.jpg,0,0,bridge,bridge,0.9108443856239319,True
+data\raw\val\bridge\bridge794.jpg,0,0,bridge,bridge,0.9108670949935913,True
+data\raw\val\bridge\bridge795.jpg,0,0,bridge,bridge,0.9113216400146484,True
+data\raw\val\bridge\bridge796.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge797.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge798.jpg,0,0,bridge,bridge,0.9099670648574829,True
+data\raw\val\bridge\bridge799.jpg,0,0,bridge,bridge,0.9099515676498413,True
+data\raw\val\bridge\bridge800.jpg,0,0,bridge,bridge,0.9094984531402588,True
+data\raw\val\freeway\freeway701.jpg,1,1,freeway,freeway,0.9129306077957153,True
+data\raw\val\freeway\freeway702.jpg,1,1,freeway,freeway,0.9126675724983215,True
+data\raw\val\freeway\freeway703.jpg,1,1,freeway,freeway,0.9124327301979065,True
+data\raw\val\freeway\freeway704.jpg,1,1,freeway,freeway,0.9124327301979065,True
+data\raw\val\freeway\freeway705.jpg,1,1,freeway,freeway,0.9127684831619263,True
+data\raw\val\freeway\freeway706.jpg,1,1,freeway,freeway,0.9010334610939026,True
+data\raw\val\freeway\freeway707.jpg,1,1,freeway,freeway,0.912132203578949,True
+data\raw\val\freeway\freeway708.jpg,1,1,freeway,freeway,0.805376410484314,True
+data\raw\val\freeway\freeway709.jpg,1,1,freeway,freeway,0.9126675724983215,True
+data\raw\val\freeway\freeway710.jpg,1,1,freeway,freeway,0.9127614498138428,True
+data\raw\val\freeway\freeway711.jpg,1,1,freeway,freeway,0.9117437601089478,True
+data\raw\val\freeway\freeway712.jpg,1,1,freeway,freeway,0.9118801355361938,True
+data\raw\val\freeway\freeway713.jpg,1,1,freeway,freeway,0.9142596125602722,True
+data\raw\val\freeway\freeway714.jpg,1,1,freeway,freeway,0.9129921793937683,True
+data\raw\val\freeway\freeway715.jpg,1,1,freeway,freeway,0.9129235744476318,True
+data\raw\val\freeway\freeway716.jpg,1,1,freeway,freeway,0.9129921793937683,True
+data\raw\val\freeway\freeway717.jpg,1,1,freeway,freeway,0.912504255771637,True
+data\raw\val\freeway\freeway718.jpg,1,1,freeway,freeway,0.9128537178039551,True
+data\raw\val\freeway\freeway719.jpg,1,1,freeway,freeway,0.9129306077957153,True
+data\raw\val\freeway\freeway720.jpg,1,1,freeway,freeway,0.5938092470169067,True
+data\raw\val\freeway\freeway721.jpg,1,1,freeway,freeway,0.894015371799469,True
+data\raw\val\freeway\freeway722.jpg,1,0,freeway,bridge,0.7146457433700562,False
+data\raw\val\freeway\freeway723.jpg,1,0,freeway,bridge,0.8730420470237732,False
+data\raw\val\freeway\freeway724.jpg,1,2,freeway,overpass,0.7926084995269775,False
+data\raw\val\freeway\freeway725.jpg,1,1,freeway,freeway,0.9112100601196289,True
+data\raw\val\freeway\freeway726.jpg,1,1,freeway,freeway,0.9122276306152344,True
+data\raw\val\freeway\freeway727.jpg,1,1,freeway,freeway,0.9126259684562683,True
+data\raw\val\freeway\freeway728.jpg,1,1,freeway,freeway,0.9127614498138428,True
+data\raw\val\freeway\freeway729.jpg,1,1,freeway,freeway,0.9124345183372498,True
+data\raw\val\freeway\freeway730.jpg,1,1,freeway,freeway,0.9129306077957153,True
+data\raw\val\freeway\freeway731.jpg,1,1,freeway,freeway,0.9118937253952026,True
+data\raw\val\freeway\freeway732.jpg,1,1,freeway,freeway,0.9125511050224304,True
+data\raw\val\freeway\freeway733.jpg,1,1,freeway,freeway,0.9124345183372498,True
+data\raw\val\freeway\freeway734.jpg,1,1,freeway,freeway,0.9094708561897278,True
+data\raw\val\freeway\freeway735.jpg,1,1,freeway,freeway,0.9117437601089478,True
+data\raw\val\freeway\freeway736.jpg,1,1,freeway,freeway,0.9114618301391602,True
+data\raw\val\freeway\freeway737.jpg,1,1,freeway,freeway,0.9115779399871826,True
+data\raw\val\freeway\freeway738.jpg,1,1,freeway,freeway,0.9126536846160889,True
+data\raw\val\freeway\freeway739.jpg,1,1,freeway,freeway,0.8116927742958069,True
+data\raw\val\freeway\freeway740.jpg,1,1,freeway,freeway,0.902477502822876,True
+data\raw\val\freeway\freeway741.jpg,1,1,freeway,freeway,0.9116024971008301,True
+data\raw\val\freeway\freeway742.jpg,1,2,freeway,overpass,0.4628574848175049,False
+data\raw\val\freeway\freeway743.jpg,1,1,freeway,freeway,0.4987078905105591,True
+data\raw\val\freeway\freeway744.jpg,1,1,freeway,freeway,0.5660086870193481,True
+data\raw\val\freeway\freeway745.jpg,1,1,freeway,freeway,0.9107735753059387,True
+data\raw\val\freeway\freeway746.jpg,1,1,freeway,freeway,0.9124345183372498,True
+data\raw\val\freeway\freeway747.jpg,1,2,freeway,overpass,0.5537416338920593,False
+data\raw\val\freeway\freeway748.jpg,1,1,freeway,freeway,0.9120277762413025,True
+data\raw\val\freeway\freeway749.jpg,1,1,freeway,freeway,0.9117437601089478,True
+data\raw\val\freeway\freeway750.jpg,1,1,freeway,freeway,0.9088431596755981,True
+data\raw\val\freeway\freeway751.jpg,1,1,freeway,freeway,0.9021634459495544,True
+data\raw\val\freeway\freeway752.jpg,1,1,freeway,freeway,0.9124498963356018,True
+data\raw\val\freeway\freeway753.jpg,1,1,freeway,freeway,0.9120209217071533,True
+data\raw\val\freeway\freeway754.jpg,1,1,freeway,freeway,0.9125579595565796,True
+data\raw\val\freeway\freeway755.jpg,1,1,freeway,freeway,0.9120209217071533,True
+data\raw\val\freeway\freeway756.jpg,1,1,freeway,freeway,0.9118937253952026,True
+data\raw\val\freeway\freeway757.jpg,1,1,freeway,freeway,0.9125511050224304,True
+data\raw\val\freeway\freeway758.jpg,1,1,freeway,freeway,0.9092738628387451,True
+data\raw\val\freeway\freeway759.jpg,1,1,freeway,freeway,0.9090668559074402,True
+data\raw\val\freeway\freeway760.jpg,1,1,freeway,freeway,0.9096696972846985,True
+data\raw\val\freeway\freeway761.jpg,1,1,freeway,freeway,0.9124274253845215,True
+data\raw\val\freeway\freeway762.jpg,1,1,freeway,freeway,0.9117504954338074,True
+data\raw\val\freeway\freeway763.jpg,1,1,freeway,freeway,0.9126675724983215,True
+data\raw\val\freeway\freeway764.jpg,1,3,freeway,railway,0.5780196785926819,False
+data\raw\val\freeway\freeway765.jpg,1,1,freeway,freeway,0.9089331030845642,True
+data\raw\val\freeway\freeway766.jpg,1,2,freeway,overpass,0.8661165237426758,False
+data\raw\val\freeway\freeway767.jpg,1,1,freeway,freeway,0.9068167209625244,True
+data\raw\val\freeway\freeway768.jpg,1,1,freeway,freeway,0.6384075880050659,True
+data\raw\val\freeway\freeway769.jpg,1,2,freeway,overpass,0.9127689599990845,False
+data\raw\val\freeway\freeway770.jpg,1,2,freeway,overpass,0.8625741004943848,False
+data\raw\val\freeway\freeway771.jpg,1,1,freeway,freeway,0.8905545473098755,True
+data\raw\val\freeway\freeway772.jpg,1,1,freeway,freeway,0.6034272313117981,True
+data\raw\val\freeway\freeway773.jpg,1,2,freeway,overpass,0.8711147904396057,False
+data\raw\val\freeway\freeway774.jpg,1,2,freeway,overpass,0.9000998139381409,False
+data\raw\val\freeway\freeway775.jpg,1,1,freeway,freeway,0.9097695350646973,True
+data\raw\val\freeway\freeway776.jpg,1,1,freeway,freeway,0.7519360184669495,True
+data\raw\val\freeway\freeway777.jpg,1,2,freeway,overpass,0.5113178491592407,False
+data\raw\val\freeway\freeway778.jpg,1,2,freeway,overpass,0.7027698159217834,False
+data\raw\val\freeway\freeway779.jpg,1,2,freeway,overpass,0.8865518569946289,False
+data\raw\val\freeway\freeway780.jpg,1,1,freeway,freeway,0.9096106886863708,True
+data\raw\val\freeway\freeway781.jpg,1,2,freeway,overpass,0.9022160172462463,False
+data\raw\val\freeway\freeway782.jpg,1,1,freeway,freeway,0.8929306864738464,True
+data\raw\val\freeway\freeway783.jpg,1,2,freeway,overpass,0.9121178984642029,False
+data\raw\val\freeway\freeway784.jpg,1,1,freeway,freeway,0.9121460914611816,True
+data\raw\val\freeway\freeway785.jpg,1,1,freeway,freeway,0.909853458404541,True
+data\raw\val\freeway\freeway786.jpg,1,1,freeway,freeway,0.8999540209770203,True
+data\raw\val\freeway\freeway787.jpg,1,1,freeway,freeway,0.9113461971282959,True
+data\raw\val\freeway\freeway788.jpg,1,1,freeway,freeway,0.9117504954338074,True
+data\raw\val\freeway\freeway789.jpg,1,2,freeway,overpass,0.7613767981529236,False
+data\raw\val\freeway\freeway790.jpg,1,2,freeway,overpass,0.7148616313934326,False
+data\raw\val\freeway\freeway791.jpg,1,1,freeway,freeway,0.9020780920982361,True
+data\raw\val\freeway\freeway792.jpg,1,1,freeway,freeway,0.6309640407562256,True
+data\raw\val\freeway\freeway793.jpg,1,1,freeway,freeway,0.9074133634567261,True
+data\raw\val\freeway\freeway794.jpg,1,2,freeway,overpass,0.8532926440238953,False
+data\raw\val\freeway\freeway795.jpg,1,2,freeway,overpass,0.8968381285667419,False
+data\raw\val\freeway\freeway796.jpg,1,2,freeway,overpass,0.9126280546188354,False
+data\raw\val\freeway\freeway797.jpg,1,2,freeway,overpass,0.8944348096847534,False
+data\raw\val\freeway\freeway798.jpg,1,2,freeway,overpass,0.8939730525016785,False
+data\raw\val\freeway\freeway799.jpg,1,1,freeway,freeway,0.9075585603713989,True
+data\raw\val\freeway\freeway800.jpg,1,1,freeway,freeway,0.9121925830841064,True
+data\raw\val\overpass\overpass701.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass702.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass703.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass704.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass705.jpg,2,2,overpass,overpass,0.9146519899368286,True
+data\raw\val\overpass\overpass706.jpg,2,2,overpass,overpass,0.9147741794586182,True
+data\raw\val\overpass\overpass707.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass708.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass709.jpg,2,2,overpass,overpass,0.9143085479736328,True
+data\raw\val\overpass\overpass710.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass711.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass712.jpg,2,2,overpass,overpass,0.9138587117195129,True
+data\raw\val\overpass\overpass713.jpg,2,2,overpass,overpass,0.9156335592269897,True
+data\raw\val\overpass\overpass714.jpg,2,2,overpass,overpass,0.9160774946212769,True
+data\raw\val\overpass\overpass715.jpg,2,2,overpass,overpass,0.9156762361526489,True
+data\raw\val\overpass\overpass716.jpg,2,2,overpass,overpass,0.9143085479736328,True
+data\raw\val\overpass\overpass717.jpg,2,2,overpass,overpass,0.9152325391769409,True
+data\raw\val\overpass\overpass718.jpg,2,2,overpass,overpass,0.914367139339447,True
+data\raw\val\overpass\overpass719.jpg,2,2,overpass,overpass,0.9143085479736328,True
+data\raw\val\overpass\overpass720.jpg,2,2,overpass,overpass,0.9143085479736328,True
+data\raw\val\overpass\overpass721.jpg,2,2,overpass,overpass,0.9147741794586182,True
+data\raw\val\overpass\overpass722.jpg,2,2,overpass,overpass,0.9156762361526489,True
+data\raw\val\overpass\overpass723.jpg,2,2,overpass,overpass,0.914367139339447,True
+data\raw\val\overpass\overpass724.jpg,2,2,overpass,overpass,0.9147741794586182,True
+data\raw\val\overpass\overpass725.jpg,2,2,overpass,overpass,0.9134858250617981,True
+data\raw\val\overpass\overpass726.jpg,2,2,overpass,overpass,0.9063472151756287,True
+data\raw\val\overpass\overpass727.jpg,2,2,overpass,overpass,0.9156335592269897,True
+data\raw\val\overpass\overpass728.jpg,2,2,overpass,overpass,0.914367139339447,True
+data\raw\val\overpass\overpass729.jpg,2,2,overpass,overpass,0.9081922173500061,True
+data\raw\val\overpass\overpass730.jpg,2,2,overpass,overpass,0.9139747023582458,True
+data\raw\val\overpass\overpass731.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass732.jpg,2,0,overpass,bridge,0.583236813545227,False
+data\raw\val\overpass\overpass733.jpg,2,2,overpass,overpass,0.9141941666603088,True
+data\raw\val\overpass\overpass734.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass735.jpg,2,2,overpass,overpass,0.9141941666603088,True
+data\raw\val\overpass\overpass736.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass737.jpg,2,2,overpass,overpass,0.9141075611114502,True
+data\raw\val\overpass\overpass738.jpg,2,2,overpass,overpass,0.9141941666603088,True
+data\raw\val\overpass\overpass739.jpg,2,2,overpass,overpass,0.915576696395874,True
+data\raw\val\overpass\overpass740.jpg,2,2,overpass,overpass,0.9146519899368286,True
+data\raw\val\overpass\overpass741.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass742.jpg,2,2,overpass,overpass,0.9138509631156921,True
+data\raw\val\overpass\overpass743.jpg,2,2,overpass,overpass,0.9146519899368286,True
+data\raw\val\overpass\overpass744.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass745.jpg,2,2,overpass,overpass,0.9140839576721191,True
+data\raw\val\overpass\overpass746.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass747.jpg,2,2,overpass,overpass,0.9123448133468628,True
+data\raw\val\overpass\overpass748.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass749.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass750.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass751.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass752.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass753.jpg,2,2,overpass,overpass,0.9136975407600403,True
+data\raw\val\overpass\overpass754.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass755.jpg,2,2,overpass,overpass,0.9146519899368286,True
+data\raw\val\overpass\overpass756.jpg,2,2,overpass,overpass,0.9146519899368286,True
+data\raw\val\overpass\overpass757.jpg,2,2,overpass,overpass,0.9141471982002258,True
+data\raw\val\overpass\overpass758.jpg,2,2,overpass,overpass,0.9136975407600403,True
+data\raw\val\overpass\overpass759.jpg,2,2,overpass,overpass,0.9141471982002258,True
+data\raw\val\overpass\overpass760.jpg,2,2,overpass,overpass,0.9141075611114502,True
+data\raw\val\overpass\overpass761.jpg,2,2,overpass,overpass,0.9156182408332825,True
+data\raw\val\overpass\overpass762.jpg,2,2,overpass,overpass,0.9136975407600403,True
+data\raw\val\overpass\overpass763.jpg,2,2,overpass,overpass,0.9144878387451172,True
+data\raw\val\overpass\overpass764.jpg,2,2,overpass,overpass,0.9146519899368286,True
+data\raw\val\overpass\overpass765.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass766.jpg,2,2,overpass,overpass,0.9112870693206787,True
+data\raw\val\overpass\overpass767.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass768.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass769.jpg,2,2,overpass,overpass,0.915217399597168,True
+data\raw\val\overpass\overpass770.jpg,2,2,overpass,overpass,0.9142351746559143,True
+data\raw\val\overpass\overpass771.jpg,2,2,overpass,overpass,0.9135417342185974,True
+data\raw\val\overpass\overpass772.jpg,2,2,overpass,overpass,0.9141075611114502,True
+data\raw\val\overpass\overpass773.jpg,2,2,overpass,overpass,0.9145653247833252,True
+data\raw\val\overpass\overpass774.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass775.jpg,2,2,overpass,overpass,0.9139747023582458,True
+data\raw\val\overpass\overpass776.jpg,2,2,overpass,overpass,0.913785457611084,True
+data\raw\val\overpass\overpass777.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass778.jpg,2,2,overpass,overpass,0.9138587117195129,True
+data\raw\val\overpass\overpass779.jpg,2,2,overpass,overpass,0.9138010740280151,True
+data\raw\val\overpass\overpass780.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass781.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass782.jpg,2,2,overpass,overpass,0.9141784906387329,True
+data\raw\val\overpass\overpass783.jpg,2,2,overpass,overpass,0.9142661690711975,True
+data\raw\val\overpass\overpass784.jpg,2,2,overpass,overpass,0.9141941666603088,True
+data\raw\val\overpass\overpass785.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass786.jpg,2,2,overpass,overpass,0.9147741794586182,True
+data\raw\val\overpass\overpass787.jpg,2,2,overpass,overpass,0.913785457611084,True
+data\raw\val\overpass\overpass788.jpg,2,2,overpass,overpass,0.9141941666603088,True
+data\raw\val\overpass\overpass789.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass790.jpg,2,2,overpass,overpass,0.9138587117195129,True
+data\raw\val\overpass\overpass791.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass792.jpg,2,2,overpass,overpass,0.9138010740280151,True
+data\raw\val\overpass\overpass793.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass794.jpg,2,2,overpass,overpass,0.9142661690711975,True
+data\raw\val\overpass\overpass795.jpg,2,2,overpass,overpass,0.9142661690711975,True
+data\raw\val\overpass\overpass796.jpg,2,2,overpass,overpass,0.9138010740280151,True
+data\raw\val\overpass\overpass797.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\overpass\overpass798.jpg,2,2,overpass,overpass,0.914367139339447,True
+data\raw\val\overpass\overpass799.jpg,2,2,overpass,overpass,0.9143238663673401,True
+data\raw\val\overpass\overpass800.jpg,2,2,overpass,overpass,0.9142585396766663,True
+data\raw\val\railway\railway701.jpg,3,3,railway,railway,0.9098118543624878,True
+data\raw\val\railway\railway702.jpg,3,3,railway,railway,0.9094359278678894,True
+data\raw\val\railway\railway703.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway704.jpg,3,3,railway,railway,0.9099363684654236,True
+data\raw\val\railway\railway705.jpg,3,3,railway,railway,0.9099363684654236,True
+data\raw\val\railway\railway706.jpg,3,3,railway,railway,0.9103748202323914,True
+data\raw\val\railway\railway707.jpg,3,3,railway,railway,0.9094598293304443,True
+data\raw\val\railway\railway708.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway709.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway710.jpg,3,3,railway,railway,0.9098342657089233,True
+data\raw\val\railway\railway711.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway712.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway713.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway714.jpg,3,3,railway,railway,0.9066446423530579,True
+data\raw\val\railway\railway715.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway716.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway717.jpg,3,3,railway,railway,0.9098978638648987,True
+data\raw\val\railway\railway718.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway719.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway720.jpg,3,3,railway,railway,0.9098439812660217,True
+data\raw\val\railway\railway721.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway722.jpg,3,3,railway,railway,0.9094293117523193,True
+data\raw\val\railway\railway723.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway724.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway725.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway726.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway727.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway728.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway729.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway730.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway731.jpg,3,3,railway,railway,0.8723154664039612,True
+data\raw\val\railway\railway732.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway733.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway734.jpg,3,3,railway,railway,0.9095063209533691,True
+data\raw\val\railway\railway735.jpg,3,3,railway,railway,0.9099670648574829,True
+data\raw\val\railway\railway736.jpg,3,3,railway,railway,0.8726921677589417,True
+data\raw\val\railway\railway737.jpg,3,3,railway,railway,0.9098600149154663,True
+data\raw\val\railway\railway738.jpg,3,0,railway,bridge,0.8901776671409607,False
+data\raw\val\railway\railway739.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway740.jpg,3,0,railway,bridge,0.6938265562057495,False
+data\raw\val\railway\railway741.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway742.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway743.jpg,3,3,railway,railway,0.9099670648574829,True
+data\raw\val\railway\railway744.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway745.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway746.jpg,3,3,railway,railway,0.9099670648574829,True
+data\raw\val\railway\railway747.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway748.jpg,3,3,railway,railway,0.9099205732345581,True
+data\raw\val\railway\railway749.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway750.jpg,3,3,railway,railway,0.9095063209533691,True
+data\raw\val\railway\railway751.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway752.jpg,3,3,railway,railway,0.9098978638648987,True
+data\raw\val\railway\railway753.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway754.jpg,3,3,railway,railway,0.9095063209533691,True
+data\raw\val\railway\railway755.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway756.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway757.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway758.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway759.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway760.jpg,3,0,railway,bridge,0.9043805599212646,False
+data\raw\val\railway\railway761.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway762.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway763.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway764.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway765.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway766.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway767.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway768.jpg,3,3,railway,railway,0.9099670648574829,True
+data\raw\val\railway\railway769.jpg,3,3,railway,railway,0.9099670648574829,True
+data\raw\val\railway\railway770.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway771.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway772.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway773.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway774.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway775.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway776.jpg,3,3,railway,railway,0.9099670648574829,True
+data\raw\val\railway\railway777.jpg,3,3,railway,railway,0.9104206562042236,True
+data\raw\val\railway\railway778.jpg,3,3,railway,railway,0.9099363684654236,True
+data\raw\val\railway\railway779.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway780.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway781.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway782.jpg,3,3,railway,railway,0.9094750881195068,True
+data\raw\val\railway\railway783.jpg,3,3,railway,railway,0.9099363684654236,True
+data\raw\val\railway\railway784.jpg,3,3,railway,railway,0.9094677567481995,True
+data\raw\val\railway\railway785.jpg,3,3,railway,railway,0.8795585632324219,True
+data\raw\val\railway\railway786.jpg,3,3,railway,railway,0.9094598293304443,True
+data\raw\val\railway\railway787.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway788.jpg,3,3,railway,railway,0.9099363684654236,True
+data\raw\val\railway\railway789.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway790.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway791.jpg,3,3,railway,railway,0.9094677567481995,True
+data\raw\val\railway\railway792.jpg,3,3,railway,railway,0.6476490497589111,True
+data\raw\val\railway\railway793.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway794.jpg,3,3,railway,railway,0.9099363684654236,True
+data\raw\val\railway\railway795.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway796.jpg,3,3,railway,railway,0.9099515676498413,True
+data\raw\val\railway\railway797.jpg,3,3,railway,railway,0.9094293117523193,True
+data\raw\val\railway\railway798.jpg,3,3,railway,railway,0.9099594950675964,True
+data\raw\val\railway\railway799.jpg,3,3,railway,railway,0.9094908833503723,True
+data\raw\val\railway\railway800.jpg,3,3,railway,railway,0.9099363684654236,True

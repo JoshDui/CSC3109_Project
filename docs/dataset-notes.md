@@ -2,7 +2,9 @@
 
 ## Assigned Classes
 
-Dataset partition: `set 12`
+Dataset partition: Team 12 PatternNet subset. Historical local archives may use
+the name `set 12`, but the canonical raw image layout is `data/raw/train` and
+`data/raw/val`.
 
 | Class Index | Class Name | Training Count | Validation Count | Notes |
 | ---: | --- | ---: | ---: | --- |

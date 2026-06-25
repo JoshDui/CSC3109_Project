@@ -75,7 +75,7 @@
     "runtime": "onnxruntime_fp32",
     "onnx_path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx",
     "export_manifest": "reports/onnx/swin_tiny_lora/export_manifest.json",
-    "data_dir": "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/raw/val",
+    "data_dir": "data/raw/val",
     "samples_evaluated": 400,
     "batch_size": 32,
     "max_batches": null,
