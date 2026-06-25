@@ -1,0 +1,150 @@
+{
+  "checkpoint": "model/hetmcl_lite/best_stop_model.pt",
+  "classes": [
+    "bridge",
+    "freeway",
+    "overpass",
+    "railway"
+  ],
+  "architecture": {
+    "num_classes": 4,
+    "pretrained_backbone": false,
+    "fpn_channels": 128,
+    "dropout": 0.1,
+    "use_affm": true,
+    "hfie_mode": "full",
+    "mcaa_mode": "full",
+    "hlftm_depth": 1,
+    "num_heads": 4,
+    "mlp_ratio": 4.0,
+    "low_frequency_ratio": 0.5,
+    "dfe_split_ratio": 0.5,
+    "kv_pool_ratio": 2
+  },
+  "learning_curves": "reports/hetmcl_lite_reliability/learning_curves.png",
+  "holdout_clean": {
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "ece": 0.04203339144587516,
+    "mean_confidence": 0.9579666085541249
+  },
+  "nwpu_ood": {
+    "status": "skipped_missing_files",
+    "missing_count": 400,
+    "first_missing": [
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_470.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_406.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_512.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_218.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_323.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_581.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_217.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_068.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_275.jpg",
+      "/Users/cantabile/projects/sit/csc3109/project/CSC3109_Project/data/external/nwpu/bridge/bridge_411.jpg"
+    ]
+  },
+  "generalization_gap_macro_f1": null,
+  "robustness": {
+    "blur": {
+      "severities": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "accuracy": [
+        1.0,
+        0.985,
+        0.755,
+        0.72
+      ],
+      "macro_f1": [
+        1.0,
+        0.9849,
+        0.6606,
+        0.6207
+      ]
+    },
+    "noise": {
+      "severities": [
+        0,
+        10,
+        25,
+        45
+      ],
+      "accuracy": [
+        1.0,
+        1.0,
+        0.945,
+        0.4425
+      ],
+      "macro_f1": [
+        1.0,
+        1.0,
+        0.9449,
+        0.3954
+      ]
+    },
+    "jpeg": {
+      "severities": [
+        100,
+        50,
+        30,
+        15
+      ],
+      "accuracy": [
+        1.0,
+        1.0,
+        0.9975,
+        0.945
+      ],
+      "macro_f1": [
+        1.0,
+        1.0,
+        0.9975,
+        0.9462
+      ]
+    },
+    "brightness": {
+      "severities": [
+        1.0,
+        0.7,
+        1.3,
+        0.5
+      ],
+      "accuracy": [
+        1.0,
+        1.0,
+        1.0,
+        0.9825
+      ],
+      "macro_f1": [
+        1.0,
+        1.0,
+        1.0,
+        0.9827
+      ]
+    },
+    "rotation": {
+      "severities": [
+        0,
+        15,
+        30,
+        45
+      ],
+      "accuracy": [
+        1.0,
+        1.0,
+        0.9975,
+        0.8375
+      ],
+      "macro_f1": [
+        1.0,
+        1.0,
+        0.9975,
+        0.8183
+      ]
+    }
+  }
+}
