@@ -3,3 +3,6 @@ dist/
 .vite/
 *.tsbuildinfo
 *.local
+
+# Synced model binaries (reproduced via `bun run sync:assets`)
+public/models/

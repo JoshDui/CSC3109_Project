@@ -1,34 +1,33 @@
 # Deployment
 
 The Streamlit deployment path is superseded by a browser-side edge inference
-deployment scaffold:
+demo:
 
 ```text
 deployment/
-  frontend/   React + Vite + ONNX Runtime Web scaffold
-  cloudflare/ Workers Static Assets + R2 model-hosting notes
-  backend/    optional authenticated model-manifest contract
-  docker/     fallback static frontend container and CDN-origin notes
+  frontend/   React + Vite + ONNX Runtime Web app
+  docker/     optional static frontend container for local smoke tests
 ```
 
 ## Architecture
 
-The backend is optional and does **not** perform inference. The simplest public
-demo can use a static model manifest. If access control is required, one small
-authenticated endpoint can return an authorized model manifest. In both cases,
-the frontend downloads the versioned ONNX artifact from the CDN and performs
-inference locally with ONNX Runtime Web.
+The demo is a static frontend: it fetches a lightweight `models.json` catalog,
+downloads a selected ONNX artifact, and performs inference locally with ONNX
+Runtime Web. Images stay in the browser; there is no server-side inference path.
 
 ```text
 browser client
-  -> static manifest or optional /api/model-manifest
-  -> versioned CDN/R2 model URL
-  -> browser cache / IndexedDB
+  -> static models.json catalog
+  -> local static model or external model URL
+  -> browser cache
   -> ONNX Runtime Web inference on edge device
 ```
 
-This framing keeps RF airtime and backend compute low for constrained aerial
+This framing keeps RF airtime and server compute low for constrained aerial
 deployment scenarios such as drones, aircraft, satellites, or field terminals.
+
+See `edge-inference-benchmarks.md` for CPU ONNX latency vs delivery-size
+measurements across all exported models and which are practical for edge.
 
 ## Local frontend scaffold
 
@@ -38,28 +37,11 @@ bun install
 bun run dev
 ```
 
-Build and precompress static assets:
+Build the static React app:
 
 ```bash
-bun run build:cdn
+bun run build
 ```
-
-## Cloudflare-first deployment
-
-Use Workers Static Assets for the React/Vite app and Cloudflare R2 for ONNX
-model artifacts:
-
-```text
-app.example.com     Workers Static Assets: HTML/CSS/JS/ORT wasm
-models.example.com  R2 custom domain: versioned .onnx files
-```
-
-Cloudflare Workers Static Assets currently have a 25 MiB individual file limit,
-so the model files should not be uploaded as frontend static assets. Store ONNX
-artifacts in R2, connect a custom domain, enable HTTP/3, configure CORS for the
-frontend origin, and use cache rules for long-lived immutable model caching.
-
-See `deployment/cloudflare/` for a `wrangler.jsonc` scaffold and R2/CORS notes.
 
 ## Docker static frontend fallback
 
@@ -71,5 +53,5 @@ docker run --rm -p 8080:8080 csc3109-edge-frontend
 ```
 
 The Docker container serves the static frontend only. Use it for local smoke
-tests or as a non-Cloudflare origin fallback. Production model delivery should
-still come from CDN/R2 rather than through the container.
+tests or as a simple static origin. Large ONNX artifacts can be served from a
+separate object-storage/CDN host by pointing `public/models.json` URLs there.

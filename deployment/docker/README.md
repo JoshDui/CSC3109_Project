@@ -1,8 +1,7 @@
 # Docker fallback
 
-Docker is scoped to static frontend delivery for local smoke tests or a
-non-Cloudflare origin fallback. The Cloudflare-first path is documented under
-`deployment/cloudflare/`.
+Docker is scoped to static frontend delivery for local smoke tests or a simple
+static origin.
 
 Build the React/Vite frontend image from the repository root with the deployment
 folder as the build context:
@@ -12,9 +11,9 @@ docker build -f deployment/docker/frontend.Dockerfile -t csc3109-edge-frontend d
 docker run --rm -p 8080:8080 csc3109-edge-frontend
 ```
 
-The runtime image serves precompressed React assets with Caddy. It is suitable as
-an origin behind a CDN, but large ONNX models should still be served from object
-storage/CDN rather than through this container.
+The runtime image serves the built React app with Caddy. It is suitable as an
+origin behind a CDN. For production-scale serving, large ONNX models can be
+served from separate object storage/CDN URLs referenced by `models.json`.
 
 Recommended CDN headers:
 
