@@ -1,9 +1,0 @@
-{
-  "checkpoint": "model/vit_small_patch14_dinov2_lvd142m_finetune/best_model.pt",
-  "precision": "fp16",
-  "latency": {
-    "average_batch_latency_seconds": 0.008460393600398675,
-    "average_image_latency_seconds": 0.0002643873000124586,
-    "timed_batches": 5.0
-  }
-}

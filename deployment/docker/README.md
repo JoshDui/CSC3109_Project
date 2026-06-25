@@ -1,13 +1,27 @@
 # Docker
 
-Docker files will be added in a later phase.
+This folder is for the static web deployment container.
 
-Expected commands:
+Planned approach:
+
+- Build the React frontend.
+- Copy the production build into a small Caddy image.
+- Serve the site and model registry over HTTP.
+- Keep inference in the browser through ONNX Runtime Web.
+
+Expected command shape once the Dockerfile exists:
 
 ```powershell
-docker build -t cnn-classifier:1.0 .
-docker run -p 8501:8501 cnn-classifier:1.0
+docker build -t csc3109-aerial-classifier:latest -f deployment/docker/Dockerfile .
+docker run --rm -p 8080:80 csc3109-aerial-classifier:latest
 ```
 
-Docker Desktop must be running before these commands are used.
+Then open:
 
+```text
+http://localhost:8080
+```
+
+The container should not assume the assessor has an NVIDIA GPU. Training scripts
+may use CUDA locally, but the deployment image should work as a CPU/browser-side
+static app.

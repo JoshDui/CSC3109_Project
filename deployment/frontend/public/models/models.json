@@ -1,0 +1,106 @@
+{
+  "models": [
+    {
+      "id": "custom_cnn_small_int8",
+      "displayName": "Custom CNN Small (INT8)",
+      "purpose": "From-scratch tiny CNN. Smallest payload when RF airtime is scarce.",
+      "task": "classification",
+      "url": "/models/custom_cnn_small_int8_qdq.onnx",
+      "sizeBytes": 1318351,
+      "accuracy": 0.9625,
+      "inputName": "images",
+      "classificationOutputName": "logits",
+      "preprocessing": {
+        "imageSize": 224,
+        "resize": "stretch",
+        "interpolation": "bilinear",
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      },
+      "labels": ["bridge", "freeway", "overpass", "railway"],
+      "preferredEP": ["wasm", "webgpu"]
+    },
+    {
+      "id": "focalnet_tiny_srf_int8",
+      "displayName": "FocalNet-Tiny SRF (INT8)",
+      "purpose": "Best accuracy-per-byte classifier. Recommended default.",
+      "task": "classification",
+      "url": "/models/focalnet_tiny_srf_int8_qdq.onnx",
+      "sizeBytes": 28954694,
+      "accuracy": 0.995,
+      "inputName": "images",
+      "classificationOutputName": "logits",
+      "preprocessing": {
+        "imageSize": 224,
+        "resize": "stretch",
+        "interpolation": "bicubic",
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      },
+      "labels": ["bridge", "freeway", "overpass", "railway"],
+      "preferredEP": ["wasm", "webgpu"]
+    },
+    {
+      "id": "vit_dinov2_lora_int8",
+      "displayName": "ViT-S DINOv2 LoRA (INT8)",
+      "purpose": "Smallest transformer payload after INT8 quantization.",
+      "task": "classification",
+      "url": "/models/vit_dinov2_lora_int8_qdq.onnx",
+      "sizeBytes": 23102850,
+      "accuracy": 0.9825,
+      "inputName": "images",
+      "classificationOutputName": "logits",
+      "preprocessing": {
+        "imageSize": 224,
+        "resize": "stretch",
+        "interpolation": "bicubic",
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      },
+      "labels": ["bridge", "freeway", "overpass", "railway"],
+      "preferredEP": ["wasm", "webgpu"]
+    },
+    {
+      "id": "swin_tiny_lora_int8",
+      "displayName": "Swin-Tiny LoRA (INT8)",
+      "purpose": "LoRA Swin transformer with high accuracy and CDN-sized payload.",
+      "task": "classification",
+      "url": "/models/swin_tiny_lora_int8_qdq.onnx",
+      "sizeBytes": 31842653,
+      "accuracy": 0.9925,
+      "inputName": "images",
+      "classificationOutputName": "logits",
+      "preprocessing": {
+        "imageSize": 224,
+        "resize": "stretch",
+        "interpolation": "bicubic",
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      },
+      "labels": ["bridge", "freeway", "overpass", "railway"],
+      "preferredEP": ["wasm", "webgpu"]
+    },
+    {
+      "id": "semantic_guided_cgaf_int8",
+      "displayName": "Semantic-Guided CG-AF (INT8)",
+      "purpose": "Scene classification plus segmentation overlay at 512x512. Heavier, but visually useful.",
+      "task": "segmentation_scene",
+      "url": "/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx",
+      "sizeBytes": 29321225,
+      "inputName": "images",
+      "classificationOutputName": "scene_logits",
+      "segmentationOutputName": "segmentation_logits",
+      "preprocessing": {
+        "imageSize": 512,
+        "resize": "stretch",
+        "interpolation": "bilinear",
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      },
+      "labels": ["bridge", "freeway", "overpass", "railway"],
+      "segmentationLabels": ["background", "bridge", "freeway", "overpass", "railway"],
+      "preferredEP": ["wasm"]
+    }
+  ]
+}
+

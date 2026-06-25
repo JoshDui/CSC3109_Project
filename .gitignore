@@ -20,6 +20,7 @@ data/*
 model/*.pt
 model/*.pth
 model/*.onnx
+model/*_metadata.json
 model/**/*.pt
 model/**/*.pth
 model/**/*.onnx
@@ -29,8 +30,22 @@ model/**/*.png
 *.log
 
 # Reports and exports
+# Generated report artifacts kept locally for report writing
+reports/figures/
+reports/tables/
 reports/build/
+reports/**/*.png
+reports/**/*.json
+reports/**/*.csv
+reports/**/*.pt
 *.tmp
+
+# Frontend model payloads
+# Keep the lightweight registry tracked, but keep large model binaries local.
+deployment/frontend/public/models/*.onnx
+deployment/frontend/public/models/*.ort
+deployment/frontend/public/models/*.bin
+!deployment/frontend/public/models/models.json
 
 # OS and editor files
 .DS_Store
