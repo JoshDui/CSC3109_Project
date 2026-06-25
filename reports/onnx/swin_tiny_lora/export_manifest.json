@@ -1,8 +1,8 @@
 {
   "artifact_format": "swin_dino_peft_lora_onnx_export_manifest_v1",
   "created_at_utc": "2026-06-24T08:00:06.394354+00:00",
-  "run_dir": "model/swin_tiny_lora",
-  "source_artifact": "model/swin_tiny_lora/merged_model.pt",
+  "run_dir": "model/swin_and_dino/swin/swin_tiny_lora",
+  "source_artifact": "model/swin_and_dino/swin/swin_tiny_lora/merged_model.pt",
   "source_mode": "merged_checkpoint",
   "run_config": {
     "family": "swin",
@@ -60,10 +60,10 @@
     "lora_trainable_parameters": 565248,
     "modules_to_save_trainable_parameters": 3076
   },
-  "onnx_path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx",
+  "onnx_path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx",
   "onnx_size_bytes": 113949899,
   "onnx_graph_size_bytes": 1686731,
-  "onnx_external_data_path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx.data",
+  "onnx_external_data_path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx.data",
   "onnx_external_data_size_bytes": 112263168,
   "onnx_total_size_bytes": 113949899,
   "opset": 18,

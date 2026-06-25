@@ -1,8 +1,8 @@
 """Train DINOv2 or Swin with PEFT/LoRA adapters.
 
 Examples:
-    python -m src.training.swin_and_dino.train_peft_lora --family dinov2 --device mps
-    python -m src.training.swin_and_dino.train_peft_lora --family swin --variant tiny --device mps
+    python -m src.training.swin_and_dino.train_peft_lora --family dinov2 --device auto
+    python -m src.training.swin_and_dino.train_peft_lora --family swin --variant tiny --device auto
 """
 
 from __future__ import annotations

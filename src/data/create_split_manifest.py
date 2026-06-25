@@ -3,7 +3,7 @@ import csv
 import random
 from pathlib import Path
 
-from src.config import ASSIGNED_DATASET_DIR, CLASS_NAMES, PROJECT_ROOT, RANDOM_SEED, SPLIT_MANIFEST_PATH
+from src.config import CLASS_NAMES, PROJECT_ROOT, RANDOM_SEED, SPLIT_MANIFEST_PATH, TRAIN_DIR
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"}
@@ -77,7 +77,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Create a deterministic stratified train/validation manifest without moving images."
     )
-    parser.add_argument("--dataset-root", type=Path, default=ASSIGNED_DATASET_DIR)
+    parser.add_argument("--dataset-root", type=Path, default=TRAIN_DIR)
     parser.add_argument("--output", type=Path, default=SPLIT_MANIFEST_PATH)
     parser.add_argument("--val-ratio", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)

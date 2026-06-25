@@ -276,8 +276,8 @@ def parse_args():
         default=Path("reports/clip_training/clip_fft_augmented/model_state.pt"),
         help="Full CLIP classifier state dict, or classifier-head-only state dict for the selected --model-name.",
     )
-    parser.add_argument("--train-dir", type=Path, default=Path("data/set 12/set 12"))
-    parser.add_argument("--val-dir", type=Path, default=Path("data/val 12/val 12"))
+    parser.add_argument("--train-dir", type=Path, default=Path("data/raw/train"))
+    parser.add_argument("--val-dir", type=Path, default=Path("data/raw/val"))
     parser.add_argument("--output-dir", type=Path, default=Path("reports/clip_training/clip_onnx_int8_qdq"))
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--calibration-samples", type=int, default=256)

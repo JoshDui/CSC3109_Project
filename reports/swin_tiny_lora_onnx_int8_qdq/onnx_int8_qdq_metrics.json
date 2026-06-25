@@ -1,0 +1,71 @@
+{
+  "accuracy": 0.9925,
+  "classification_report": {
+    "accuracy": 0.9925,
+    "bridge": {
+      "f1-score": 0.9900990099009901,
+      "precision": 0.9803921568627451,
+      "recall": 1.0,
+      "support": 100.0
+    },
+    "freeway": {
+      "f1-score": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 100.0
+    },
+    "macro avg": {
+      "f1-score": 0.9924738647817354,
+      "precision": 0.9926227916909338,
+      "recall": 0.9924999999999999,
+      "support": 400.0
+    },
+    "overpass": {
+      "f1-score": 0.9950248756218906,
+      "precision": 0.9900990099009901,
+      "recall": 1.0,
+      "support": 100.0
+    },
+    "railway": {
+      "f1-score": 0.9847715736040609,
+      "precision": 1.0,
+      "recall": 0.97,
+      "support": 100.0
+    },
+    "weighted avg": {
+      "f1-score": 0.9924738647817354,
+      "precision": 0.9926227916909337,
+      "recall": 0.9925,
+      "support": 400.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      100,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      100,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      100,
+      0
+    ],
+    [
+      2,
+      0,
+      1,
+      97
+    ]
+  ],
+  "macro_f1": 0.9924738647817354,
+  "macro_precision": 0.9926227916909338,
+  "macro_recall": 0.9924999999999999
+}

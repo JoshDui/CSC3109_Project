@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from src.config import ASSIGNED_DATASET_DIR, CLASS_NAMES, RANDOM_SEED, TABLES_DIR
+from src.config import CLASS_NAMES, RANDOM_SEED, TABLES_DIR, TRAIN_DIR
 from src.data.create_split_manifest import collect_class_images, print_summary, relative_to_project, write_manifest
 
 
@@ -56,7 +56,7 @@ def parse_args() -> argparse.Namespace:
             "blocks per class instead of random per-class samples."
         )
     )
-    parser.add_argument("--dataset-root", type=Path, default=ASSIGNED_DATASET_DIR)
+    parser.add_argument("--dataset-root", type=Path, default=TRAIN_DIR)
     parser.add_argument("--output-dir", type=Path, default=TABLES_DIR)
     parser.add_argument("--val-ratio", type=float, default=0.2)
     parser.add_argument("--seeds", type=int, nargs="+", default=list(DEFAULT_SEEDS))

@@ -19,5 +19,6 @@ Target folders:
 - `swin_and_dino/`
 - `clip/`
 - `focalnet/`
+- `hetmcl/`
 - `scratch_cnn/`
 - `semantic_guided/`

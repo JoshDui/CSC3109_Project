@@ -90,7 +90,7 @@
       "onnx_size_bytes": null,
       "average_batch_latency_seconds": null,
       "metrics_path": "reports/vit_small_patch14_dinov2_lvd142m_lora_eval/metrics.json",
-      "run_dir": "model/vit_small_patch14_dinov2_lvd142m_lora"
+      "run_dir": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
@@ -113,7 +113,7 @@
       "onnx_size_bytes": 87609868,
       "average_batch_latency_seconds": 0.6136261181673035,
       "metrics_path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/eval/metrics.json",
-      "run_dir": "model/vit_small_patch14_dinov2_lvd142m_lora"
+      "run_dir": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora"
     },
     {
       "run": "Swin-Tiny LoRA",
@@ -136,7 +136,7 @@
       "onnx_size_bytes": null,
       "average_batch_latency_seconds": null,
       "metrics_path": "reports/swin_tiny_lora_eval/metrics.json",
-      "run_dir": "model/swin_tiny_lora"
+      "run_dir": "model/swin_and_dino/swin/swin_tiny_lora"
     },
     {
       "run": "Swin-Tiny LoRA ONNX",
@@ -159,7 +159,7 @@
       "onnx_size_bytes": 113949899,
       "average_batch_latency_seconds": 0.597441965250861,
       "metrics_path": "reports/onnx/swin_tiny_lora/eval/metrics.json",
-      "run_dir": "model/swin_tiny_lora"
+      "run_dir": "model/swin_and_dino/swin/swin_tiny_lora"
     }
   ],
   "artifacts": [
@@ -263,25 +263,25 @@
       "run": "DINOv2 ViT-S/14 LoRA",
       "kind": "run_dir",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA",
       "kind": "run_manifest",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA",
       "kind": "adapter_dir",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/adapter"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/adapter"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA",
       "kind": "merged_checkpoint",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
@@ -293,25 +293,25 @@
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
       "kind": "run_dir",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
       "kind": "run_manifest",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/run_manifest.json"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
       "kind": "adapter_dir",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/adapter"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/adapter"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
       "kind": "merged_checkpoint",
       "exists": true,
-      "path": "model/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/merged_model.pt"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
@@ -323,13 +323,19 @@
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
       "kind": "onnx_model",
       "exists": true,
-      "path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx"
     },
     {
       "run": "DINOv2 ViT-S/14 LoRA ONNX",
       "kind": "onnx_external_data",
       "exists": true,
-      "path": "reports/onnx/vit_small_patch14_dinov2_lvd142m_lora/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx.data"
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_fp32.onnx.data"
+    },
+    {
+      "run": "DINOv2 ViT-S/14 LoRA ONNX",
+      "kind": "onnx_int8_qdq_model",
+      "exists": true,
+      "path": "model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/onnx/vit_small_patch14_dinov2_lvd142m_lora_int8_qdq.onnx"
     },
     {
       "run": "Swin-Tiny LoRA",
@@ -341,25 +347,25 @@
       "run": "Swin-Tiny LoRA",
       "kind": "run_dir",
       "exists": true,
-      "path": "model/swin_tiny_lora"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora"
     },
     {
       "run": "Swin-Tiny LoRA",
       "kind": "run_manifest",
       "exists": true,
-      "path": "model/swin_tiny_lora/run_manifest.json"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/run_manifest.json"
     },
     {
       "run": "Swin-Tiny LoRA",
       "kind": "adapter_dir",
       "exists": true,
-      "path": "model/swin_tiny_lora/adapter"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/adapter"
     },
     {
       "run": "Swin-Tiny LoRA",
       "kind": "merged_checkpoint",
       "exists": true,
-      "path": "model/swin_tiny_lora/merged_model.pt"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/merged_model.pt"
     },
     {
       "run": "Swin-Tiny LoRA ONNX",
@@ -371,25 +377,25 @@
       "run": "Swin-Tiny LoRA ONNX",
       "kind": "run_dir",
       "exists": true,
-      "path": "model/swin_tiny_lora"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora"
     },
     {
       "run": "Swin-Tiny LoRA ONNX",
       "kind": "run_manifest",
       "exists": true,
-      "path": "model/swin_tiny_lora/run_manifest.json"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/run_manifest.json"
     },
     {
       "run": "Swin-Tiny LoRA ONNX",
       "kind": "adapter_dir",
       "exists": true,
-      "path": "model/swin_tiny_lora/adapter"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/adapter"
     },
     {
       "run": "Swin-Tiny LoRA ONNX",
       "kind": "merged_checkpoint",
       "exists": true,
-      "path": "model/swin_tiny_lora/merged_model.pt"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/merged_model.pt"
     },
     {
       "run": "Swin-Tiny LoRA ONNX",
@@ -401,13 +407,19 @@
       "run": "Swin-Tiny LoRA ONNX",
       "kind": "onnx_model",
       "exists": true,
-      "path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx"
     },
     {
       "run": "Swin-Tiny LoRA ONNX",
       "kind": "onnx_external_data",
       "exists": true,
-      "path": "reports/onnx/swin_tiny_lora/swin_tiny_lora_fp32.onnx.data"
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_fp32.onnx.data"
+    },
+    {
+      "run": "Swin-Tiny LoRA ONNX",
+      "kind": "onnx_int8_qdq_model",
+      "exists": true,
+      "path": "model/swin_and_dino/swin/swin_tiny_lora/onnx/swin_tiny_lora_int8_qdq.onnx"
     }
   ]
 }

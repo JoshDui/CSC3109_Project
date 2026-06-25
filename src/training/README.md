@@ -92,14 +92,14 @@ python -m src.evaluation.evaluate_timm_classifier \
 The Swin/DINO owner folder contains the parameter-efficient LoRA trainer used by
 `notebooks/02_swin_tiny_results_summary.ipynb`. It keeps the legacy full
 fine-tuning scripts intact and writes adapter, tuning, merged-checkpoint, and
-manifest artifacts under `model/*_lora/`.
+manifest artifacts under `model/swin_and_dino/{swin,dino}/*_lora/`.
 
-Run DINOv2 LoRA on Apple MPS:
+Run DINOv2 LoRA with automatic CUDA/MPS/CPU device selection:
 
 ```bash
 PYTORCH_ENABLE_MPS_FALLBACK=1 uv run python -m src.training.swin_and_dino.train_peft_lora \
   --family dinov2 \
-  --device mps \
+  --device auto \
   --epochs 20 \
   --batch-size 16 \
   --lr 1e-4 \
@@ -107,13 +107,13 @@ PYTORCH_ENABLE_MPS_FALLBACK=1 uv run python -m src.training.swin_and_dino.train_
   --early-stop-metric macro-f1
 ```
 
-Run Swin-Tiny LoRA on Apple MPS:
+Run Swin-Tiny LoRA with automatic CUDA/MPS/CPU device selection:
 
 ```bash
 PYTORCH_ENABLE_MPS_FALLBACK=1 uv run python -m src.training.swin_and_dino.train_peft_lora \
   --family swin \
   --variant tiny \
-  --device mps \
+  --device auto \
   --epochs 20 \
   --batch-size 16 \
   --lr 1e-4 \
@@ -124,12 +124,15 @@ PYTORCH_ENABLE_MPS_FALLBACK=1 uv run python -m src.training.swin_and_dino.train_
 Default LoRA settings are rank 8, alpha 16, dropout 0.05, and attention/MLP
 projection targets matching `attn.qkv`, `attn.proj`, `mlp.fc1`, and `mlp.fc2`.
 The classifier head is trained normally through `modules_to_save`.
+Use `--device cuda` or `--device mps` to force a specific accelerator; on Apple
+Silicon, `PYTORCH_ENABLE_MPS_FALLBACK=1` lets unsupported MPS ops fall back to
+CPU.
 
 Outputs include:
 
 ```text
-model/vit_small_patch14_dinov2_lvd142m_lora/
-model/swin_tiny_lora/
+model/swin_and_dino/dino/vit_small_patch14_dinov2_lvd142m_lora/
+model/swin_and_dino/swin/swin_tiny_lora/
   adapter/
   best_tune_metrics.json
   best_tune_confusion_matrix.png

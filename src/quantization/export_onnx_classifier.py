@@ -44,6 +44,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--image-size", type=int, default=None, help="Override checkpoint image size.")
     parser.add_argument("--opset", type=int, default=18)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="cpu")
+    parser.add_argument(
+        "--exporter",
+        choices=("auto", "dynamo", "legacy_tracer"),
+        default="auto",
+        help="ONNX exporter backend. Use legacy_tracer when torch.export produces fixed-batch graphs.",
+    )
     parser.add_argument("--skip-onnx-check", action="store_true")
     parser.add_argument("--skip-ort-check", action="store_true")
     return parser.parse_args()
@@ -86,6 +92,7 @@ def export_onnx_model(
     dummy: torch.Tensor,
     onnx_path: Path,
     opset: int,
+    exporter: str,
 ) -> str:
     """Export via the dynamo exporter, falling back to the legacy tracer.
 
@@ -99,6 +106,10 @@ def export_onnx_model(
         "output_names": ["logits"],
         "opset_version": opset,
     }
+    if exporter == "legacy_tracer":
+        export_onnx_model_legacy(model=model, dummy=dummy, onnx_path=onnx_path, base_kwargs=base_kwargs)
+        return "legacy_tracer"
+
     try:
         torch.onnx.export(
             model,
@@ -110,6 +121,8 @@ def export_onnx_model(
         )
         return "dynamo"
     except Exception as exc:  # noqa: BLE001 - fall back to the legacy tracer
+        if exporter == "dynamo":
+            raise
         print(
             f"WARNING: dynamo ONNX export failed; falling back to legacy tracer. Error: {exc}",
             file=sys.stderr,
@@ -119,15 +132,25 @@ def export_onnx_model(
         for stale in (onnx_path, onnx_path.with_name(onnx_path.name + ".data")):
             if stale.exists():
                 stale.unlink()
-        torch.onnx.export(
-            model,
-            (dummy,),
-            str(onnx_path),
-            dynamo=False,
-            dynamic_axes={"images": {0: "batch"}, "logits": {0: "batch"}},
-            **base_kwargs,
-        )
+        export_onnx_model_legacy(model=model, dummy=dummy, onnx_path=onnx_path, base_kwargs=base_kwargs)
         return "legacy_tracer"
+
+
+def export_onnx_model_legacy(
+    *,
+    model: torch.nn.Module,
+    dummy: torch.Tensor,
+    onnx_path: Path,
+    base_kwargs: dict[str, Any],
+) -> None:
+    torch.onnx.export(
+        model,
+        (dummy,),
+        str(onnx_path),
+        dynamo=False,
+        dynamic_axes={"images": {0: "batch"}, "logits": {0: "batch"}},
+        **base_kwargs,
+    )
 
 
 def onnx_value_shape(value: Any) -> list[int | str | None]:
@@ -259,6 +282,7 @@ def main() -> None:
         dummy=dummy,
         onnx_path=onnx_path,
         opset=args.opset,
+        exporter=args.exporter,
     )
     consolidated = consolidate_single_file(onnx_path)
 
