@@ -1,7 +1,0 @@
-seed,manifest,accuracy,precision_macro,recall_macro,f1_macro,best_epoch,epochs,batch_size,notes
-42,reports/tables/strict_split_manifest_seed42.csv,1.0000,1.0000,1.0000,1.0000,4,10,32,Contiguous filename-block validation split
-123,reports/tables/strict_split_manifest_seed123.csv,0.9929,0.9930,0.9929,0.9928,5,10,32,Contiguous filename-block validation split
-999,reports/tables/strict_split_manifest_seed999.csv,1.0000,1.0000,1.0000,1.0000,1,10,32,Contiguous filename-block validation split
-mean,,0.9976,0.9977,0.9976,0.9976,,,,
-min,,0.9929,0.9930,0.9929,0.9928,,,,
-max,,1.0000,1.0000,1.0000,1.0000,,,,

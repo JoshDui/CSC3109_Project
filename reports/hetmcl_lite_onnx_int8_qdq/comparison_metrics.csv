@@ -1,4 +1,0 @@
-variant,accuracy,macro_precision,macro_recall,macro_f1,samples
-torch_fp32,1.0,1.0,1.0,1.0,400
-onnx_fp32,1.0,1.0,1.0,1.0,400
-onnx_int8_qdq,1.0,1.0,1.0,1.0,400

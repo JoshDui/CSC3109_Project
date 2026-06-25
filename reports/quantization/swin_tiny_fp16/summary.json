@@ -1,9 +1,0 @@
-{
-  "checkpoint": "model/swin_tiny/best_model.pt",
-  "precision": "fp16",
-  "latency": {
-    "average_batch_latency_seconds": 0.010896934798802249,
-    "average_image_latency_seconds": 0.0003405292124625703,
-    "timed_batches": 5.0
-  }
-}

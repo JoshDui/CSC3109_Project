@@ -1,9 +1,0 @@
-{
-  "checkpoint": "model/focalnet_tiny_srf_notebook/final/best_model.pt",
-  "precision": "fp16",
-  "latency": {
-    "average_batch_latency_seconds": 0.013124730001436546,
-    "average_image_latency_seconds": 0.0004101478125448921,
-    "timed_batches": 5.0
-  }
-}

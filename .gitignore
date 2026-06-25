@@ -20,6 +20,7 @@ data/*
 model/*.pt
 model/*.pth
 model/*.onnx
+model/*_metadata.json
 model/**/*.pt
 model/**/*.pth
 model/**/*.onnx
@@ -29,8 +30,23 @@ model/**/*.png
 *.log
 
 # Reports and exports
+# Generated report artifacts kept locally for report writing.
+reports/figures/
+reports/tables/
 reports/build/
+reports/**/*.png
+reports/**/*.json
+reports/**/*.csv
+reports/**/*.pt
+reports/**/*.onnx
+reports/**/*.data
 *.tmp
+
+# Frontend model payloads
+# The lightweight registry lives at deployment/frontend/public/models.json.
+# Large copied ONNX artifacts live under public/models/ and are reproduced by sync:assets.
+deployment/frontend/public/models/
+!deployment/frontend/public/models/.gitkeep
 
 # OS and editor files
 .DS_Store
@@ -44,3 +60,4 @@ Thumbs.db
 .opencode/
 /AGENTS.md
 opencode.json
+

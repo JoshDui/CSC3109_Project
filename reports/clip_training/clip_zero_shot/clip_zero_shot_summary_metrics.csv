@@ -1,8 +1,0 @@
-metric,value
-accuracy,0.695
-macro_precision,0.8000795946794017
-macro_recall,0.6950000000000001
-macro_f1,0.6727511416143152
-weighted_precision,0.8000795946794017
-weighted_recall,0.695
-weighted_f1,0.6727511416143152
