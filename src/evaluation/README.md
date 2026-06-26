@@ -4,14 +4,20 @@ Place evaluation scripts here.
 
 Current evaluation files:
 
-- `metrics.py` — accuracy, precision, recall, F1, confusion matrix helpers.
-- `evaluate_swin.py` — evaluates a saved Swin checkpoint on a labelled image folder.
-- `evaluate_timm_classifier.py` — evaluates a saved generic `timm`/DINOv2 checkpoint.
-- `clip/export_onnx_int8_qdq.py` — exports the CLIP FFT classifier to ONNX,
+- `metrics.py` - accuracy, precision, recall, F1, confusion matrix helpers.
+- `evaluate_swin.py` - evaluates a saved Swin checkpoint on a labelled image folder.
+- `evaluate_timm_classifier.py` - evaluates a saved generic `timm`/DINOv2 checkpoint.
+- `clip/export_onnx_int8_qdq.py` - exports the CLIP FFT classifier to ONNX,
   creates an INT8 QDQ artifact, and evaluates FP32/INT8 ONNX outputs.
-- `export_clip_onnx_int8_qdq.py` — compatibility wrapper for the CLIP exporter.
-
+- `export_clip_onnx_int8_qdq.py` - compatibility wrapper for the CLIP exporter.
 - `resnet/evaluate_finetune.py` - evaluates the fine-tuned ResNet18 last-block checkpoint.
+- `evaluate_resnet18_finetune.py` - compatibility wrapper for existing ResNet18 scripts.
+- `summarize_resnet18_scratch_comparison.py` - compares strict-split scratch
+  ResNet18 runs against pretrained fine-tuned ResNet18 runs.
+- `summarize_convnext_scratch_comparison.py` - compares strict-split scratch
+  ConvNeXtV2 runs against local pretrained ConvNeXtV2 artifacts.
+- `build_model_results_master.py` - creates the consolidated ResNet18/ConvNeXt
+  results table used by the cleanup notebooks.
 
 Evaluate the trained Swin-Tiny checkpoint:
 
@@ -75,9 +81,6 @@ python -m src.evaluation.resnet.evaluate_finetune `
   --device cuda
 ```
 
-The old `src.evaluation.evaluate_resnet18_finetune` command remains a
-compatibility wrapper for existing scripts.
-
 This evaluator writes:
 
 ```text
@@ -85,6 +88,47 @@ reports/resnet18_finetune_last_block_raw_val_eval/
   metrics.json
   confusion_matrix.png
   predictions.csv
+```
+
+Summarise scratch ResNet18 versus pretrained strict-split ResNet18 after the
+scratch seed runs finish:
+
+```powershell
+python -m src.evaluation.summarize_resnet18_scratch_comparison
+```
+
+This writes:
+
+```text
+reports/tables/resnet18_scratch_vs_pretrained_strict_summary.csv
+reports/tables/resnet18_scratch_vs_pretrained_strict_summary.json
+```
+
+Summarise scratch ConvNeXtV2 versus local pretrained ConvNeXtV2 artifacts after
+the scratch seed runs finish:
+
+```powershell
+python -m src.evaluation.summarize_convnext_scratch_comparison
+```
+
+This writes:
+
+```text
+reports/tables/convnextv2_scratch_vs_pretrained_summary.csv
+reports/tables/convnextv2_scratch_vs_pretrained_summary.json
+```
+
+Build the consolidated model results table used by the cleaned notebooks:
+
+```powershell
+python -m src.evaluation.build_model_results_master
+```
+
+This writes:
+
+```text
+reports/tables/model_results_master.csv
+reports/tables/model_results_master.json
 ```
 
 Suggested files for later phases:
