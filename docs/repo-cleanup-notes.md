@@ -46,13 +46,13 @@ Note: the ResNet source modules have since moved into owner-scoped packages unde
 root-level compatibility wrappers. The artifact-layout cleanup remains separate.
 
 ### P4 — Documentation is sprawled / partly stale
-Notes live in root `README.md`, `AGENTS.md`, `project_requirements.md`, `docs/*`,
+Notes live in root `README.md`, `project_requirements.md`, `docs/*`,
 six `src/**/README.md`, `model/README.md`, `notebooks/README.md`,
 `deployment/**/README.md`, `reports/*`, `experiments/results-log.md`.
 - Custom-CNN architecture is described in BOTH `custom_cnn.py` docstring AND
   `src/training/README.md` (the "4 stages" wording is ambiguous vs 8 conv layers).
-- Root `README.md` still says "Current Phase: Phase 1" and draws the tree as
-  `ML_Group_Project/` (repo is `CSC3109_Project`, clearly past Phase 1).
+- Root `README.md` has since been refreshed for closeout; older package-level
+  READMEs may still duplicate architecture or workflow details.
 Action: make `docs/` the single source of truth; reduce package READMEs to short
 pointers; refresh root README; keep architecture description next to the code only.
 

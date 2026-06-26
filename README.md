@@ -1,10 +1,12 @@
 # CSC3109 ML Group Project
 
-This is the working skeleton for the CSC3109 aerial-image classification group project.
+This repository contains the closeout code, notebooks, and curated result
+artifacts for the CSC3109 aerial-image classification group project.
 
 ## Current Phase
 
-Phase 1: project setup, dataset confirmation, team roles, and experiment planning.
+Final submission closeout: canonical data paths, model-result notebooks, and
+tracked deployment artifacts are being kept camera-ready-ish for review.
 
 ## Project Goal
 
@@ -38,7 +40,7 @@ Metric sources:
 - FocalNet: `reports/focalnet_tiny_srf_onnx_int8_qdq/comparison_metrics.csv`.
 - Semantic-Guided CG-AF CNN: `notebooks/05_semantic_guided_cgaf_quantisation.ipynb` and `docs/semantic_guided_best_recipe.md`.
 - Custom CNN: `reports/custom_cnn_small_onnx_int8_qdq/comparison_metrics.csv`.
-- Swin-Tiny and DINOv2 PEFT LoRA: `reports/tables/swin_dino_peft_lora_summary.csv`, `notebooks/02_swin_tiny_results_summary.ipynb`, and respective `reports/*_onnx_int8_qdq/comparison_metrics.csv` files.
+- Swin-Tiny and DINOv2 PEFT LoRA: `reports/tables/swin_dino_peft_lora_summary.csv`, `notebooks/02_swin_dino_results_summary.ipynb`, and respective `reports/*_onnx_int8_qdq/comparison_metrics.csv` files.
 
 Quantised size is listed only for models with current quantized deployment
 artifacts in this closeout branch. ResNet18 is left as N/A because no current
@@ -47,7 +49,7 @@ quantized artifact is being reported for it.
 ## Folder Structure
 
 ```text
-ML_Group_Project/
+CSC3109_Project/
   data/
   docs/
   experiments/
@@ -58,15 +60,16 @@ ML_Group_Project/
   deployment/
 ```
 
-## Immediate Phase 1 Tasks
+## Dataset and Reproducibility Notes
 
-1. Create the Git repository around this folder.
-2. Confirm the assigned dataset categories.
-3. Place the dataset under `data/` using the expected structure in `data/README.md`.
-4. Fill in `docs/team-roles.md`.
-5. Fill in `docs/dataset-notes.md`.
-6. Agree on one model approach per team member.
-7. Start recording experiments in `experiments/results-log.md`.
+- Raw classification images are expected locally under `data/raw/train` and
+  `data/raw/val`; raw images are not committed.
+- Semantic masks and other derived datasets stay outside `data/raw`.
+- Most final-facing notebooks are artifact-first summaries that load tracked
+  model/report files instead of retraining models inline.
+- Full reproduction remains compute-, dependency-, and external-data-sensitive;
+  NWPU/OOD and semantic-mask workflows require data or derived artifacts that are
+  intentionally not committed.
 
 ## Suggested Setup
 
@@ -108,5 +111,6 @@ generates and prints its usual access URL.
 ## Notes
 
 - Do not commit the actual dataset unless the team has confirmed it is allowed.
-- Do not commit large trained model files unless required by the final submission.
-- Keep all experiment results reproducible by recording the model settings and metrics.
+- Large trained model files are committed only when they are final-submission
+  artifacts or needed by artifact-first notebooks.
+- Keep experiment results reproducible by recording the model settings and metrics.
