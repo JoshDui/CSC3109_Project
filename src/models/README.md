@@ -8,6 +8,8 @@ Current model files:
 - `timm_classifier.py` - generic `timm` classifier factory with DINOv2 aliases.
 - `resnet/frozen.py` - frozen ResNet18 transfer-learning baseline.
 - `resnet/finetune.py` - ResNet18 last-block fine-tuning helper.
+- `resnet18_scratch.py` - ResNet18 with random initialization for from-scratch comparison runs.
+- `convnext_scratch.py` - ConvNeXtV2 Tiny with random initialization for from-scratch comparison runs.
 
 Root-level `resnet18_frozen.py` and `resnet18_finetune.py` remain compatibility
 wrappers for older imports.
@@ -19,7 +21,7 @@ Suggested files for later phases:
 - `transfer_efficientnet.py`
 - `transfer_mobilenet.py`
 
-Keep the final model architecture reusable by both training code and the Streamlit app.
+Keep the final model architecture reusable by both training code and the deployment app.
 
 Note: Swin and generic timm factories require the `timm` package when instantiated.
 
@@ -51,3 +53,17 @@ This is the first no-augmentation baseline before later augmentation or fine-tun
 - Keeps early ResNet layers frozen.
 - Unfreezes only `layer4` and `fc`.
 - Provides separate optimizer parameter groups for conservative backbone tuning and faster classifier learning.
+
+`resnet18_scratch.py` builds the diagnostic non-pretrained comparison:
+
+- Creates ResNet18 with `weights=None`.
+- Replaces the final layer with a 4-class classifier.
+- Keeps all layers trainable because the starting features are random.
+- Should be compared against the pretrained strict-split ResNet18 runs, not treated as the main deployment model unless it is competitive.
+
+`convnext_scratch.py` builds the non-pretrained ConvNeXtV2 comparison:
+
+- Creates ConvNeXtV2 Tiny through `timm` with `pretrained=False`.
+- Replaces the classifier with a 4-class output head.
+- Keeps all layers trainable because the starting weights are random.
+- Should be compared against local pretrained ConvNeXtV2 artifacts, not treated as the main deployment model unless it is competitive.
