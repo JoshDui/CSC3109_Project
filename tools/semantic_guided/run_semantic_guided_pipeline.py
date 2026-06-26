@@ -265,12 +265,13 @@ def resolve_paths(args: argparse.Namespace) -> None:
     args.onnx_delivery_size_summary_json = args.onnx_delivery_size_summary_json or args.unseen_output_dir / "onnx_delivery_size_summary.json"
     args.onnx_case_study_dir = args.onnx_case_study_dir or args.project_root / "reports" / "figures" / f"semantic_guided_cgaf_johor_onnx_{args.run_id}"
     args.awq_onnx_case_study_dir = args.awq_onnx_case_study_dir or args.project_root / "reports" / "figures" / f"semantic_guided_cgaf_awq_vs_onnx_int8_case_studies_{args.run_id}"
+    johor_case_study_image = args.project_root / "tools" / "semantic_guided" / "assets" / "johor_ciq_case_study.png"
     if args.onnx_case_study_image is None:
-        args.onnx_case_study_image = [f"johor={args.project_root / 'Screenshot_20260616_172913.png'}"]
+        args.onnx_case_study_image = [f"johor={johor_case_study_image}"]
     if args.awq_onnx_case_study_image is None:
         args.awq_onnx_case_study_image = [
             f"railway701={args.project_root / 'data' / 'raw' / 'val' / 'railway' / 'railway701.jpg'}",
-            f"johor_ciq={args.project_root / 'Screenshot_20260616_172913.png'}",
+            f"johor_ciq={johor_case_study_image}",
         ]
     args.pipeline_manifest = args.pipeline_manifest or artifact_dir / "semantic_guided_cgaf_pipeline_manifest.json"
     args.pipeline_summary = args.pipeline_summary or artifact_dir / "semantic_guided_cgaf_pipeline_summary.csv"
