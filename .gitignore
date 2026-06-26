@@ -17,6 +17,8 @@ env/
 # Data and generated artifacts
 data/*
 !data/README.md
+!data/splits/
+!data/splits/*.csv
 model/*.pt
 model/*.pth
 model/*.onnx
@@ -44,3 +46,28 @@ Thumbs.db
 .opencode/
 /AGENTS.md
 opencode.json
+
+
+
+# ResNet/ConvNeXt generated reports
+reports/resnet18_frozen/
+reports/resnet18_frozen_augmented/
+reports/resnet18_finetune_last_block/
+reports/resnet18_scratch/
+reports/resnet18_comparison/
+reports/convnextv2_scratch/
+reports/convnextv2_comparison/
+reports/model_comparison/
+reports/tables/strict_split_manifest_seed*.csv
+reports/tables/resnet18*_metrics.json
+reports/tables/resnet18*_history.json
+reports/tables/resnet18*_summary.csv
+reports/tables/resnet18*_summary.json
+reports/tables/convnextv2*_metrics.json
+reports/tables/convnextv2*_history.json
+reports/tables/convnextv2*_summary.csv
+reports/tables/convnextv2*_summary.json
+reports/tables/model_results_master.csv
+reports/tables/model_results_master.json
+reports/figures/resnet18*.png
+reports/figures/convnextv2*.png

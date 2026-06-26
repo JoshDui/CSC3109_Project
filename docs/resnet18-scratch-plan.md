@@ -25,21 +25,21 @@ Run three seeds for 20 epochs:
 
 ```powershell
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --manifest data/splits/strict_split_manifest_seed42.csv `
   --seed 42 `
   --epochs 20 `
   --batch-size 32 `
   --artifact-prefix resnet18_scratch_strict_seed42
 
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed123.csv `
+  --manifest data/splits/strict_split_manifest_seed123.csv `
   --seed 123 `
   --epochs 20 `
   --batch-size 32 `
   --artifact-prefix resnet18_scratch_strict_seed123
 
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed999.csv `
+  --manifest data/splits/strict_split_manifest_seed999.csv `
   --seed 999 `
   --epochs 20 `
   --batch-size 32 `
@@ -60,21 +60,21 @@ runs stay intact:
 
 ```powershell
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --manifest data/splits/strict_split_manifest_seed42.csv `
   --seed 42 `
   --epochs 50 `
   --batch-size 32 `
   --artifact-prefix resnet18_scratch_50ep_es_strict_seed42
 
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed123.csv `
+  --manifest data/splits/strict_split_manifest_seed123.csv `
   --seed 123 `
   --epochs 50 `
   --batch-size 32 `
   --artifact-prefix resnet18_scratch_50ep_es_strict_seed123
 
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed999.csv `
+  --manifest data/splits/strict_split_manifest_seed999.csv `
   --seed 999 `
   --epochs 50 `
   --batch-size 32 `
@@ -95,8 +95,8 @@ After the early-stopped 50-epoch runs finish, create a separate comparison:
 python -m src.evaluation.summarize_resnet18_scratch_comparison `
   --scratch-prefix-template "resnet18_scratch_50ep_es_strict_seed{seed}" `
   --scratch-family scratch_full_network_50ep_early_stopped `
-  --output-csv reports/tables/resnet18_scratch_50ep_es_vs_pretrained_strict_summary.csv `
-  --output-json reports/tables/resnet18_scratch_50ep_es_vs_pretrained_strict_summary.json
+  --output-csv reports/resnet18_comparison/scratch_50ep_es_vs_pretrained_strict_summary.csv `
+  --output-json reports/resnet18_comparison/scratch_50ep_es_vs_pretrained_strict_summary.json
 ```
 
 ## What To Look For
@@ -115,8 +115,8 @@ Each run writes:
 ```text
 model/resnet18_scratch_strict_seed<seed>.pt
 model/resnet18_scratch_strict_seed<seed>_metadata.json
-reports/tables/resnet18_scratch_strict_seed<seed>_metrics.json
-reports/tables/resnet18_scratch_strict_seed<seed>_history.json
-reports/figures/resnet18_scratch_strict_seed<seed>_confusion_matrix.png
-reports/figures/resnet18_scratch_strict_seed<seed>_training_curves.png
+reports/resnet18_scratch/resnet18_scratch_strict_seed<seed>/metrics.json
+reports/resnet18_scratch/resnet18_scratch_strict_seed<seed>/history.json
+reports/resnet18_scratch/resnet18_scratch_strict_seed<seed>/confusion_matrix.png
+reports/resnet18_scratch/resnet18_scratch_strict_seed<seed>/training_curves.png
 ```

@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import confusion_matrix
 
-from src.config import CLASS_NAMES, FIGURES_DIR, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, SPLIT_MANIFEST_PATH, TABLES_DIR
+from src.config import CLASS_NAMES, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, REPORTS_DIR, SPLIT_MANIFEST_PATH
 from src.data.resnet_augmented_dataloaders import AUGMENTATION_CONFIG, create_augmented_dataloaders
 from src.models.resnet import (
     build_resnet18_finetune_last_block,
@@ -70,6 +70,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Fine-tune ResNet18 by unfreezing only layer4 and the classifier.")
     parser.add_argument("--manifest", type=Path, default=SPLIT_MANIFEST_PATH)
     parser.add_argument("--artifact-prefix", default=ARTIFACT_PREFIX)
+    parser.add_argument("--output-dir", type=Path, default=None, help="Optional run-scoped report output directory.")
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--layer4-learning-rate", type=float, default=1e-4)
@@ -151,6 +152,8 @@ def main() -> None:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     checkpoint_path = MODEL_DIR / f"{args.artifact_prefix}.pt"
     checkpoint_relative_path = checkpoint_path.relative_to(PROJECT_ROOT).as_posix()
+    report_dir = args.output_dir or (REPORTS_DIR / "resnet18_finetune_last_block" / args.artifact_prefix)
+    report_relative_path = report_dir.relative_to(PROJECT_ROOT).as_posix()
     augmentation_config = _json_safe_augmentation_config()
 
     metrics = compute_metrics(final_labels, final_predictions)
@@ -172,6 +175,7 @@ def main() -> None:
             "weight_decay": args.weight_decay,
             "parameter_summary": parameter_summary,
             "checkpoint": checkpoint_relative_path,
+            "report_dir": report_relative_path,
         }
     )
 
@@ -221,12 +225,13 @@ def main() -> None:
             "weight_decay": args.weight_decay,
             "parameter_summary": parameter_summary,
             "checkpoint": checkpoint_relative_path,
+            "report_dir": report_relative_path,
         },
     )
-    save_json(TABLES_DIR / f"{args.artifact_prefix}_metrics.json", metrics)
-    save_json(TABLES_DIR / f"{args.artifact_prefix}_history.json", history)
-    save_confusion_matrix(final_labels, final_predictions, FIGURES_DIR / f"{args.artifact_prefix}_confusion_matrix.png")
-    save_training_curves(history, FIGURES_DIR / f"{args.artifact_prefix}_training_curves.png")
+    save_json(report_dir / "metrics.json", metrics)
+    save_json(report_dir / "history.json", history)
+    save_confusion_matrix(final_labels, final_predictions, report_dir / "confusion_matrix.png")
+    save_training_curves(history, report_dir / "training_curves.png")
 
 
 if __name__ == "__main__":

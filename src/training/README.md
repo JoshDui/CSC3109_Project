@@ -221,13 +221,11 @@ Then run the fine-tuned ResNet18 on each manifest with a unique artifact prefix:
 
 ```powershell
 python -m src.training.resnet.finetune_last_block `
-  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --manifest data/splits/strict_split_manifest_seed42.csv `
   --seed 42 `
   --artifact-prefix resnet18_finetune_last_block_strict_seed42
 ```
 
-The old root-level ResNet module names remain compatibility wrappers, so existing
-commands such as `python -m src.training.train_resnet18_frozen` still work.
 
 ## ResNet18 From Scratch
 
@@ -239,21 +237,21 @@ Run the strict split seeds for 20 epochs:
 
 ```powershell
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --manifest data/splits/strict_split_manifest_seed42.csv `
   --seed 42 `
   --epochs 20 `
   --batch-size 32 `
   --artifact-prefix resnet18_scratch_strict_seed42
 
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed123.csv `
+  --manifest data/splits/strict_split_manifest_seed123.csv `
   --seed 123 `
   --epochs 20 `
   --batch-size 32 `
   --artifact-prefix resnet18_scratch_strict_seed123
 
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed999.csv `
+  --manifest data/splits/strict_split_manifest_seed999.csv `
   --seed 999 `
   --epochs 20 `
   --batch-size 32 `
@@ -273,7 +271,7 @@ so the 20-epoch outputs are not overwritten:
 
 ```powershell
 python -m src.training.train_resnet18_scratch `
-  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --manifest data/splits/strict_split_manifest_seed42.csv `
   --seed 42 `
   --epochs 50 `
   --batch-size 32 `
@@ -286,8 +284,8 @@ Summarise the 50-epoch scratch run set separately:
 python -m src.evaluation.summarize_resnet18_scratch_comparison `
   --scratch-prefix-template "resnet18_scratch_50ep_es_strict_seed{seed}" `
   --scratch-family scratch_full_network_50ep_early_stopped `
-  --output-csv reports/tables/resnet18_scratch_50ep_es_vs_pretrained_strict_summary.csv `
-  --output-json reports/tables/resnet18_scratch_50ep_es_vs_pretrained_strict_summary.json
+  --output-csv reports/resnet18_comparison/scratch_50ep_es_vs_pretrained_strict_summary.csv `
+  --output-json reports/resnet18_comparison/scratch_50ep_es_vs_pretrained_strict_summary.json
 ```
 
 Full notes are in `docs/resnet18-scratch-plan.md`.
@@ -302,21 +300,21 @@ Run the strict split seeds with a 50-epoch maximum and early stopping enabled:
 
 ```powershell
 python -m src.training.train_convnext_scratch `
-  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --manifest data/splits/strict_split_manifest_seed42.csv `
   --seed 42 `
   --epochs 50 `
   --batch-size 16 `
   --artifact-prefix convnextv2_tiny_scratch_50ep_es_strict_seed42
 
 python -m src.training.train_convnext_scratch `
-  --manifest reports/tables/strict_split_manifest_seed123.csv `
+  --manifest data/splits/strict_split_manifest_seed123.csv `
   --seed 123 `
   --epochs 50 `
   --batch-size 16 `
   --artifact-prefix convnextv2_tiny_scratch_50ep_es_strict_seed123
 
 python -m src.training.train_convnext_scratch `
-  --manifest reports/tables/strict_split_manifest_seed999.csv `
+  --manifest data/splits/strict_split_manifest_seed999.csv `
   --seed 999 `
   --epochs 50 `
   --batch-size 16 `

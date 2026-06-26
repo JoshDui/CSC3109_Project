@@ -1,4 +1,4 @@
-﻿"""Build one consolidated results table for report/notebook cleanup.
+"""Build one consolidated results table for report/notebook cleanup.
 
 The project has several model-specific summary files. This script creates one
 curated master table for the ResNet18 and ConvNeXt runs owned in this cleanup
@@ -14,7 +14,7 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
-from src.config import PROJECT_ROOT, TABLES_DIR
+from src.config import PROJECT_ROOT, REPORTS_DIR, TABLES_DIR
 
 STRICT_SEEDS = (42, 123, 999)
 
@@ -55,16 +55,32 @@ def read_json(path: Path) -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def relative(path: Path | str | None) -> str:
-    if path is None or path == "":
-        return ""
+def project_path(path: Path | str) -> Path:
     candidate = Path(path)
     if not candidate.is_absolute():
         candidate = PROJECT_ROOT / candidate
+    return candidate
+
+
+def relative(path: Path | str | None) -> str:
+    if path is None or path == "":
+        return ""
+    candidate = project_path(path)
     try:
         return candidate.relative_to(PROJECT_ROOT).as_posix()
     except ValueError:
         return candidate.as_posix()
+
+
+def resolve_metrics_path(defn: dict[str, Any]) -> Path:
+    candidates = [project_path(defn["metrics_file"])]
+    prefix = defn.get("artifact_prefix")
+    if prefix and str(defn["metrics_file"]).startswith("reports/"):
+        candidates.append(TABLES_DIR / f"{prefix}_metrics.json")
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
 
 
 def first_present(metrics: dict[str, Any] | None, *names: str) -> Any:
@@ -102,7 +118,12 @@ def early_stopping_label(metrics: dict[str, Any] | None) -> str:
     return f"yes; monitor={monitor}; stopped_early={stopped}; stop_epoch={stop_epoch}"
 
 
-def existing_figure(prefix: str, suffix: str) -> str:
+def existing_figure(prefix: str, suffix: str, report_dir: str = "") -> str:
+    if report_dir:
+        filename = "confusion_matrix.png" if suffix == "confusion_matrix" else "training_curves.png"
+        path = project_path(Path(report_dir) / filename)
+        if path.exists():
+            return relative(path)
     if not prefix:
         return ""
     path = PROJECT_ROOT / "reports" / "figures" / f"{prefix}_{suffix}.png"
@@ -110,10 +131,11 @@ def existing_figure(prefix: str, suffix: str) -> str:
 
 
 def row_from_definition(defn: dict[str, Any]) -> dict[str, Any]:
-    metrics_path = PROJECT_ROOT / defn["metrics_file"]
+    metrics_path = resolve_metrics_path(defn)
     metrics = read_json(metrics_path)
     prefix = defn.get("artifact_prefix") or first_present(metrics, "artifact_prefix") or ""
     checkpoint = first_present(metrics, "checkpoint") or defn.get("checkpoint") or ""
+    report_dir = first_present(metrics, "report_dir") or defn.get("report_dir") or Path(defn["metrics_file"]).parent.as_posix()
 
     max_epochs = first_present(metrics, "max_epochs", "epochs")
     epochs_trained = first_present(metrics, "epochs_trained", "epochs")
@@ -144,8 +166,8 @@ def row_from_definition(defn: dict[str, Any]) -> dict[str, Any]:
         "notes": defn.get("notes", ""),
         "checkpoint": relative(checkpoint),
         "metrics_file": relative(metrics_path),
-        "confusion_matrix_figure": existing_figure(prefix, "confusion_matrix"),
-        "training_curve_figure": existing_figure(prefix, "training_curves"),
+        "confusion_matrix_figure": existing_figure(prefix, "confusion_matrix", report_dir),
+        "training_curve_figure": existing_figure(prefix, "training_curves", report_dir),
     }
     return {key: row.get(key, "") for key in FIELDNAMES}
 
@@ -160,7 +182,8 @@ def definitions() -> list[dict[str, Any]]:
             "pretrained": True,
             "split": "original split_manifest.csv",
             "augmentation": "none",
-            "metrics_file": "reports/tables/resnet18_frozen_metrics.json",
+            "metrics_file": "reports/resnet18_frozen/metrics.json",
+            "artifact_prefix": "resnet18_frozen",
             "recommendation": "baseline",
             "notes": "First transfer-learning baseline without stochastic augmentation.",
         },
@@ -172,7 +195,7 @@ def definitions() -> list[dict[str, Any]]:
             "pretrained": True,
             "split": "original split_manifest.csv",
             "augmentation": "training-only RandomResizedCrop, flip, rotation, ColorJitter",
-            "metrics_file": "reports/tables/resnet18_frozen_augmented_metrics.json",
+            "metrics_file": "reports/resnet18_frozen_augmented/metrics.json",
             "artifact_prefix": "resnet18_frozen_augmented",
             "recommendation": "augmentation comparison",
             "notes": "Frozen-feature follow-up run with training-only augmentation.",
@@ -185,7 +208,7 @@ def definitions() -> list[dict[str, Any]]:
             "pretrained": True,
             "split": "original split_manifest.csv",
             "augmentation": "training-only RandomResizedCrop, flip, rotation, ColorJitter",
-            "metrics_file": "reports/tables/resnet18_finetune_last_block_metrics.json",
+            "metrics_file": "reports/resnet18_finetune_last_block/resnet18_finetune_last_block/metrics.json",
             "artifact_prefix": "resnet18_finetune_last_block",
             "recommendation": "strong baseline",
             "notes": "Original-split fine-tuned transfer-learning run.",
@@ -203,7 +226,7 @@ def definitions() -> list[dict[str, Any]]:
                 "seed": seed,
                 "split": f"strict contiguous split seed {seed}",
                 "augmentation": "training-only RandomResizedCrop, flip, rotation, ColorJitter",
-                "metrics_file": f"reports/tables/resnet18_finetune_last_block_strict_seed{seed}_metrics.json",
+                "metrics_file": f"reports/resnet18_finetune_last_block/resnet18_finetune_last_block_strict_seed{seed}/metrics.json",
                 "artifact_prefix": f"resnet18_finetune_last_block_strict_seed{seed}",
                 "recommendation": "headline transfer-learning comparison",
                 "notes": "Strict split transfer-learning run for seed robustness comparison.",
@@ -219,7 +242,7 @@ def definitions() -> list[dict[str, Any]]:
                 "seed": seed,
                 "split": f"strict contiguous split seed {seed}",
                 "augmentation": "training-only RandomResizedCrop, flip, rotation, ColorJitter",
-                "metrics_file": f"reports/tables/resnet18_scratch_strict_seed{seed}_metrics.json",
+                "metrics_file": f"reports/resnet18_scratch/resnet18_scratch_strict_seed{seed}/metrics.json",
                 "artifact_prefix": f"resnet18_scratch_strict_seed{seed}",
                 "recommendation": "diagnostic scratch comparison",
                 "notes": "20-epoch scratch run used to compare against pretrained ResNet18.",
@@ -235,7 +258,7 @@ def definitions() -> list[dict[str, Any]]:
                 "seed": seed,
                 "split": f"strict contiguous split seed {seed}",
                 "augmentation": "training-only RandomResizedCrop, flip, rotation, ColorJitter",
-                "metrics_file": f"reports/tables/resnet18_scratch_50ep_es_strict_seed{seed}_metrics.json",
+                "metrics_file": f"reports/resnet18_scratch/resnet18_scratch_50ep_es_strict_seed{seed}/metrics.json",
                 "artifact_prefix": f"resnet18_scratch_50ep_es_strict_seed{seed}",
                 "recommendation": "preferred scratch diagnostic",
                 "notes": "50-epoch maximum scratch run with early stopping on validation loss.",
@@ -298,7 +321,7 @@ def definitions() -> list[dict[str, Any]]:
                 "seed": seed,
                 "split": f"strict contiguous split seed {seed}",
                 "augmentation": "training-only RandomResizedCrop, flip, rotation, ColorJitter",
-                "metrics_file": f"reports/tables/convnextv2_tiny_scratch_50ep_es_strict_seed{seed}_metrics.json",
+                "metrics_file": f"reports/convnextv2_scratch/convnextv2_tiny_scratch_50ep_es_strict_seed{seed}/metrics.json",
                 "artifact_prefix": f"convnextv2_tiny_scratch_50ep_es_strict_seed{seed}",
                 "recommendation": "scratch ConvNeXt comparison",
                 "notes": "50-epoch maximum scratch run with early stopping on validation loss.",
@@ -333,8 +356,8 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the consolidated model results table.")
-    parser.add_argument("--output-csv", type=Path, default=TABLES_DIR / "model_results_master.csv")
-    parser.add_argument("--output-json", type=Path, default=TABLES_DIR / "model_results_master.json")
+    parser.add_argument("--output-csv", type=Path, default=REPORTS_DIR / "model_comparison" / "model_results_master.csv")
+    parser.add_argument("--output-json", type=Path, default=REPORTS_DIR / "model_comparison" / "model_results_master.json")
     return parser.parse_args()
 
 

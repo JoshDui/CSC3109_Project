@@ -26,21 +26,21 @@ Use the existing strict split manifests and separate artifact prefixes:
 
 ```powershell
 python -m src.training.train_convnext_scratch `
-  --manifest reports/tables/strict_split_manifest_seed42.csv `
+  --manifest data/splits/strict_split_manifest_seed42.csv `
   --seed 42 `
   --epochs 50 `
   --batch-size 16 `
   --artifact-prefix convnextv2_tiny_scratch_50ep_es_strict_seed42
 
 python -m src.training.train_convnext_scratch `
-  --manifest reports/tables/strict_split_manifest_seed123.csv `
+  --manifest data/splits/strict_split_manifest_seed123.csv `
   --seed 123 `
   --epochs 50 `
   --batch-size 16 `
   --artifact-prefix convnextv2_tiny_scratch_50ep_es_strict_seed123
 
 python -m src.training.train_convnext_scratch `
-  --manifest reports/tables/strict_split_manifest_seed999.csv `
+  --manifest data/splits/strict_split_manifest_seed999.csv `
   --seed 999 `
   --epochs 50 `
   --batch-size 16 `
@@ -67,8 +67,8 @@ python -m src.evaluation.summarize_convnext_scratch_comparison
 This writes:
 
 ```text
-reports/tables/convnextv2_scratch_vs_pretrained_summary.csv
-reports/tables/convnextv2_scratch_vs_pretrained_summary.json
+reports/convnextv2_comparison/scratch_vs_pretrained_summary.csv
+reports/convnextv2_comparison/scratch_vs_pretrained_summary.json
 ```
 
 The summary script compares the scratch strict-seed artifacts against any local
@@ -90,8 +90,8 @@ Each run writes:
 ```text
 model/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>.pt
 model/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>_metadata.json
-reports/tables/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>_metrics.json
-reports/tables/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>_history.json
-reports/figures/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>_confusion_matrix.png
-reports/figures/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>_training_curves.png
+reports/convnextv2_scratch/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>/metrics.json
+reports/convnextv2_scratch/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>/history.json
+reports/convnextv2_scratch/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>/confusion_matrix.png
+reports/convnextv2_scratch/convnextv2_tiny_scratch_50ep_es_strict_seed<seed>/training_curves.png
 ```
