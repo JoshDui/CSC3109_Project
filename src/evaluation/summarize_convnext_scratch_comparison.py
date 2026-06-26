@@ -5,7 +5,7 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
-from src.config import PROJECT_ROOT, TABLES_DIR
+from src.config import PROJECT_ROOT, REPORTS_DIR, TABLES_DIR
 
 
 STRICT_SEEDS = (42, 123, 999)
@@ -31,6 +31,17 @@ def relative_path(path: Path) -> str:
         return path.relative_to(PROJECT_ROOT).as_posix()
     except ValueError:
         return path.as_posix()
+
+
+def scratch_metrics_path(prefix: str) -> Path:
+    candidates = [
+        REPORTS_DIR / "convnextv2_scratch" / prefix / "metrics.json",
+        TABLES_DIR / f"{prefix}_metrics.json",
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return candidates[0]
 
 
 def comparison_row(family: str, artifact_name: str, metrics_path: Path, seed: int | None = None) -> dict[str, Any]:
@@ -102,8 +113,8 @@ def parse_args() -> argparse.Namespace:
         help="Artifact prefix template for scratch ConvNeXt metrics. Use {seed} as the seed placeholder.",
     )
     parser.add_argument("--scratch-family", default="scratch_full_network_50ep_early_stopped")
-    parser.add_argument("--output-csv", type=Path, default=TABLES_DIR / "convnextv2_scratch_vs_pretrained_summary.csv")
-    parser.add_argument("--output-json", type=Path, default=TABLES_DIR / "convnextv2_scratch_vs_pretrained_summary.json")
+    parser.add_argument("--output-csv", type=Path, default=REPORTS_DIR / "convnextv2_comparison" / "scratch_vs_pretrained_summary.csv")
+    parser.add_argument("--output-json", type=Path, default=REPORTS_DIR / "convnextv2_comparison" / "scratch_vs_pretrained_summary.json")
     return parser.parse_args()
 
 
@@ -134,7 +145,7 @@ def main() -> None:
             comparison_row(
                 args.scratch_family,
                 prefix,
-                TABLES_DIR / f"{prefix}_metrics.json",
+                scratch_metrics_path(prefix),
                 seed=seed,
             )
         )

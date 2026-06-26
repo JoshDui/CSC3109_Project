@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import confusion_matrix
 
-from src.config import CLASS_NAMES, FIGURES_DIR, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, SPLIT_MANIFEST_PATH, TABLES_DIR
+from src.config import CLASS_NAMES, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, REPORTS_DIR, SPLIT_MANIFEST_PATH
 from src.data.resnet_augmented_dataloaders import AUGMENTATION_CONFIG, create_augmented_dataloaders
 from src.models.resnet import build_resnet18_frozen, trainable_parameters
 from src.training.resnet.frozen import (
@@ -60,6 +60,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)
+    parser.add_argument("--output-dir", type=Path, default=None, help="Optional run-scoped report output directory.")
     return parser.parse_args()
 
 
@@ -118,6 +119,8 @@ def main() -> None:
     checkpoint_path = MODEL_DIR / "resnet18_frozen_augmented.pt"
     torch.save(best_state, checkpoint_path)
     checkpoint_relative_path = checkpoint_path.relative_to(PROJECT_ROOT).as_posix()
+    report_dir = args.output_dir or (REPORTS_DIR / "resnet18_frozen_augmented")
+    report_relative_path = report_dir.relative_to(PROJECT_ROOT).as_posix()
     augmentation_config = _json_safe_augmentation_config()
 
     metrics = compute_metrics(final_labels, final_predictions)
@@ -132,6 +135,7 @@ def main() -> None:
             "batch_size": args.batch_size,
             "learning_rate": args.learning_rate,
             "checkpoint": checkpoint_relative_path,
+            "report_dir": report_relative_path,
         }
     )
 
@@ -147,12 +151,13 @@ def main() -> None:
             "augmentation_config": augmentation_config,
             "class_order": CLASS_NAMES,
             "checkpoint": checkpoint_relative_path,
+            "report_dir": report_relative_path,
         },
     )
-    save_json(TABLES_DIR / "resnet18_frozen_augmented_metrics.json", metrics)
-    save_json(TABLES_DIR / "resnet18_frozen_augmented_history.json", history)
-    save_confusion_matrix(final_labels, final_predictions, FIGURES_DIR / "resnet18_frozen_augmented_confusion_matrix.png")
-    save_training_curves(history, FIGURES_DIR / "resnet18_frozen_augmented_training_curves.png")
+    save_json(report_dir / "metrics.json", metrics)
+    save_json(report_dir / "history.json", history)
+    save_confusion_matrix(final_labels, final_predictions, report_dir / "confusion_matrix.png")
+    save_training_curves(history, report_dir / "training_curves.png")
 
 
 if __name__ == "__main__":

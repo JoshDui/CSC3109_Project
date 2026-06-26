@@ -5,7 +5,7 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
-from src.config import PROJECT_ROOT, TABLES_DIR
+from src.config import PROJECT_ROOT, REPORTS_DIR, TABLES_DIR
 
 
 STRICT_SEEDS = (42, 123, 999)
@@ -18,15 +18,20 @@ METRIC_COLUMNS = (
 )
 
 
-def metrics_path(prefix: str) -> Path:
-    return TABLES_DIR / f"{prefix}_metrics.json"
+def metrics_candidates(prefix: str, family: str) -> list[Path]:
+    if family == "pretrained_finetune_last_block":
+        report_path = REPORTS_DIR / "resnet18_finetune_last_block" / prefix / "metrics.json"
+    else:
+        report_path = REPORTS_DIR / "resnet18_scratch" / prefix / "metrics.json"
+    return [report_path, TABLES_DIR / f"{prefix}_metrics.json"]
 
 
-def read_metrics(prefix: str) -> tuple[dict[str, Any] | None, Path]:
-    path = metrics_path(prefix)
-    if not path.exists():
-        return None, path
-    return json.loads(path.read_text(encoding="utf-8")), path
+def read_metrics(prefix: str, family: str) -> tuple[dict[str, Any] | None, Path]:
+    candidates = metrics_candidates(prefix, family)
+    for path in candidates:
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8")), path
+    return None, candidates[0]
 
 
 def metric_value(metrics: dict[str, Any] | None, name: str) -> Any:
@@ -36,7 +41,7 @@ def metric_value(metrics: dict[str, Any] | None, name: str) -> Any:
 
 
 def comparison_row(family: str, seed: int, prefix: str) -> dict[str, Any]:
-    metrics, path = read_metrics(prefix)
+    metrics, path = read_metrics(prefix, family)
     row: dict[str, Any] = {
         "family": family,
         "seed": seed,
@@ -115,8 +120,8 @@ def parse_args() -> argparse.Namespace:
         help="Artifact prefix template for scratch ResNet18 metrics. Use {seed} as the seed placeholder.",
     )
     parser.add_argument("--scratch-family", default="scratch_full_network")
-    parser.add_argument("--output-csv", type=Path, default=TABLES_DIR / "resnet18_scratch_vs_pretrained_strict_summary.csv")
-    parser.add_argument("--output-json", type=Path, default=TABLES_DIR / "resnet18_scratch_vs_pretrained_strict_summary.json")
+    parser.add_argument("--output-csv", type=Path, default=REPORTS_DIR / "resnet18_comparison" / "scratch_vs_pretrained_strict_summary.csv")
+    parser.add_argument("--output-json", type=Path, default=REPORTS_DIR / "resnet18_comparison" / "scratch_vs_pretrained_strict_summary.json")
     return parser.parse_args()
 
 

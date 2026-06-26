@@ -101,9 +101,6 @@ notebook manifest/path discovery has compatibility support.
 - `src/models/resnet18_finetune.py` - compatibility wrapper
 - `src/models/resnet/frozen.py`
 - `src/models/resnet/finetune.py`
-- `src/training/train_resnet18_frozen.py` - compatibility wrapper
-- `src/training/train_resnet18_frozen_augmented.py` - compatibility wrapper
-- `src/training/train_resnet18_finetune_last_block.py` - compatibility wrapper
 - `src/training/resnet/frozen.py`
 - `src/training/resnet/frozen_augmented.py`
 - `src/training/resnet/finetune_last_block.py`
@@ -111,7 +108,7 @@ notebook manifest/path discovery has compatibility support.
 - `src/evaluation/resnet/evaluate_finetune.py`
 - `src/data/resnet_augmented_dataloaders.py`
 
-ResNet source has moved to owner folders with wrappers for old import paths.
+ResNet training source now lives in owner-scoped modules under `src/training/resnet/`.
 The data-loader helper remains under shared `src/data/` because split/preprocess
 helpers are still shared project infrastructure.
 

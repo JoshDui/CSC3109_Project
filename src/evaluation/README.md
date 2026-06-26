@@ -100,8 +100,8 @@ python -m src.evaluation.summarize_resnet18_scratch_comparison
 This writes:
 
 ```text
-reports/tables/resnet18_scratch_vs_pretrained_strict_summary.csv
-reports/tables/resnet18_scratch_vs_pretrained_strict_summary.json
+reports/resnet18_comparison/scratch_vs_pretrained_strict_summary.csv
+reports/resnet18_comparison/scratch_vs_pretrained_strict_summary.json
 ```
 
 Summarise scratch ConvNeXtV2 versus local pretrained ConvNeXtV2 artifacts after
@@ -114,8 +114,8 @@ python -m src.evaluation.summarize_convnext_scratch_comparison
 This writes:
 
 ```text
-reports/tables/convnextv2_scratch_vs_pretrained_summary.csv
-reports/tables/convnextv2_scratch_vs_pretrained_summary.json
+reports/convnextv2_comparison/scratch_vs_pretrained_summary.csv
+reports/convnextv2_comparison/scratch_vs_pretrained_summary.json
 ```
 
 Build the consolidated model results table used by the cleaned notebooks:
@@ -127,8 +127,8 @@ python -m src.evaluation.build_model_results_master
 This writes:
 
 ```text
-reports/tables/model_results_master.csv
-reports/tables/model_results_master.json
+reports/model_comparison/model_results_master.csv
+reports/model_comparison/model_results_master.json
 ```
 
 Suggested files for later phases:

@@ -1,4 +1,4 @@
-﻿# Notebooks
+# Notebooks
 
 This folder holds notebook-first workflow artifacts kept in project history with
 executed outputs or reproducible notebook shells.
@@ -53,8 +53,8 @@ python -m src.evaluation.build_model_results_master
 This writes local generated files:
 
 ```text
-reports/tables/model_results_master.csv
-reports/tables/model_results_master.json
+reports/model_comparison/model_results_master.csv
+reports/model_comparison/model_results_master.json
 ```
 
 Regenerate this master file after adding new ResNet18 or ConvNeXt result

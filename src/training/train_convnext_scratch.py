@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import confusion_matrix
 
-from src.config import CLASS_NAMES, FIGURES_DIR, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, SPLIT_MANIFEST_PATH, TABLES_DIR
+from src.config import CLASS_NAMES, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, REPORTS_DIR, STRICT_SPLIT_MANIFEST_PATH
 from src.data import build_eval_transform, build_train_transform, create_manifest_dataloaders
 from src.models.convnext_scratch import (
     build_convnextv2_scratch,
@@ -21,7 +21,7 @@ from src.models.convnext_scratch import (
     trainable_parameters,
 )
 from src.models.timm_classifier import CONVNEXTV2_TINY, get_timm_preprocess_settings, slugify_model_name
-from src.training.train_resnet18_frozen import (
+from src.training.resnet.frozen import (
     choose_device,
     compute_metrics,
     evaluate,
@@ -68,9 +68,10 @@ def save_confusion_matrix(labels: list[int], predictions: list[int], output_path
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train ConvNeXtV2 from scratch on a strict split manifest.")
-    parser.add_argument("--manifest", type=Path, default=SPLIT_MANIFEST_PATH)
+    parser.add_argument("--manifest", type=Path, default=STRICT_SPLIT_MANIFEST_PATH)
     parser.add_argument("--model-name", default=CONVNEXTV2_TINY.alias)
     parser.add_argument("--artifact-prefix", default=None)
+    parser.add_argument("--output-dir", type=Path, default=None, help="Optional run-scoped report output directory.")
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--image-size", type=int, default=IMAGE_SIZE)
@@ -215,6 +216,8 @@ def main() -> None:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     checkpoint_path = MODEL_DIR / f"{args.artifact_prefix}.pt"
     checkpoint_relative_path = checkpoint_path.relative_to(PROJECT_ROOT).as_posix()
+    report_dir = args.output_dir or (REPORTS_DIR / "convnextv2_scratch" / args.artifact_prefix)
+    report_relative_path = report_dir.relative_to(PROJECT_ROOT).as_posix()
     metrics = compute_metrics(final_labels, final_predictions)
     metrics.update(
         {
@@ -258,6 +261,7 @@ def main() -> None:
                 "best_monitor_epoch": best_monitor_epoch,
             },
             "checkpoint": checkpoint_relative_path,
+            "report_dir": report_relative_path,
         }
     )
 
@@ -308,17 +312,18 @@ def main() -> None:
             "preprocess": metrics["preprocess"],
             "early_stopping": metrics["early_stopping"],
             "checkpoint": checkpoint_relative_path,
+            "report_dir": report_relative_path,
         },
     )
-    save_json(TABLES_DIR / f"{args.artifact_prefix}_metrics.json", metrics)
-    save_json(TABLES_DIR / f"{args.artifact_prefix}_history.json", history)
+    save_json(report_dir / "metrics.json", metrics)
+    save_json(report_dir / "history.json", history)
     save_confusion_matrix(
         final_labels,
         final_predictions,
-        FIGURES_DIR / f"{args.artifact_prefix}_confusion_matrix.png",
+        report_dir / "confusion_matrix.png",
         title="ConvNeXtV2 Scratch Confusion Matrix",
     )
-    save_training_curves(history, FIGURES_DIR / f"{args.artifact_prefix}_training_curves.png")
+    save_training_curves(history, report_dir / "training_curves.png")
 
 
 if __name__ == "__main__":
