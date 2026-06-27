@@ -33,7 +33,7 @@ Swin-Tiny, and DINOv2; 512×512 for Semantic-Guided CG-AF CNN.
 
 Metric sources:
 
-- ResNet18: `reports/resnet18_finetune_last_block/resnet18_finetune_last_block/metrics.json`.
+- ResNet18: `reports/resnet18_finetune_last_block_heldout_val12_eval/metrics.json`.
 - HETMCL-lite: `reports/hetmcl_lite_onnx_int8_qdq/comparison_metrics.csv`,
   `reports/hetmcl_lite_onnx_int8_qdq/summary.json`, and
   `notebooks/08_hetmcl_lite_quantisation.ipynb`.

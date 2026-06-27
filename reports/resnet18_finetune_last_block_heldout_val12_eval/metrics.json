@@ -1,0 +1,119 @@
+{
+  "accuracy": 1.0,
+  "macro_precision": 1.0,
+  "macro_recall": 1.0,
+  "macro_f1": 1.0,
+  "classification_report": {
+    "bridge": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 100.0
+    },
+    "freeway": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 100.0
+    },
+    "overpass": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 100.0
+    },
+    "railway": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 100.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 400.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 400.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      100,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      100,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      100,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      100
+    ]
+  ],
+  "evaluation": {
+    "checkpoint": "model\\resnet18_finetune_last_block.pt",
+    "data_dir": "data\\val 12",
+    "output_dir": "reports\\resnet18_finetune_last_block_heldout_val12_eval",
+    "device": "cuda",
+    "samples_evaluated": 400,
+    "batch_size": 32,
+    "max_batches": null
+  },
+  "checkpoint_training": {
+    "training_strategy": "fine_tune_last_block",
+    "epoch": 1,
+    "accuracy": 1.0,
+    "precision_macro": 1.0,
+    "recall_macro": 1.0,
+    "f1_macro": 1.0,
+    "best_val_accuracy": 1.0,
+    "best_epoch": 1
+  },
+  "model": {
+    "model_name": "resnet18",
+    "model_type": "resnet18_finetune_last_block",
+    "image_size": 224,
+    "class_names": [
+      "bridge",
+      "freeway",
+      "overpass",
+      "railway"
+    ],
+    "preprocess": {
+      "input_size": [
+        3,
+        224,
+        224
+      ],
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ],
+      "interpolation": "bilinear"
+    }
+  }
+}
