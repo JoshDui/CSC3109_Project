@@ -213,6 +213,19 @@ def definitions() -> list[dict[str, Any]]:
             "recommendation": "strong baseline",
             "notes": "Original-split fine-tuned transfer-learning run.",
         },
+        {
+            "model_family": "resnet18",
+            "model_name": "ResNet18 fine-tuned last block held-out val12",
+            "run_group": "resnet18_pretrained_finetune_last_block_heldout_val12",
+            "training_strategy": "pretrained layer4 plus classifier fine-tuning",
+            "pretrained": True,
+            "split": "downloaded held-out validation set data/val 12",
+            "augmentation": "none at evaluation",
+            "metrics_file": "reports/resnet18_finetune_last_block_heldout_val12_eval/metrics.json",
+            "checkpoint": "model/resnet18_finetune_last_block.pt",
+            "recommendation": "held-out validation evidence",
+            "notes": "Final-facing held-out validation result on the provided same-source validation set; avoid presenting as proof of real-world generalization.",
+        },
     ]
 
     for seed in STRICT_SEEDS:
@@ -304,8 +317,8 @@ def definitions() -> list[dict[str, Any]]:
                 "augmentation": "training-only augmentation in timm workflow",
                 "metrics_file": "model/convnextv2_tiny_fcmae_ft_in1k_finetune/best_tune_metrics.json",
                 "checkpoint": "model/convnextv2_tiny_fcmae_ft_in1k_finetune/best_model.pt",
-                "recommendation": "failed/suspect run",
-                "notes": "Accuracy is 0.25 on a tiny/support-limited tune artifact; do not use as headline without rerun.",
+                "recommendation": "comparison only",
+                "notes": "Local tune artifact reports high accuracy, but this run needs held-out validation before use as headline evidence.",
             },
         ]
     )
