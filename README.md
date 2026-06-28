@@ -46,6 +46,12 @@ Quantised size is listed only for models with current quantized deployment
 artifacts in this closeout branch. ResNet18 is left as N/A because no current
 quantized artifact is being reported for it.
 
+ResNet18's `1.0000` score should be read as same-source held-out validation
+performance, not proof of real-world perfection. The tracked ResNet18 metrics
+folder keeps the historical `heldout_val12` name because that run was produced
+from a locally downloaded folder named `data/val 12`; the canonical repository
+layout for the same held-out validation concept is `data/raw/val`.
+
 ## Folder Structure
 
 ```text
@@ -64,6 +70,9 @@ CSC3109_Project/
 
 - Raw classification images are expected locally under `data/raw/train` and
   `data/raw/val`; raw images are not committed.
+- Some older result artifact names mention `data/val 12` or `heldout_val12`.
+  Treat those as historical names for the downloaded held-out validation folder;
+  new commands and documentation should use `data/raw/val`.
 - Semantic masks and other derived datasets stay outside `data/raw`.
 - Most final-facing notebooks are artifact-first summaries that load tracked
   model/report files instead of retraining models inline.
