@@ -70,7 +70,7 @@ python -m src.evaluation.evaluate_timm_classifier `
 Do not report internal sanity-check metrics as final held-out validation
 performance.
 
-Evaluate the fine-tuned ResNet18 last-block checkpoint on the newer held-out
+Evaluate the fine-tuned ResNet18 last-block checkpoint on the canonical held-out
 validation folder:
 
 ```powershell
@@ -89,6 +89,11 @@ reports/resnet18_finetune_last_block_raw_val_eval/
   confusion_matrix.png
   predictions.csv
 ```
+
+The tracked ResNet18 held-out artifact under
+`reports/resnet18_finetune_last_block_heldout_val12_eval/` was produced before
+this path was standardised, when the same held-out validation images were stored
+locally as `data/val 12`. For new runs, use `data/raw/val`.
 
 Summarise scratch ResNet18 versus pretrained strict-split ResNet18 after the
 scratch seed runs finish:
