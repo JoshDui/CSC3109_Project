@@ -12,13 +12,9 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import confusion_matrix
 
-from src.config import CLASS_NAMES, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, REPORTS_DIR, SPLIT_MANIFEST_PATH
+from src.config import CLASS_NAMES, IMAGE_SIZE, MODEL_DIR, PROJECT_ROOT, RANDOM_SEED, REPORTS_DIR, STRICT_SPLIT_MANIFEST_PATH
 from src.data.resnet_augmented_dataloaders import AUGMENTATION_CONFIG, create_augmented_dataloaders
-from src.models.resnet import (
-    build_resnet18_finetune_last_block,
-    last_block_parameter_groups,
-    trainable_parameter_summary,
-)
+from src.models.resnet18_scratch import build_resnet18_scratch, trainable_parameter_summary, trainable_parameters
 from src.training.resnet.frozen import (
     choose_device,
     compute_metrics,
@@ -30,7 +26,7 @@ from src.training.resnet.frozen import (
 )
 
 
-ARTIFACT_PREFIX = "resnet18_finetune_last_block"
+ARTIFACT_PREFIX = "resnet18_scratch"
 
 
 def _json_safe_augmentation_config() -> dict[str, dict[str, object]]:
@@ -60,25 +56,37 @@ def save_confusion_matrix(labels: list[int], predictions: list[int], output_path
     )
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Actual")
-    ax.set_title("ResNet18 Fine-Tuned Last Block Confusion Matrix")
+    ax.set_title("ResNet18 Scratch Confusion Matrix")
     fig.tight_layout()
     fig.savefig(output_path, dpi=160)
     plt.close(fig)
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Fine-tune ResNet18 by unfreezing only layer4 and the classifier.")
-    parser.add_argument("--manifest", type=Path, default=SPLIT_MANIFEST_PATH)
+    parser = argparse.ArgumentParser(description="Train ResNet18 from scratch with all layers trainable.")
+    parser.add_argument("--manifest", type=Path, default=STRICT_SPLIT_MANIFEST_PATH)
     parser.add_argument("--artifact-prefix", default=ARTIFACT_PREFIX)
     parser.add_argument("--output-dir", type=Path, default=None, help="Optional run-scoped report output directory.")
-    parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=32)
-    parser.add_argument("--layer4-learning-rate", type=float, default=1e-4)
-    parser.add_argument("--classifier-learning-rate", type=float, default=1e-3)
+    parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-2)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)
+    parser.add_argument("--early-stopping-monitor", choices=("val_loss", "val_accuracy"), default="val_loss")
+    parser.add_argument("--early-stopping-patience", type=int, default=10)
+    parser.add_argument("--early-stopping-min-epochs", type=int, default=20)
+    parser.add_argument("--early-stopping-min-delta", type=float, default=0.0)
+    parser.add_argument("--disable-early-stopping", action="store_true")
     return parser.parse_args()
+
+
+def monitor_improved(current: float, best: float | None, *, monitor: str, min_delta: float) -> bool:
+    if best is None:
+        return True
+    if monitor == "val_loss":
+        return current < best - min_delta
+    return current > best + min_delta
 
 
 def main() -> None:
@@ -93,24 +101,18 @@ def main() -> None:
     )
 
     device = choose_device()
-    model = build_resnet18_finetune_last_block(num_classes=len(CLASS_NAMES)).to(device)
+    model = build_resnet18_scratch(num_classes=len(CLASS_NAMES)).to(device)
     parameter_summary = trainable_parameter_summary(model)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(
-        last_block_parameter_groups(
-            model,
-            layer4_learning_rate=args.layer4_learning_rate,
-            classifier_learning_rate=args.classifier_learning_rate,
-        ),
+        trainable_parameters(model),
+        lr=args.learning_rate,
         weight_decay=args.weight_decay,
     )
 
     print(f"Device: {device}")
     print(f"Trainable parameters: {parameter_summary['trainable']:,} / {parameter_summary['total']:,}")
-    print(
-        "Parameter groups: "
-        f"layer4 lr={args.layer4_learning_rate}, classifier lr={args.classifier_learning_rate}"
-    )
+    print("Initialization: random weights; all ResNet18 layers trainable")
 
     history: list[dict[str, float]] = []
     best_val_accuracy = -1.0
@@ -118,6 +120,11 @@ def main() -> None:
     best_state = None
     final_labels: list[int] = []
     final_predictions: list[int] = []
+    best_monitor_value: float | None = None
+    best_monitor_epoch: int | None = None
+    epochs_without_monitor_improvement = 0
+    stopped_early = False
+    stop_epoch: int | None = None
 
     for epoch in range(1, args.epochs + 1):
         train_loss, train_accuracy = train_one_epoch(model, train_loader, criterion, optimizer, device)
@@ -140,11 +147,39 @@ def main() -> None:
             final_labels = labels
             final_predictions = predictions
 
+        monitor_value = val_loss if args.early_stopping_monitor == "val_loss" else val_accuracy
+        if monitor_improved(
+            monitor_value,
+            best_monitor_value,
+            monitor=args.early_stopping_monitor,
+            min_delta=args.early_stopping_min_delta,
+        ):
+            best_monitor_value = monitor_value
+            best_monitor_epoch = epoch
+            epochs_without_monitor_improvement = 0
+        else:
+            epochs_without_monitor_improvement += 1
+
         print(
             f"epoch={epoch} "
             f"train_loss={train_loss:.4f} train_acc={train_accuracy:.4f} "
             f"val_loss={val_loss:.4f} val_acc={val_accuracy:.4f}"
         )
+
+        if (
+            not args.disable_early_stopping
+            and epoch >= args.early_stopping_min_epochs
+            and epochs_without_monitor_improvement >= args.early_stopping_patience
+        ):
+            stopped_early = True
+            stop_epoch = epoch
+            print(
+                "Early stopping triggered: "
+                f"monitor={args.early_stopping_monitor}, "
+                f"best_epoch={best_monitor_epoch}, "
+                f"patience={args.early_stopping_patience}"
+            )
+            break
 
     if best_state is None or best_epoch is None:
         raise RuntimeError("Training did not produce a checkpoint.")
@@ -152,7 +187,7 @@ def main() -> None:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     checkpoint_path = MODEL_DIR / f"{args.artifact_prefix}.pt"
     checkpoint_relative_path = checkpoint_path.relative_to(PROJECT_ROOT).as_posix()
-    report_dir = args.output_dir or (REPORTS_DIR / "resnet18_finetune_last_block" / args.artifact_prefix)
+    report_dir = args.output_dir or (REPORTS_DIR / "resnet18_scratch" / args.artifact_prefix)
     report_relative_path = report_dir.relative_to(PROJECT_ROOT).as_posix()
     augmentation_config = _json_safe_augmentation_config()
 
@@ -161,19 +196,32 @@ def main() -> None:
         {
             "model": "resnet18",
             "artifact_prefix": args.artifact_prefix,
-            "training_strategy": "fine_tune_last_block",
-            "trainable_modules": ["layer4", "fc"],
-            "frozen_modules": ["conv1", "bn1", "layer1", "layer2", "layer3"],
+            "training_strategy": "from_scratch_full_network",
+            "pretrained": False,
+            "weights": None,
+            "trainable_modules": ["all"],
             "data_augmentation": True,
             "augmentation_config": augmentation_config,
             "best_val_accuracy": best_val_accuracy,
             "best_epoch": best_epoch,
             "epochs": args.epochs,
+            "epochs_trained": len(history),
+            "max_epochs": args.epochs,
             "batch_size": args.batch_size,
-            "layer4_learning_rate": args.layer4_learning_rate,
-            "classifier_learning_rate": args.classifier_learning_rate,
+            "learning_rate": args.learning_rate,
             "weight_decay": args.weight_decay,
             "parameter_summary": parameter_summary,
+            "early_stopping": {
+                "enabled": not args.disable_early_stopping,
+                "monitor": args.early_stopping_monitor,
+                "patience": args.early_stopping_patience,
+                "min_epochs": args.early_stopping_min_epochs,
+                "min_delta": args.early_stopping_min_delta,
+                "stopped_early": stopped_early,
+                "stop_epoch": stop_epoch,
+                "best_monitor_value": best_monitor_value,
+                "best_monitor_epoch": best_monitor_epoch,
+            },
             "checkpoint": checkpoint_relative_path,
             "report_dir": report_relative_path,
         }
@@ -184,7 +232,7 @@ def main() -> None:
             "checkpoint_format_version": 1,
             "model_name": "resnet18",
             "resolved_model_name": "resnet18",
-            "model_type": "resnet18_finetune_last_block",
+            "model_type": "resnet18_scratch",
             "model_state_dict": best_state,
             "class_to_idx": {name: index for index, name in enumerate(CLASS_NAMES)},
             "idx_to_class": {index: name for index, name in enumerate(CLASS_NAMES)},
@@ -195,12 +243,25 @@ def main() -> None:
                 "std": (0.229, 0.224, 0.225),
                 "interpolation": "bilinear",
             },
-            "training_strategy": "fine_tune_last_block",
-            "trainable_modules": ["layer4", "fc"],
-            "frozen_modules": ["conv1", "bn1", "layer1", "layer2", "layer3"],
+            "training_strategy": "from_scratch_full_network",
+            "pretrained": False,
+            "trainable_modules": ["all"],
             "data_augmentation": True,
             "augmentation_config": augmentation_config,
             "epoch": best_epoch,
+            "epochs_trained": len(history),
+            "max_epochs": args.epochs,
+            "early_stopping": {
+                "enabled": not args.disable_early_stopping,
+                "monitor": args.early_stopping_monitor,
+                "patience": args.early_stopping_patience,
+                "min_epochs": args.early_stopping_min_epochs,
+                "min_delta": args.early_stopping_min_delta,
+                "stopped_early": stopped_early,
+                "stop_epoch": stop_epoch,
+                "best_monitor_value": best_monitor_value,
+                "best_monitor_epoch": best_monitor_epoch,
+            },
             "args": _serialise_args(args),
             "metrics": metrics,
         },
@@ -212,18 +273,24 @@ def main() -> None:
         {
             "model": "resnet18",
             "artifact_prefix": args.artifact_prefix,
-            "training_strategy": "fine_tune_last_block",
+            "training_strategy": "from_scratch_full_network",
+            "pretrained": False,
             "image_size": IMAGE_SIZE,
             "normalization": "imagenet",
             "data_augmentation": True,
             "augmentation_config": augmentation_config,
             "class_order": CLASS_NAMES,
-            "trainable_modules": ["layer4", "fc"],
-            "frozen_modules": ["conv1", "bn1", "layer1", "layer2", "layer3"],
-            "layer4_learning_rate": args.layer4_learning_rate,
-            "classifier_learning_rate": args.classifier_learning_rate,
+            "trainable_modules": ["all"],
+            "learning_rate": args.learning_rate,
             "weight_decay": args.weight_decay,
             "parameter_summary": parameter_summary,
+            "early_stopping": {
+                "enabled": not args.disable_early_stopping,
+                "monitor": args.early_stopping_monitor,
+                "patience": args.early_stopping_patience,
+                "min_epochs": args.early_stopping_min_epochs,
+                "min_delta": args.early_stopping_min_delta,
+            },
             "checkpoint": checkpoint_relative_path,
             "report_dir": report_relative_path,
         },
