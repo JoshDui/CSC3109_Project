@@ -1,0 +1,115 @@
+{
+  "artifact_format": "swin_dino_hetmcl_near_confusion_v1",
+  "class_names": [
+    "bridge",
+    "freeway",
+    "overpass",
+    "railway"
+  ],
+  "models": {
+    "dinov2_vits14_lora": {
+      "artifacts": {
+        "highest_runner_up_probability_heatmap_png": "reports/figures/swin_dino_hetmcl_near_confusion/dinov2_vits14_lora_onnx_int8_qdq_highest_runner_up_probability_heatmap.png",
+        "highest_runner_up_probability_matrix_csv": "reports/tables/swin_dino_hetmcl_near_confusion/dinov2_vits14_lora_onnx_int8_qdq_highest_runner_up_probability_matrix.csv",
+        "lowest_margin_heatmap_png": "reports/figures/swin_dino_hetmcl_near_confusion/dinov2_vits14_lora_onnx_int8_qdq_lowest_margin_heatmap.png",
+        "lowest_margin_matrix_csv": "reports/tables/swin_dino_hetmcl_near_confusion/dinov2_vits14_lora_onnx_int8_qdq_lowest_margin_matrix.csv",
+        "lowest_margin_top20_csv": "reports/tables/swin_dino_hetmcl_near_confusion/dinov2_vits14_lora_onnx_int8_qdq_lowest_margin_top20.csv",
+        "pair_summary_csv": "reports/tables/swin_dino_hetmcl_near_confusion/dinov2_vits14_lora_onnx_int8_qdq_near_confusion_pair_summary.csv",
+        "per_image_csv": "reports/tables/swin_dino_hetmcl_near_confusion/dinov2_vits14_lora_onnx_int8_qdq_near_confusion_per_image.csv"
+      },
+      "label": "DINOv2 ViT-S/14 LoRA",
+      "source_predictions": "reports/vit_small_patch14_dinov2_lvd142m_lora_onnx_int8_qdq/onnx_int8_qdq_predictions.csv",
+      "summary": {
+        "accuracy": 0.955,
+        "count_margin_lt_0_25": 29,
+        "count_margin_lt_0_35": 50,
+        "count_margin_lt_0_50": 79,
+        "images": 400,
+        "lowest_margin_image_name": "freeway766.jpg",
+        "lowest_margin_predicted_class": "railway",
+        "lowest_margin_runner_up_class": "freeway",
+        "lowest_margin_true_class": "freeway",
+        "max_runner_up_probability": 0.4342651056276741,
+        "mean_margin": 0.6753064016590986,
+        "median_margin": 0.742623013158622,
+        "min_margin": 0.011867469878811376,
+        "model": "DINOv2 ViT-S/14 LoRA",
+        "model_key": "dinov2_vits14_lora",
+        "p01_margin": 0.024096153058933454,
+        "p05_margin": 0.1751512130295584,
+        "p10_margin": 0.3063580609899253,
+        "variant": "onnx_int8_qdq"
+      }
+    },
+    "hetmcl_lite": {
+      "artifacts": {
+        "highest_runner_up_probability_heatmap_png": "reports/figures/swin_dino_hetmcl_near_confusion/hetmcl_lite_onnx_int8_qdq_highest_runner_up_probability_heatmap.png",
+        "highest_runner_up_probability_matrix_csv": "reports/tables/swin_dino_hetmcl_near_confusion/hetmcl_lite_onnx_int8_qdq_highest_runner_up_probability_matrix.csv",
+        "lowest_margin_heatmap_png": "reports/figures/swin_dino_hetmcl_near_confusion/hetmcl_lite_onnx_int8_qdq_lowest_margin_heatmap.png",
+        "lowest_margin_matrix_csv": "reports/tables/swin_dino_hetmcl_near_confusion/hetmcl_lite_onnx_int8_qdq_lowest_margin_matrix.csv",
+        "lowest_margin_top20_csv": "reports/tables/swin_dino_hetmcl_near_confusion/hetmcl_lite_onnx_int8_qdq_lowest_margin_top20.csv",
+        "pair_summary_csv": "reports/tables/swin_dino_hetmcl_near_confusion/hetmcl_lite_onnx_int8_qdq_near_confusion_pair_summary.csv",
+        "per_image_csv": "reports/tables/swin_dino_hetmcl_near_confusion/hetmcl_lite_onnx_int8_qdq_near_confusion_per_image.csv"
+      },
+      "label": "HETMCL-lite",
+      "source_predictions": "reports/hetmcl_lite_onnx_int8_qdq/onnx_int8_qdq_predictions.csv",
+      "summary": {
+        "accuracy": 1.0,
+        "count_margin_lt_0_25": 0,
+        "count_margin_lt_0_35": 0,
+        "count_margin_lt_0_50": 0,
+        "images": 400,
+        "lowest_margin_image_name": "bridge751.jpg",
+        "lowest_margin_predicted_class": "bridge",
+        "lowest_margin_runner_up_class": "overpass",
+        "lowest_margin_true_class": "bridge",
+        "max_runner_up_probability": 0.1589376551805458,
+        "mean_margin": 0.9359297761584026,
+        "median_margin": 0.9414300776266524,
+        "min_margin": 0.5998992325493135,
+        "model": "HETMCL-lite",
+        "model_key": "hetmcl_lite",
+        "p01_margin": 0.8664555332073196,
+        "p05_margin": 0.9065114112659247,
+        "p10_margin": 0.9182300293132384,
+        "variant": "onnx_int8_qdq"
+      }
+    },
+    "swin_tiny_lora": {
+      "artifacts": {
+        "highest_runner_up_probability_heatmap_png": "reports/figures/swin_dino_hetmcl_near_confusion/swin_tiny_lora_onnx_int8_qdq_highest_runner_up_probability_heatmap.png",
+        "highest_runner_up_probability_matrix_csv": "reports/tables/swin_dino_hetmcl_near_confusion/swin_tiny_lora_onnx_int8_qdq_highest_runner_up_probability_matrix.csv",
+        "lowest_margin_heatmap_png": "reports/figures/swin_dino_hetmcl_near_confusion/swin_tiny_lora_onnx_int8_qdq_lowest_margin_heatmap.png",
+        "lowest_margin_matrix_csv": "reports/tables/swin_dino_hetmcl_near_confusion/swin_tiny_lora_onnx_int8_qdq_lowest_margin_matrix.csv",
+        "lowest_margin_top20_csv": "reports/tables/swin_dino_hetmcl_near_confusion/swin_tiny_lora_onnx_int8_qdq_lowest_margin_top20.csv",
+        "pair_summary_csv": "reports/tables/swin_dino_hetmcl_near_confusion/swin_tiny_lora_onnx_int8_qdq_near_confusion_pair_summary.csv",
+        "per_image_csv": "reports/tables/swin_dino_hetmcl_near_confusion/swin_tiny_lora_onnx_int8_qdq_near_confusion_per_image.csv"
+      },
+      "label": "Swin-Tiny LoRA",
+      "source_predictions": "reports/swin_tiny_lora_onnx_int8_qdq/onnx_int8_qdq_predictions.csv",
+      "summary": {
+        "accuracy": 0.9925,
+        "count_margin_lt_0_25": 14,
+        "count_margin_lt_0_35": 29,
+        "count_margin_lt_0_50": 86,
+        "images": 400,
+        "lowest_margin_image_name": "bridge751.jpg",
+        "lowest_margin_predicted_class": "bridge",
+        "lowest_margin_runner_up_class": "overpass",
+        "lowest_margin_true_class": "bridge",
+        "max_runner_up_probability": 0.3376243582258749,
+        "mean_margin": 0.5776970930971143,
+        "median_margin": 0.6051147125775518,
+        "min_margin": 0.0,
+        "model": "Swin-Tiny LoRA",
+        "model_key": "swin_tiny_lora",
+        "p01_margin": 0.049491630347555556,
+        "p05_margin": 0.29660394314778954,
+        "p10_margin": 0.40303531815590155,
+        "variant": "onnx_int8_qdq"
+      }
+    }
+  },
+  "summary_csv": "reports/tables/swin_dino_hetmcl_near_confusion/onnx_int8_qdq_margin_summary.csv",
+  "variant": "onnx_int8_qdq"
+}
