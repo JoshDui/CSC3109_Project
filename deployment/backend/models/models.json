@@ -1,0 +1,41 @@
+{
+  "active_model": "resnet18_finetuned",
+  "models": {
+    "resnet18_finetuned": {
+      "name": "ResNet18 fine-tuned transfer learning",
+      "display_name": "ResNet18 fine-tuned",
+      "description": "Final packaged deployment baseline. Classical transfer learning with a ResNet18 backbone and a 4-class classifier head.",
+      "family": "ResNet18",
+      "role": "Packaged final baseline",
+      "onnx_path": "resnet18_finetuned.onnx",
+      "labels_path": "class_labels.json",
+      "input_name": "images",
+      "output_name": "logits",
+      "input_size": [224, 224],
+      "resize_size": 256,
+      "resize_mode": "resize_crop",
+      "mean": [0.485, 0.456, 0.406],
+      "std": [0.229, 0.224, 0.225],
+      "interpolation": "bilinear",
+      "preprocessing": "resize shortest side to 256, center crop to 224, scale to [0,1], ImageNet normalization, NCHW"
+    },
+    "custom_cnn_small_int8": {
+      "name": "Custom CNN Small INT8",
+      "display_name": "Custom CNN Small INT8",
+      "description": "Lightweight custom CNN comparison model. INT8 ONNX keeps the payload small while still returning the same 4-class scene labels.",
+      "family": "Custom CNN",
+      "role": "Packaged lightweight comparison",
+      "onnx_path": "custom_cnn_small_int8_qdq.onnx",
+      "labels_path": "class_labels.json",
+      "input_name": "images",
+      "output_name": "logits",
+      "input_size": [224, 224],
+      "resize_size": 224,
+      "resize_mode": "stretch",
+      "mean": [0.485, 0.456, 0.406],
+      "std": [0.229, 0.224, 0.225],
+      "interpolation": "bilinear",
+      "preprocessing": "resize directly to 224, scale to [0,1], ImageNet normalization, NCHW"
+    }
+  }
+}
