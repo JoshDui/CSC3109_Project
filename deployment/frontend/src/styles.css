@@ -219,6 +219,40 @@ button:disabled {
   padding-right: 0.2rem;
 }
 
+.mode-switch {
+  background: #08111b;
+  border: 1px solid rgb(148 163 184 / 0.18);
+  border-radius: 999px;
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 0.85rem;
+  padding: 0.25rem;
+}
+
+.mode-option {
+  background: transparent;
+  border-radius: 999px;
+  display: grid;
+  gap: 0.05rem;
+  padding: 0.55rem 0.75rem;
+  text-align: center;
+}
+
+.mode-option.active {
+  background: #7dd3fc;
+  color: #07111f;
+}
+
+.mode-option span {
+  color: #9fb1c3;
+  font-size: 0.7rem;
+}
+
+.mode-option.active span {
+  color: #0b3046;
+}
+
 .model-option {
   align-items: center;
   background: #0b121c;

@@ -32,12 +32,16 @@ const wasmConfigured = (() => {
     if (import.meta.env.VITE_ORT_WASM_PATHS) {
       ort.env.wasm.wasmPaths = import.meta.env.VITE_ORT_WASM_PATHS;
     }
-    ort.env.wasm.numThreads = Math.max(1, Math.min(4, navigator.hardwareConcurrency || 1));
+    // Single-thread WASM avoids ORT worker-loading issues in the local Caddy demo.
+    ort.env.wasm.proxy = false;
+    ort.env.wasm.numThreads = 1;
     done = true;
   };
 })();
 
 const sessionCache = new Map<string, LoadedModel>();
+const modelBytesCache = new Map<string, Uint8Array>();
+const BROWSER_MODEL_CACHE = "csc3109-onnx-models-v1";
 
 /**
  * Create (or reuse) an inference session for a model, attempting each resolved
@@ -55,10 +59,14 @@ export async function loadModel(config: ModelConfig): Promise<LoadedModel> {
   for (const provider of providers) {
     try {
       const start = performance.now();
-      const session = await ort.InferenceSession.create(config.url, {
+      const modelSource = await loadModelSource(config.url);
+      const options = {
         executionProviders: [toOrtProvider(provider) as never],
         graphOptimizationLevel: "all",
-      });
+      } satisfies ort.InferenceSession.SessionOptions;
+      const session = typeof modelSource === "string"
+        ? await ort.InferenceSession.create(modelSource, options)
+        : await ort.InferenceSession.create(modelSource, options);
       const loadMs = performance.now() - start;
       const loaded: LoadedModel = { config, session, provider, loadMs };
       sessionCache.set(config.id, loaded);
@@ -69,6 +77,55 @@ export async function loadModel(config: ModelConfig): Promise<LoadedModel> {
   }
 
   throw new Error(`Failed to create session for ${config.id}. Tried -> ${errors.join(" | ")}`);
+}
+
+async function loadModelSource(url: string): Promise<string | Uint8Array> {
+  const cachedBytes = modelBytesCache.get(url);
+  if (cachedBytes) return cachedBytes;
+
+  if (!("caches" in globalThis)) return url;
+
+  let cache: Cache;
+  try {
+    cache = await caches.open(BROWSER_MODEL_CACHE);
+  } catch (cause) {
+    console.warn(`Model Cache API unavailable for ${url}; falling back to direct URL session`, cause);
+    return url;
+  }
+
+  const cached = await cache.match(url);
+  if (cached) {
+    try {
+      const bytes = await responseToModelBytes(cached, url);
+      modelBytesCache.set(url, bytes);
+      return bytes;
+    } catch (cause) {
+      await cache.delete(url);
+      console.warn(`Discarded invalid cached model response for ${url}`, cause);
+    }
+  }
+
+  const response = await fetch(url, { cache: "force-cache" });
+  const clone = response.clone();
+  const bytes = await responseToModelBytes(response, url);
+  await cache.put(url, clone);
+  modelBytesCache.set(url, bytes);
+  return bytes;
+}
+
+async function responseToModelBytes(response: Response, url: string): Promise<Uint8Array> {
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ONNX model ${url}: HTTP ${response.status}`);
+  }
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("text/html") || contentType.includes("application/json")) {
+    throw new Error(`Model URL ${url} returned '${contentType || "unknown"}' instead of ONNX bytes`);
+  }
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if (bytes.byteLength < 16 || bytes[0] === 0x3c) {
+    throw new Error(`Model URL ${url} did not return a plausible ONNX payload`);
+  }
+  return bytes;
 }
 
 export async function classifyImage(

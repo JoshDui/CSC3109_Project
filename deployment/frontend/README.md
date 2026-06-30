@@ -2,13 +2,18 @@
 
 This React/Vite app is the user interface for the CSC3109 deployment container.
 
-The current deployment flow is backend inference:
+The app has two inference modes:
 
 ```text
-GET /models -> choose packaged model -> POST /predict -> FastAPI backend -> ONNX Runtime -> JSON result
+Web   -> GET /models -> choose packaged model -> POST /predict -> FastAPI backend -> ONNX Runtime -> JSON result
+Local -> fetch ONNX from VITE_ONNX_MODEL_BASE_URL -> browser cache -> ONNX Runtime Web -> local result
 ```
 
-The frontend is built into static files by the root Dockerfile and served by the FastAPI runtime image. It displays the two packaged deployment models, predicted class, confidence, per-class scores, preprocessing note, and the ONNX execution provider reported by the backend. The top-right endpoint badge is informational; the `Run prediction` button is what sends the image to `POST /predict`.
+The frontend is built into static files by the root Dockerfile and served by the
+FastAPI runtime image. In the local smoke stack, Caddy sits in front of the same
+container and serves ONNX artifacts from `/edge-models/models` for Local mode.
+The model set is intentionally limited to HETMCL-lite INT8 and
+Semantic-Guided CG-AF INT8.
 
 ## Commands
 
@@ -19,8 +24,20 @@ bun run check
 bun run build
 ```
 
-`bun run sync:assets` remains available only for the older browser-side ONNX experiment. It is not part of the final Docker deployment path.
+For Local mode, choose the ONNX host at build/deploy time:
+
+```bash
+# Local Caddy smoke stack / same host
+VITE_ONNX_MODEL_BASE_URL=/edge-models/models bun run build
+
+# Optional Cloudflare R2/CDN custom domain
+VITE_ONNX_MODEL_BASE_URL=https://models.example.com/models bun run build
+```
 
 ## Model selector
 
-The model cards come from the backend `/models` endpoint, not from `public/models.json`. The current deployment intentionally ships two runnable models: `resnet18_finetuned` and `custom_cnn_small_int8`. Additional cards should only be added when their ONNX artifacts are copied into `deployment/backend/models/` and verified against the backend response format.
+Web mode model cards come from the backend `/models` endpoint. Local mode model
+cards come from `public/models.json`, which is kept to the same two-model set:
+`hetmcl_lite_int8` and `semantic_guided_cgaf_int8`. Additional cards should
+only be added when the backend registry, edge ONNX catalog, and smoke tests are
+updated together.
