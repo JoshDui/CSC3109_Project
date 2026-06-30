@@ -1,0 +1,51 @@
+services:
+  model-stage:
+    image: alpine:3.21
+    working_dir: /repo
+    volumes:
+      - ../..:/repo:ro
+      - edge-models:/srv/edge-models
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -eu
+        mkdir -p /srv/edge-models/models
+        cp /repo/model/hetmcl_lite/onnx/hetmcl_lite_best_stop_int8_qdq.onnx \
+          /srv/edge-models/models/hetmcl_lite_best_stop_int8_qdq.onnx
+        cp /repo/model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx \
+          /srv/edge-models/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
+        for model in \
+          /repo/model/hetmcl_lite/onnx/hetmcl_lite_best_stop_int8_qdq.onnx \
+          /repo/model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
+        do
+          if [ -f "$${model}.br" ]; then
+            cp "$${model}.br" "/srv/edge-models/models/$$(basename "$${model}").br"
+          fi
+        done
+        ls -lh /srv/edge-models/models
+
+  app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: csc3109-aerial-classifier:local-edge
+    depends_on:
+      model-stage:
+        condition: service_completed_successfully
+
+  caddy:
+    image: caddy:2.10.2-alpine
+    depends_on:
+      app:
+        condition: service_started
+      model-stage:
+        condition: service_completed_successfully
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
+      - edge-models:/srv/edge-models:ro
+
+volumes:
+  edge-models:

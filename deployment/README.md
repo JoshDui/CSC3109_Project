@@ -1,17 +1,29 @@
 # Deployment
 
-The current submission deployment is a single Docker container that serves the React frontend and exposes backend inference endpoints.
+The current deployment is a local Docker demo that serves the React frontend,
+exposes backend inference through FastAPI, and can optionally sit behind Caddy
+for same-host ONNX model delivery.
 
 ```text
 browser
-  -> React/Vite frontend served by FastAPI
+  -> React/Vite frontend served by FastAPI or Caddy reverse proxy
   -> GET /models for the model registry
   -> POST /predict with uploaded image + model_id
   -> ONNX Runtime inference on the backend
   -> JSON response: predicted_label, confidence, class_scores
+
+browser local mode
+  -> downloads HETMCL/CG-AF ONNX from /edge-models/models or a configured CDN
+  -> caches the model in the browser
+  -> runs ONNX Runtime Web locally
 ```
 
-This is intentionally scope-first for the CSC3109 marking requirements: the container proves that a final model can be served through an inference endpoint, accepts aerial image input, and returns a prediction with confidence scores.
+This is intentionally scope-first for the CSC3109 marking requirements: the
+container proves that selected final models can be served through an inference
+endpoint, accepts aerial image input, and returns predictions with confidence
+scores. The Caddy/edge path is primarily for local smoke testing of browser ONNX
+delivery; VPS/TLS/QUIC or Cloudflare R2/CDN are optional extensions when a real
+model-host URL is provided.
 
 ## Runtime path
 
@@ -22,11 +34,14 @@ repo root Dockerfile
 
 /app/backend/models/models.json
 /app/backend/models/class_labels.json
-/app/backend/models/resnet18_finetuned.onnx
-/app/backend/models/custom_cnn_small_int8_qdq.onnx
+/app/backend/models/hetmcl_lite_best_stop_int8_qdq.onnx
+/app/backend/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
 ```
 
-The packaged deployment models are the ResNet18 fine-tuned transfer-learning classifier and the Custom CNN Small INT8 classifier. ResNet18 remains the active default; Custom CNN is included as a lightweight comparison model with the same 4-class output contract. The backend model registry can list additional showcase candidates later, but only entries whose ONNX file exists under `deployment/backend/models/` are runnable in the Docker build.
+The packaged deployment models are HETMCL-lite INT8 and Semantic-Guided CG-AF
+INT8. HETMCL remains the active default for backend `/predict`; CG-AF uses its
+`scene_logits` output for the same 4-class response contract. The same two ONNX
+artifacts are also the browser-side Local mode models.
 
 ## Model selection
 
@@ -40,10 +55,10 @@ Each registry entry reports whether it is packaged:
 
 ```json
 {
-  "id": "resnet18_finetuned",
-  "display_name": "ResNet18 fine-tuned",
+  "id": "hetmcl_lite_int8",
+  "display_name": "HETMCL-lite ResNet18 Hybrid (INT8)",
   "available": true,
-  "role": "Packaged final baseline"
+  "role": "Packaged backend and edge classifier"
 }
 ```
 
@@ -56,7 +71,12 @@ multipart form fields:
   model_id: model ID from /models
 ```
 
-The current registry intentionally lists only the two packaged models. If another model is added later, copy its ONNX file to `deployment/backend/models/` and make sure its `models.json` entry has the correct tensor names and preprocessing settings; otherwise the frontend will mark it as `Not packaged` and the backend will reject direct calls with HTTP 404.
+The current registry intentionally lists only HETMCL-lite INT8 and
+Semantic-Guided CG-AF INT8. If another model is added later, copy its ONNX file
+to `deployment/backend/models/` and make sure its `models.json` entry has the
+correct tensor names and preprocessing settings; otherwise the frontend will
+mark it as `Not packaged` and the backend will reject direct calls with HTTP
+404.
 
 ## GPU, CPU, and Mac behavior
 
@@ -75,6 +95,12 @@ From the repository root:
 ```powershell
 docker build -t csc3109-aerial-classifier .
 docker run --rm -p 8080:8080 csc3109-aerial-classifier
+```
+
+For a Cloudflare/R2 model host, pass the ONNX base URL at image build time:
+
+```powershell
+docker build --build-arg VITE_ONNX_MODEL_BASE_URL=https://models.example.com/models -t csc3109-aerial-classifier .
 ```
 
 Open the frontend at:
@@ -98,15 +124,15 @@ Invoke-RestMethod http://localhost:8080/models
 Prediction endpoint with curl:
 
 ```powershell
-curl.exe -F "file=@data\set 12\bridge\bridge001.jpg" -F "model_id=resnet18_finetuned" http://localhost:8080/predict
+curl.exe -F "file=@data\raw\val\bridge\bridge722.jpg" -F "model_id=hetmcl_lite_int8" http://localhost:8080/predict
 ```
 
 The prediction response has this shape:
 
 ```json
 {
-  "model_id": "resnet18_finetuned",
-  "display_name": "ResNet18 fine-tuned",
+  "model_id": "hetmcl_lite_int8",
+  "display_name": "HETMCL-lite ResNet18 Hybrid (INT8)",
   "predicted_label": "bridge",
   "confidence": 0.998,
   "class_scores": {
@@ -120,21 +146,37 @@ The prediction response has this shape:
 }
 ```
 
-## Exporting the ONNX model
+## Local Caddy + browser ONNX smoke path
 
-If `deployment/backend/models/resnet18_finetuned.onnx` is missing, export it from the local ResNet checkpoint before building the final image:
+For the full local demo, run the FastAPI/frontend container behind Caddy and
+serve the same HETMCL/CG-AF ONNX artifacts from `/edge-models/models`:
 
-```powershell
-.\.venv\Scripts\python.exe -m src.quantization.export_onnx_classifier `
-  --checkpoint model/resnet18_finetune_last_block.pt `
-  --output-dir deployment\backend\models `
-  --onnx-fp32-output resnet18_finetuned.onnx `
-  --exporter legacy_tracer `
-  --device cpu
+```bash
+docker compose -f deployment/edge_onnx/compose.local.yaml up --build
 ```
 
-Do not copy the raw dataset or old training checkpoints into the Docker image. The image only needs the backend code, the frontend build, the two selected packaged ONNX model files, and the class-label/registry JSON files.
+Open `http://127.0.0.1:8090`. Web mode uses backend `/predict`; Local mode
+downloads ONNX from Caddy, caches it in the browser, and runs ONNX Runtime Web.
 
-## What this replaces
+Use:
 
-Earlier planning discussed static-only hosting, Caddy, CDN delivery, Brotli, and browser-side ONNX. Those may be useful optimisations later, but they do not by themselves prove a containerised inference endpoint. For this submission path, the old Caddy/static Docker route is deprecated in favour of the root `Dockerfile`.
+```bash
+docker compose -f deployment/edge_onnx/compose.local.yaml down
+```
+
+to stop the stack.
+
+Do not copy the raw dataset or old training checkpoints into the Docker image.
+The image only needs the backend code, frontend build, the two selected ONNX
+model files, and the class-label/registry JSON files.
+
+## Optional VPS/CDN path
+
+The local demo is the primary target. If a VPS/domain is available, put Caddy in
+front of the same app container and use the same `/edge-models/models` route for
+ONNX delivery. Caddy can obtain ACME/Let's Encrypt certificates and serve HTTP/3
+when TCP/443 and UDP/443 are open.
+
+Cloudflare is optional: upload raw ONNX files to R2 with a custom CDN domain and
+build the frontend with `VITE_ONNX_MODEL_BASE_URL=https://models.example.com/models`.
+Cloudflare handles CDN/protocol/compression behavior for that path.
