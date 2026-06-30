@@ -9,6 +9,16 @@ __pycache__
 .opencode
 data
 model
+!model/
+model/*
+!model/hetmcl_lite/
+model/hetmcl_lite/*
+!model/hetmcl_lite/onnx/
+model/hetmcl_lite/onnx/*
+!model/hetmcl_lite/onnx/hetmcl_lite_best_stop_int8_qdq.onnx
+!model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/
+model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/*
+!model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
 notebooks
 reports
 scripts
@@ -19,5 +29,6 @@ experiments
 deployment/frontend/node_modules
 deployment/frontend/dist
 deployment/frontend/public/models
+deployment/backend/models/*.onnx
 *.log
 *.tmp
