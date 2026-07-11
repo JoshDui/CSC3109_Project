@@ -1,0 +1,45 @@
+{
+	email 2401107@sit.singaporetech.edu.sg
+}
+
+# Option A: same public app hostname.
+# - /edge-models/* serves browser-side ONNX artifacts from /srv/edge-models.
+# - everything else proxies to Joshua's containerized app/API on localhost:8080.
+# Keep TCP/443 and UDP/443 open for HTTPS and HTTP/3.
+app.example.com {
+	header {
+		X-Content-Type-Options "nosniff"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Embedder-Policy "require-corp"
+	}
+
+	handle_path /edge-models/* {
+		root * /srv/edge-models
+		header Access-Control-Allow-Origin "*"
+		header Cross-Origin-Resource-Policy "cross-origin"
+		header Cache-Control "public, max-age=31536000, immutable"
+		header Content-Type "application/octet-stream"
+		file_server {
+			precompressed br gzip
+		}
+	}
+
+	reverse_proxy 127.0.0.1:8080
+}
+
+# Option B: separate model CDN hostname.
+# Stage files under /srv/edge-models/models/*.onnx[.br].
+models.example.com {
+	root * /srv/edge-models
+
+	header Access-Control-Allow-Origin "*"
+	header Cross-Origin-Resource-Policy "cross-origin"
+	header Cache-Control "public, max-age=31536000, immutable"
+
+	@onnx path /models/*.onnx
+	header @onnx Content-Type "application/octet-stream"
+
+	file_server {
+		precompressed br gzip
+	}
+}

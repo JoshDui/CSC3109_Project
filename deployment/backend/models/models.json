@@ -1,0 +1,41 @@
+{
+  "active_model": "hetmcl_lite_int8",
+  "models": {
+    "hetmcl_lite_int8": {
+      "name": "HETMCL-lite ResNet18 Hybrid INT8",
+      "display_name": "HETMCL-lite ResNet18 Hybrid (INT8)",
+      "description": "Hybrid ResNet18-based classifier packaged for backend inference and mirrored by the browser ONNX path.",
+      "family": "HETMCL-lite",
+      "role": "Packaged backend and edge classifier",
+      "onnx_path": "hetmcl_lite_best_stop_int8_qdq.onnx",
+      "labels_path": "class_labels.json",
+      "input_name": "images",
+      "output_name": "logits",
+      "input_size": [224, 224],
+      "resize_size": 224,
+      "resize_mode": "stretch",
+      "mean": [0.485, 0.456, 0.406],
+      "std": [0.229, 0.224, 0.225],
+      "interpolation": "bilinear",
+      "preprocessing": "resize directly to 224, scale to [0,1], ImageNet normalization, NCHW"
+    },
+    "semantic_guided_cgaf_int8": {
+      "name": "Semantic-Guided CG-AF INT8",
+      "display_name": "Semantic-Guided CG-AF (INT8)",
+      "description": "Semantic-guided scene classifier with segmentation logits; backend /predict uses scene_logits for the same 4-class output contract.",
+      "family": "Semantic-Guided CG-AF",
+      "role": "Packaged backend and edge semantic classifier",
+      "onnx_path": "semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx",
+      "labels_path": "class_labels.json",
+      "input_name": "images",
+      "output_name": "scene_logits",
+      "input_size": [512, 512],
+      "resize_size": 512,
+      "resize_mode": "stretch",
+      "mean": [0.485, 0.456, 0.406],
+      "std": [0.229, 0.224, 0.225],
+      "interpolation": "bilinear",
+      "preprocessing": "resize directly to 512, scale to [0,1], ImageNet normalization, NCHW; /predict reads scene_logits"
+    }
+  }
+}

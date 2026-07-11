@@ -1,60 +1,42 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { fetchModels, predictImage, type ModelSummary, type PredictResponse } from "./api/predict";
+import { fetchModelCatalog, type ModelConfig } from "./onnx/modelRegistry";
+import { classifyImage, loadModel, type InferenceResult } from "./onnx/ortInference";
 import "./styles.css";
-import {
-  fetchModelCatalog,
-  type ModelConfig,
-} from "./onnx/modelRegistry";
-import {
-  benchmark,
-  classifyImage,
-  loadModel,
-  type BenchmarkResult,
-  type InferenceResult,
-  type LoadedModel,
-} from "./onnx/ortInference";
-import { colorForClass, type SegmentationOverlay } from "./onnx/segmentation";
 
-type Status =
-  | "idle"
-  | "loading-catalog"
-  | "ready"
-  | "loading-model"
-  | "loading-overlay-model"
-  | "classifying"
-  | "segmenting-overlay"
-  | "benchmarking"
-  | "error";
+type Status = "loading-models" | "idle" | "predicting" | "error" | "complete";
+type InferenceMode = "web" | "local";
 
-interface OverlayRun {
-  inferenceMs: number;
-  provider: string;
-}
+const CLASS_ORDER = ["bridge", "freeway", "overpass", "railway"];
+const LOCAL_ONNX_MODEL_IDS = new Set(["hetmcl_lite_int8", "semantic_guided_cgaf_int8"]);
 
 export function App() {
-  const [models, setModels] = useState<ModelConfig[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [loadedClassifier, setLoadedClassifier] = useState<LoadedModel | null>(null);
-  const [loadedOverlay, setLoadedOverlay] = useState<LoadedModel | null>(null);
-  const [classificationResult, setClassificationResult] = useState<InferenceResult | null>(null);
-  const [segmentationOverlay, setSegmentationOverlay] = useState<SegmentationOverlay | null>(null);
-  const [overlayRun, setOverlayRun] = useState<OverlayRun | null>(null);
-  const [bench, setBench] = useState<BenchmarkResult | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [status, setStatus] = useState<Status>("idle");
+  const [models, setModels] = useState<ModelSummary[]>([]);
+  const [localModels, setLocalModels] = useState<ModelConfig[]>([]);
+  const [selectedModelId, setSelectedModelId] = useState<string>("");
+  const [selectedLocalModelId, setSelectedLocalModelId] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [result, setResult] = useState<PredictResponse | null>(null);
+  const [localResult, setLocalResult] = useState<InferenceResult | null>(null);
+  const [inferenceMode, setInferenceMode] = useState<InferenceMode>("web");
+  const [status, setStatus] = useState<Status>("loading-models");
   const [error, setError] = useState<string | null>(null);
 
-  const imgRef = useRef<HTMLImageElement | null>(null);
-
   useEffect(() => {
-    setStatus("loading-catalog");
-    fetchModelCatalog()
-      .then((catalog) => {
-        const classifiers = catalog.filter((model) => model.task === "classification");
-        setModels(catalog);
-        setSelectedId(classifiers[0]?.id ?? null);
-        setStatus("ready");
+    Promise.all([fetchModels(), fetchModelCatalog()])
+      .then(([catalog, localCatalog]) => {
+        setModels(catalog.models);
+        setLocalModels(
+          localCatalog.filter((model) => LOCAL_ONNX_MODEL_IDS.has(model.id)),
+        );
+        const firstRunnable = catalog.models.find((model) => model.id === catalog.active_model && model.available)
+          ?? catalog.models.find((model) => model.available)
+          ?? catalog.models[0];
+        setSelectedModelId(firstRunnable?.id ?? "");
+        setSelectedLocalModelId(localCatalog.find((model) => model.id === "hetmcl_lite_int8")?.id ?? "");
+        setStatus("idle");
       })
       .catch((cause) => {
         setStatus("error");
@@ -64,170 +46,138 @@ export function App() {
 
   useEffect(() => {
     return () => {
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-  }, [imageUrl]);
+  }, [previewUrl]);
 
-  const classifierModels = models.filter((model) => model.task === "classification");
-  const overlayModel = models.find((model) => model.task === "segmentation_scene") ?? null;
-  const selected = classifierModels.find((model) => model.id === selectedId) ?? null;
-  const busy =
-    status === "loading-model" ||
-    status === "loading-overlay-model" ||
-    status === "classifying" ||
-    status === "segmenting-overlay" ||
-    status === "benchmarking";
-  const overlayAvailable = Boolean(segmentationOverlay);
-  const overlayVisible = overlayAvailable && showOverlay;
-  const overlayBusy = status === "loading-overlay-model" || status === "segmenting-overlay";
+  const selectedModel = useMemo(
+    () => models.find((model) => model.id === selectedModelId) ?? null,
+    [models, selectedModelId],
+  );
+  const selectedLocalModel = useMemo(
+    () => localModels.find((model) => model.id === selectedLocalModelId) ?? null,
+    [localModels, selectedLocalModelId],
+  );
 
-  const onSelectModel = useCallback((id: string) => {
-    setSelectedId(id);
-    setLoadedClassifier(null);
-    setClassificationResult(null);
-    setBench(null);
+  const scores = useMemo(() => {
+    if (inferenceMode === "local") {
+      if (!localResult) return [];
+      return CLASS_ORDER.map((label) => ({
+        label,
+        value: localResult.predictions.find((prediction) => prediction.label === label)?.prob ?? 0,
+      }));
+    }
+    if (!result) return [];
+    return CLASS_ORDER.map((label) => ({
+      label,
+      value: result.class_scores[label] ?? 0,
+    }));
+  }, [inferenceMode, localResult, result]);
+
+  const activeResult = inferenceMode === "local" ? localResult : result;
+  const activeModel = inferenceMode === "local" ? selectedLocalModel : selectedModel;
+  const activeModelAvailable = inferenceMode === "local" ? Boolean(selectedLocalModel) : Boolean(selectedModel?.available);
+
+  function selectFile(nextFile: File | undefined) {
+    if (!nextFile) return;
+    if (!nextFile.type.startsWith("image/")) {
+      setStatus("error");
+      setError("Please choose an image file.");
+      return;
+    }
+    setFile(nextFile);
+    setResult(null);
+    setLocalResult(null);
     setError(null);
-  }, []);
-
-  const onFile = useCallback((file: File | undefined) => {
-    if (!file) return;
-    setClassificationResult(null);
-    setSegmentationOverlay(null);
-    setOverlayRun(null);
-    setBench(null);
-    setError(null);
-    setShowOverlay(false);
-    setImageUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(file);
+    setStatus("idle");
+    setPreviewUrl((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return URL.createObjectURL(nextFile);
     });
-  }, []);
+  }
 
-  const ensureClassifierLoaded = useCallback(async () => {
-    if (!selected) return null;
-    if (loadedClassifier?.config.id === selected.id) return loadedClassifier;
-    setStatus("loading-model");
-    const next = await loadModel(selected);
-    setLoadedClassifier(next);
-    return next;
-  }, [selected, loadedClassifier]);
-
-  const ensureOverlayLoaded = useCallback(async () => {
-    if (!overlayModel) return null;
-    if (loadedOverlay?.config.id === overlayModel.id) return loadedOverlay;
-    setStatus("loading-overlay-model");
-    const next = await loadModel(overlayModel);
-    setLoadedOverlay(next);
-    return next;
-  }, [overlayModel, loadedOverlay]);
-
-  const onClassify = useCallback(async () => {
-    if (!imgRef.current) return;
-    setError(null);
-    try {
-      const model = await ensureClassifierLoaded();
-      if (!model) return;
-      setStatus("classifying");
-      const inference = await classifyImage(model, imgRef.current);
-      setClassificationResult(inference);
-      setStatus("ready");
-    } catch (cause) {
-      setStatus("error");
-      setError(cause instanceof Error ? cause.message : String(cause));
+  function chooseModel(modelId: string) {
+    if (inferenceMode === "local") {
+      setSelectedLocalModelId(modelId);
+    } else {
+      setSelectedModelId(modelId);
     }
-  }, [ensureClassifierLoaded]);
-
-  const onShowOverlay = useCallback(async () => {
-    if (!imgRef.current) return;
+    setResult(null);
+    setLocalResult(null);
     setError(null);
-    if (segmentationOverlay) {
-      setShowOverlay(true);
+    setStatus("idle");
+  }
+
+  function chooseMode(mode: InferenceMode) {
+    setInferenceMode(mode);
+    setResult(null);
+    setLocalResult(null);
+    setError(null);
+    setStatus("idle");
+  }
+
+  async function runPrediction() {
+    if (!file || !activeModel) return;
+    if (!activeModelAvailable) {
+      setStatus("error");
+      setError(
+        inferenceMode === "local"
+          ? "No local/browser ONNX model is configured. Check models.json and VITE_ONNX_MODEL_BASE_URL."
+          : `${selectedModel?.display_name ?? "Selected model"} is listed for showcase, but its ONNX file is not packaged in this Docker build.`,
+      );
       return;
     }
 
-    if (!overlayModel) {
-      setStatus("error");
-      setError("Semantic overlay model is not available in the catalog.");
-      return;
-    }
-
+    setStatus("predicting");
+    setError(null);
     try {
-      const model = await ensureOverlayLoaded();
-      if (!model) return;
-      setStatus("segmenting-overlay");
-      const inference = await classifyImage(model, imgRef.current);
-      if (!inference.segmentation) {
-        throw new Error("Semantic overlay model did not return segmentation logits.");
+      if (inferenceMode === "local") {
+        if (!selectedLocalModel) throw new Error("No local/browser ONNX model is selected.");
+        const image = await createImageBitmap(file);
+        try {
+          const loaded = await loadModel(selectedLocalModel);
+          setLocalResult(await classifyImage(loaded, image));
+        } finally {
+          image.close();
+        }
+      } else {
+        if (!selectedModel) throw new Error("No web inference model is selected.");
+        const prediction = await predictImage(file, selectedModel.id);
+        setResult(prediction);
       }
-      setSegmentationOverlay(inference.segmentation);
-      setOverlayRun({ inferenceMs: inference.inferenceMs, provider: inference.provider });
-      setShowOverlay(true);
-      setStatus("ready");
+      setStatus("complete");
     } catch (cause) {
       setStatus("error");
       setError(cause instanceof Error ? cause.message : String(cause));
     }
-  }, [ensureOverlayLoaded, overlayModel, segmentationOverlay]);
+  }
 
-  const onBenchmark = useCallback(async () => {
-    if (!imgRef.current) return;
-    setError(null);
-    try {
-      const model = await ensureClassifierLoaded();
-      if (!model) return;
-      setStatus("benchmarking");
-      const measured = await benchmark(model, imgRef.current, 30);
-      setBench(measured);
-      setStatus("ready");
-    } catch (cause) {
-      setStatus("error");
-      setError(cause instanceof Error ? cause.message : String(cause));
-    }
-  }, [ensureClassifierLoaded]);
-
-  const overlayTitle = !imageUrl
-    ? "Upload an image first"
-    : overlayAvailable
-      ? "Show semantic segmentation overlay"
-      : "Run the semantic-guided model and show overlay";
-
-  const overlayLabel = overlayBusy
-    ? status === "loading-overlay-model"
-      ? "Loading…"
-      : "Segmenting…"
-    : "Overlay";
+  const runnableCount = models.filter((model) => model.available).length;
+  const displayedModels = inferenceMode === "local" ? localModels : models;
+  const selectedDisplayId = inferenceMode === "local" ? selectedLocalModelId : selectedModelId;
+  const endpointLabel = inferenceMode === "local" ? "Browser ONNX" : "POST /predict";
 
   return (
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">CSC3109 deployment</p>
-          <h1>Aerial Edge Classifier</h1>
+          <p className="eyebrow">CSC3109 deployment | Group 12</p>
+          <h1>Aerial image classifier</h1>
         </div>
-        <p className="topbar-note">Browser-side ONNX inference · images stay local</p>
+        <div className="endpoint-chip" aria-label="Backend prediction endpoint">
+          <span>{inferenceMode === "local" ? "Local inference" : "Web inference"}</span>
+          <strong>{endpointLabel}</strong>
+        </div>
       </header>
 
       <section className="workspace">
-        <div className="image-panel panel">
-          <div className="image-toolbar">
-            <span>Image</span>
-            <div className="toggle-group" aria-label="Image view toggles">
-              <button
-                className={!overlayVisible ? "toggle active" : "toggle"}
-                onClick={() => setShowOverlay(false)}
-                disabled={!imageUrl || overlayBusy}
-              >
-                Raw
-              </button>
-              <button
-                className={overlayVisible ? "toggle active" : "toggle"}
-                onClick={onShowOverlay}
-                disabled={!imageUrl || !overlayModel || busy}
-                title={overlayTitle}
-              >
-                {overlayLabel}
-              </button>
+        <section className="panel image-panel">
+          <div className="panel-header">
+            <div>
+              <p className="eyebrow">Input</p>
+              <h2>Upload aerial image</h2>
             </div>
+            {file ? <span className="file-name">{file.name}</span> : null}
           </div>
 
           <div
@@ -235,155 +185,116 @@ export function App() {
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault();
-              onFile(event.dataTransfer.files?.[0]);
+              selectFile(event.dataTransfer.files?.[0]);
             }}
           >
-            {imageUrl ? (
-              <div className="image-frame">
-                <img ref={imgRef} src={imageUrl} alt="Uploaded aerial scene" className="base-image" />
-                {overlayVisible && segmentationOverlay ? (
-                  <img
-                    className="overlay-image"
-                    src={segmentationOverlay.dataUrl}
-                    alt="Semantic segmentation overlay"
-                  />
-                ) : null}
-              </div>
+            {previewUrl ? (
+              <img src={previewUrl} alt="Uploaded aerial scene preview" className="preview-image" />
             ) : (
               <label className="empty-state">
-                <input type="file" accept="image/*" onChange={(e) => onFile(e.target.files?.[0])} />
-                <strong>Upload aerial image</strong>
-                <span>Drop here or click to choose an image. It stays local.</span>
+                <input type="file" accept="image/*" onChange={(event) => selectFile(event.target.files?.[0])} />
+                <strong>Select image</strong>
+                <span>Drop an aerial image here or choose one from disk.</span>
               </label>
             )}
           </div>
 
-          {imageUrl ? (
-            <label className="replace-link">
-              Replace image
-              <input type="file" accept="image/*" onChange={(e) => onFile(e.target.files?.[0])} />
+          <div className="actions">
+            <label className="ghost-button">
+              {file ? "Replace image" : "Choose image"}
+              <input type="file" accept="image/*" onChange={(event) => selectFile(event.target.files?.[0])} />
             </label>
-          ) : null}
-        </div>
+            <button
+              className="primary-button"
+              onClick={runPrediction}
+              disabled={!file || !activeModelAvailable || status === "predicting"}
+            >
+              {status === "predicting" ? "Predicting..." : inferenceMode === "local" ? "Run local ONNX" : "Run prediction"}
+            </button>
+          </div>
+        </section>
 
         <aside className="side-panel">
-          <section className="panel result-card">
-            <p className="eyebrow">Classifier results</p>
-            {classificationResult ? (
-              <>
-                <div className="prediction-header">
-                  <strong>{classificationResult.top.label}</strong>
-                  <span>{(classificationResult.top.prob * 100).toFixed(1)}%</span>
-                </div>
-                <div className="bars">
-                  {classificationResult.predictions.map((prediction) => (
-                    <div className="bar-row" key={prediction.label}>
-                      <span className="bar-label">{prediction.label}</span>
-                      <span className="bar-track">
-                        <span
-                          className="bar-fill"
-                          style={{ width: `${(prediction.prob * 100).toFixed(1)}%` }}
-                        />
-                      </span>
-                      <span className="bar-value">{(prediction.prob * 100).toFixed(1)}%</span>
-                    </div>
-                  ))}
-                </div>
-
-              </>
-            ) : (
-              <p className="muted">Run a model to see final class probabilities and raw output summary.</p>
-            )}
-
-            {segmentationOverlay ? (
-              <div className="legend">
-                <p className="muted">Segmentation overlay classes</p>
-                <div className="legend-grid">
-                  {segmentationOverlay.labels.map((label, classId) => (
-                    <span key={label} className="legend-item">
-                      <span className="swatch" style={{ backgroundColor: rgb(colorForClass(classId)) }} />
-                      {label}
-                    </span>
-                  ))}
-                </div>
+          <section className="panel model-panel">
+            <div className="model-panel-header">
+              <div>
+                <p className="eyebrow">Model showcase</p>
+                <h2>{inferenceMode === "local" ? `${localModels.length} CDN ONNX models` : `${runnableCount} packaged / ${models.length} listed`}</h2>
               </div>
-            ) : null}
-          </section>
-
-          <section className="panel controls-card">
-            <p className="eyebrow">Model + runtime</p>
+            </div>
+            <div className="mode-switch" aria-label="Inference mode">
+              <button className={inferenceMode === "web" ? "mode-option active" : "mode-option"} onClick={() => chooseMode("web")} type="button">
+                <strong>Web</strong>
+                <span>backend /predict</span>
+              </button>
+              <button className={inferenceMode === "local" ? "mode-option active" : "mode-option"} onClick={() => chooseMode("local")} type="button">
+                <strong>Local</strong>
+                <span>CDN cached model</span>
+              </button>
+            </div>
             <div className="model-list">
-              {classifierModels.map((model) => (
+              {displayedModels.map((model) => (
                 <button
                   key={model.id}
-                  className={`model-option ${model.id === selectedId ? "selected" : ""}`}
-                  onClick={() => onSelectModel(model.id)}
-                  disabled={busy}
+                  className={`model-option ${model.id === selectedDisplayId ? "selected" : ""}`}
+                  onClick={() => chooseModel(model.id)}
+                  type="button"
                 >
-                  <span>
-                    <strong>{model.displayName}</strong>
+                  <span className="model-copy">
+                    <strong>{"display_name" in model ? model.display_name : model.displayName}</strong>
                     <small>{model.description}</small>
+                  </span>
+                  <span className={inferenceMode === "local" || ("available" in model && model.available) ? "status-chip ready" : "status-chip pending"}>
+                    {inferenceMode === "local" ? "CDN" : "available" in model && model.available ? "Packaged" : "Not packaged"}
                   </span>
                 </button>
               ))}
             </div>
+          </section>
 
-            {selected ? (
-              <dl className="telemetry">
-                <dt>Selected</dt>
-                <dd>{selected.displayName}</dd>
-                <dt>Input</dt>
-                <dd>{selected.preprocessing.imageSize}×{selected.preprocessing.imageSize}</dd>
-                <dt>Providers</dt>
-                <dd>{selected.preferredEP.join(" → ")}</dd>
-                <dt>Overlay</dt>
-                <dd>{overlayModel ? "toggle runs Semantic-Guided CG-AF" : "not available"}</dd>
-              </dl>
-            ) : null}
+          <section className="panel result-panel">
+            <p className="eyebrow">Prediction</p>
+            {activeResult ? (
+              <>
+                <div className="prediction-header">
+                  <span>{inferenceMode === "local" ? localResult?.top.label : result?.predicted_label}</span>
+                  <strong>{formatPercent(inferenceMode === "local" ? localResult?.top.prob ?? 0 : result?.confidence ?? 0)}</strong>
+                </div>
+                <div className="score-list">
+                  {scores.map((score) => (
+                    <div className="score-row" key={score.label}>
+                      <span className="score-label">{score.label}</span>
+                      <span className="score-track">
+                        <span className="score-fill" style={{ width: formatPercent(score.value) }} />
+                      </span>
+                      <span className="score-value">{formatPercent(score.value)}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="muted">Choose Web for backend inference or Local to fetch/cache an ONNX model from the CDN and run it in this browser.</p>
+            )}
+          </section>
 
-            <div className="actions">
-              <button className="primary" onClick={onClassify} disabled={!selected || !imageUrl || busy}>
-                {status === "classifying" ? "Classifying…" : "Classify"}
-              </button>
-              <button className="ghost" onClick={onBenchmark} disabled={!selected || !imageUrl || busy}>
-                {status === "benchmarking" ? "Benchmarking…" : "Benchmark ×30"}
-              </button>
-            </div>
-
-            {loadedClassifier || classificationResult || loadedOverlay || overlayRun || bench ? (
-              <dl className="telemetry runtime">
-                {loadedClassifier ? (
-                  <>
-                    <dt>Classifier load</dt>
-                    <dd>{loadedClassifier.loadMs.toFixed(1)} ms</dd>
-                  </>
-                ) : null}
-                {classificationResult ? (
-                  <>
-                    <dt>Last inference</dt>
-                    <dd>{classificationResult.inferenceMs.toFixed(1)} ms · {classificationResult.provider}</dd>
-                  </>
-                ) : null}
-                {loadedOverlay ? (
-                  <>
-                    <dt>Overlay load</dt>
-                    <dd>{loadedOverlay.loadMs.toFixed(1)} ms</dd>
-                  </>
-                ) : null}
-                {overlayRun ? (
-                  <>
-                    <dt>Overlay run</dt>
-                    <dd>{overlayRun.inferenceMs.toFixed(1)} ms · {overlayRun.provider}</dd>
-                  </>
-                ) : null}
-                {bench ? (
-                  <>
-                    <dt>Benchmark</dt>
-                    <dd>{bench.medianMs.toFixed(1)} ms median · {bench.fps.toFixed(1)} fps</dd>
-                  </>
-                ) : null}
-              </dl>
-            ) : null}
+          <section className="panel detail-panel">
+            <p className="eyebrow">Runtime</p>
+            <dl>
+              <dt>Endpoint</dt>
+              <dd>{endpointLabel}</dd>
+              <dt>Selected</dt>
+              <dd>{inferenceMode === "local" ? selectedLocalModel?.displayName ?? "Loading local models" : selectedModel?.display_name ?? "Loading models"}</dd>
+              <dt>Role</dt>
+              <dd>{inferenceMode === "local" ? "CDN/browser ONNX" : selectedModel?.role ?? "-"}</dd>
+              <dt>Model</dt>
+              <dd>{inferenceMode === "local" ? selectedLocalModel?.id ?? "-" : result?.display_name ?? selectedModel?.family ?? "-"}</dd>
+              <dt>Inference</dt>
+              <dd>{inferenceMode === "local" ? localResult ? `${localResult.inferenceMs.toFixed(1)} ms` : "Waiting for image" : result ? `${result.inference_ms.toFixed(1)} ms` : "Waiting for image"}</dd>
+              <dt>Provider</dt>
+              <dd>{inferenceMode === "local" ? localResult?.provider ?? "Browser ORT" : result?.execution_provider ?? "Detected by backend"}</dd>
+              <dt>Preprocess</dt>
+              <dd>{inferenceMode === "local" ? `${selectedLocalModel?.preprocessing.imageSize ?? "-"}×${selectedLocalModel?.preprocessing.imageSize ?? "-"}` : result?.preprocessing ?? selectedModel?.preprocessing ?? "-"}</dd>
+            </dl>
           </section>
         </aside>
       </section>
@@ -393,6 +304,6 @@ export function App() {
   );
 }
 
-function rgb(color: [number, number, number]): string {
-  return `rgb(${color[0]} ${color[1]} ${color[2]})`;
+function formatPercent(value: number): string {
+  return `${(value * 100).toFixed(1)}%`;
 }

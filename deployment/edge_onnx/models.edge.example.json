@@ -1,0 +1,20 @@
+{
+  "labels": ["bridge", "freeway", "overpass", "railway"],
+  "segmentationLabels": ["background", "bridge", "freeway", "overpass", "railway"],
+  "models": [
+    {
+      "id": "hetmcl_lite_int8",
+      "displayName": "HETMCL-lite ResNet18 Hybrid (INT8)",
+      "description": "Hybrid ResNet18-based classifier served from the ONNX edge model CDN.",
+      "artifact": "hetmcl_lite_best_stop_int8_qdq.onnx",
+      "runtimeProfile": "imagenet-224-bilinear-classifier"
+    },
+    {
+      "id": "semantic_guided_cgaf_int8",
+      "displayName": "Semantic-Guided CG-AF (INT8)",
+      "description": "Scene classifier served from the ONNX edge model CDN.",
+      "artifact": "semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx",
+      "runtimeProfile": "semantic-cgaf-512-overlay"
+    }
+  ]
+}

@@ -35,7 +35,8 @@ interface ModelCatalogEntry {
   id: string;
   displayName: string;
   description: string;
-  url: string;
+  url?: string;
+  artifact?: string;
   runtimeProfile: RuntimeProfileId;
 }
 
@@ -98,10 +99,9 @@ const RUNTIME_PROFILES = {
     preferredEP: ["wasm", "webgpu"],
   },
   "semantic-cgaf-512-overlay": {
-    task: "segmentation_scene",
+    task: "classification",
     inputName: "images",
     classificationOutputName: "scene_logits",
-    segmentationOutputName: "segmentation_logits",
     preprocessing: {
       imageSize: 512,
       resize: "stretch",
@@ -116,6 +116,7 @@ const RUNTIME_PROFILES = {
 export type RuntimeProfileId = keyof typeof RUNTIME_PROFILES;
 
 export const catalogUrl = import.meta.env.VITE_MODEL_CATALOG_URL ?? "/models.json";
+export const modelBaseUrl = trimTrailingSlash(import.meta.env.VITE_ONNX_MODEL_BASE_URL ?? "/edge-models/models");
 
 export async function fetchModelCatalog(url = catalogUrl): Promise<ModelConfig[]> {
   const response = await fetch(url, {
@@ -142,9 +143,22 @@ function normalizeModelEntry(entry: ModelCatalogEntry, catalog: ModelCatalog): M
   return {
     ...entry,
     ...profile,
+    url: resolveModelUrl(entry),
     labels: catalog.labels ?? CLASS_LABELS,
-    segmentationLabels: profile.task === "segmentation_scene" ? catalog.segmentationLabels ?? SEGMENTATION_LABELS : undefined,
+    segmentationLabels: undefined,
   };
+}
+
+function resolveModelUrl(entry: ModelCatalogEntry): string {
+  if (entry.url) return entry.url;
+  if (!entry.artifact) {
+    throw new Error(`Model '${entry.id}' must define either 'url' or 'artifact'`);
+  }
+  return `${modelBaseUrl}/${entry.artifact}`;
+}
+
+function trimTrailingSlash(value: string): string {
+  return value.endsWith("/") ? value.slice(0, -1) : value;
 }
 
 export function selectModel(models: ModelConfig[], id: string): ModelConfig {
