@@ -235,6 +235,9 @@ def build_model_from_bundle(bundle: CheckpointBundle) -> nn.Module:
             num_classes=num_classes,
             base_channels=int(bundle.args.get("base_channels", 32) or 32),
             dropout=float(bundle.args.get("dropout", 0.30) or 0.30),
+            use_residual=bool(bundle.args.get("use_residual", False)),
+            use_se=bool(bundle.args.get("use_se", False)),
+            drop_path_rate=float(bundle.args.get("drop_path_rate", 0.0) or 0.0),
         )
 
     if bundle.model_family == "resnet18_frozen":

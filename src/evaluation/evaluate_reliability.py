@@ -90,9 +90,15 @@ def load_model(checkpoint_path: Path, device: torch.device):
     args = ckpt.get("args", {})
     base_channels = int(args.get("base_channels", 32))
     dropout = float(args.get("dropout", 0.30))
+    use_residual = bool(args.get("use_residual", False))
+    use_se = bool(args.get("use_se", False))
+    drop_path_rate = float(args.get("drop_path_rate", 0.0) or 0.0)
     idx_to_class = ckpt["idx_to_class"]
     class_names = [idx_to_class[i] for i in sorted(idx_to_class)]
-    model = build_custom_cnn(num_classes=len(class_names), base_channels=base_channels, dropout=dropout)
+    model = build_custom_cnn(
+        num_classes=len(class_names), base_channels=base_channels, dropout=dropout,
+        use_residual=use_residual, use_se=use_se, drop_path_rate=drop_path_rate,
+    )
     model.load_state_dict(ckpt["model_state_dict"])
     model.to(device).eval()
     image_size = int(ckpt.get("image_size", IMAGE_SIZE))

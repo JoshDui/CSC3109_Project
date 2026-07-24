@@ -34,6 +34,53 @@ class ConvBlock(nn.Sequential):
         )
 
 
+class SqueezeExcite(nn.Module):
+    """Squeeze-and-Excitation channel attention."""
+
+    def __init__(self, channels: int, reduction: int = 8) -> None:
+        super().__init__()
+        hidden = max(8, channels // reduction)
+        self.fc = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(channels, hidden, kernel_size=1),
+            nn.GELU(),
+            nn.Conv2d(hidden, channels, kernel_size=1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x * self.fc(x)
+
+
+def drop_path(x: torch.Tensor, drop_prob: float, training: bool) -> torch.Tensor:
+    if drop_prob <= 0.0 or not training:
+        return x
+    keep = 1.0 - drop_prob
+    shape = (x.shape[0],) + (1,) * (x.ndim - 1)
+    mask = keep + torch.rand(shape, dtype=x.dtype, device=x.device)
+    return x * mask.floor_() / keep
+
+
+class ResidualStage(nn.Module):
+    """Two 3x3 conv blocks with an optional SE gate and a residual skip."""
+
+    def __init__(self, in_channels: int, out_channels: int, *, use_se: bool = True, drop_path_rate: float = 0.0) -> None:
+        super().__init__()
+        self.block = nn.Sequential(ConvBlock(in_channels, out_channels), ConvBlock(out_channels, out_channels))
+        self.se = SqueezeExcite(out_channels) if use_se else nn.Identity()
+        self.drop_path_rate = drop_path_rate
+        self.proj = (
+            nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False)
+            if in_channels != out_channels
+            else nn.Identity()
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        identity = self.proj(x)
+        out = self.se(self.block(x))
+        return identity + drop_path(out, self.drop_path_rate, self.training)
+
+
 class CustomCnnSmall(nn.Module):
     """Compact scratch-trained CNN for the 4-class aerial dataset.
 
@@ -44,27 +91,52 @@ class CustomCnnSmall(nn.Module):
     - use global average pooling to avoid a large overfitting-prone dense head
     """
 
-    def __init__(self, num_classes: int = NUM_CLASSES, base_channels: int = 32, dropout: float = 0.30) -> None:
+    def __init__(
+        self,
+        num_classes: int = NUM_CLASSES,
+        base_channels: int = 32,
+        dropout: float = 0.30,
+        *,
+        use_residual: bool = False,
+        use_se: bool = False,
+        drop_path_rate: float = 0.0,
+    ) -> None:
         super().__init__()
         c1 = base_channels
         c2 = base_channels * 2
         c3 = base_channels * 4
         c4 = base_channels * 8
+        self.use_residual = use_residual
 
-        self.features = nn.Sequential(
-            ConvBlock(3, c1),
-            ConvBlock(c1, c1),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            ConvBlock(c1, c2),
-            ConvBlock(c2, c2),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            ConvBlock(c2, c3),
-            ConvBlock(c3, c3),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            ConvBlock(c3, c4),
-            ConvBlock(c4, c4),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-        )
+        if not use_residual and not use_se and drop_path_rate == 0.0:
+            # Original plain VGG-style path (unchanged for baseline compatibility).
+            self.features = nn.Sequential(
+                ConvBlock(3, c1),
+                ConvBlock(c1, c1),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                ConvBlock(c1, c2),
+                ConvBlock(c2, c2),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                ConvBlock(c2, c3),
+                ConvBlock(c3, c3),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                ConvBlock(c3, c4),
+                ConvBlock(c4, c4),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+            )
+        else:
+            # Residual + optional SE + stochastic depth. Linearly ramp drop-path by depth.
+            dprs = [drop_path_rate * i / 3.0 for i in range(4)]
+            self.features = nn.Sequential(
+                ResidualStage(3, c1, use_se=use_se, drop_path_rate=dprs[0]),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                ResidualStage(c1, c2, use_se=use_se, drop_path_rate=dprs[1]),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                ResidualStage(c2, c3, use_se=use_se, drop_path_rate=dprs[2]),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                ResidualStage(c3, c4, use_se=use_se, drop_path_rate=dprs[3]),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+            )
         self.pool = nn.AdaptiveAvgPool2d(1)
         self.head = nn.Sequential(
             nn.Flatten(),
@@ -96,8 +168,18 @@ def build_custom_cnn(
     *,
     base_channels: int = CUSTOM_CNN_SMALL.base_channels,
     dropout: float = CUSTOM_CNN_SMALL.dropout,
+    use_residual: bool = False,
+    use_se: bool = False,
+    drop_path_rate: float = 0.0,
 ) -> nn.Module:
-    return CustomCnnSmall(num_classes=num_classes, base_channels=base_channels, dropout=dropout)
+    return CustomCnnSmall(
+        num_classes=num_classes,
+        base_channels=base_channels,
+        dropout=dropout,
+        use_residual=use_residual,
+        use_se=use_se,
+        drop_path_rate=drop_path_rate,
+    )
 
 
 def trainable_parameters(model: nn.Module):
