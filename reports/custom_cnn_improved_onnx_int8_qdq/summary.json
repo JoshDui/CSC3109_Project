@@ -1,0 +1,101 @@
+{
+  "accuracy_delta_int8_minus_fp32": 0.0,
+  "accuracy_fp32_torch": 0.995,
+  "accuracy_onnx_int8_qdq": 0.995,
+  "calibration_dir": "data/raw/train",
+  "calibration_images": 512,
+  "checkpoint": "model/custom_cnn_improve/wide_seed123/best_stop_model.pt",
+  "class_names": [
+    "bridge",
+    "freeway",
+    "overpass",
+    "railway"
+  ],
+  "comparison": [
+    {
+      "accuracy": 0.995,
+      "macro_f1": 0.9949999374984375,
+      "macro_precision": 0.9950247524752476,
+      "macro_recall": 0.9950000000000001,
+      "samples": 400,
+      "variant": "torch_fp32"
+    },
+    {
+      "accuracy": 0.995,
+      "macro_f1": 0.9949999374984375,
+      "macro_precision": 0.9950247524752476,
+      "macro_recall": 0.9950000000000001,
+      "samples": 400,
+      "variant": "onnx_fp32"
+    },
+    {
+      "accuracy": 0.995,
+      "macro_f1": 0.9949999374984375,
+      "macro_precision": 0.9950247524752476,
+      "macro_recall": 0.9950000000000001,
+      "samples": 400,
+      "variant": "onnx_int8_qdq"
+    }
+  ],
+  "export_manifest": "/home/william/school_projects/CSC3109_Project/model/custom_cnn_improve/wide_seed123/onnx/export_manifest.json",
+  "macro_f1_fp32_torch": 0.9949999374984375,
+  "macro_f1_onnx_int8_qdq": 0.9949999374984375,
+  "model_family": "custom_cnn",
+  "model_name": "custom-cnn-small",
+  "onnx_fp32_path": "model/custom_cnn_improve/wide_seed123/onnx/custom_cnn_224_fp32.onnx",
+  "onnx_int8_qdq_path": "model/custom_cnn_improve/wide_seed123/onnx/custom_cnn_224_int8_qdq.onnx",
+  "onnxruntime_version": "1.27.0",
+  "quantization": {
+    "activation_type": "QInt8",
+    "calibration_method": "minmax",
+    "elapsed_seconds": 21.884813865995966,
+    "observed_batches": 16,
+    "observed_images": 512,
+    "per_channel": true,
+    "quant_format": "QDQ",
+    "requested_batches": 16,
+    "weight_type": "QInt8"
+  },
+  "run_id": "20260724_151024",
+  "runtime": {
+    "onnx_fp32": {
+      "artifact_path": "model/custom_cnn_improve/wide_seed123/onnx/custom_cnn_224_fp32.onnx",
+      "artifact_size_bytes": 11383780,
+      "latency_mean_ms": 932.8525652514751,
+      "latency_measured_batches": 12,
+      "latency_p50_ms": 966.469827995752,
+      "provider": "CPUExecutionProvider",
+      "runtime": "onnxruntime"
+    },
+    "onnx_int8_qdq": {
+      "artifact_path": "model/custom_cnn_improve/wide_seed123/onnx/custom_cnn_224_int8_qdq.onnx",
+      "artifact_size_bytes": 3117662,
+      "latency_mean_ms": 1580.6379304194706,
+      "latency_measured_batches": 12,
+      "latency_p50_ms": 1643.883825003286,
+      "provider": "CPUExecutionProvider",
+      "quantization": {
+        "activation_type": "QInt8",
+        "calibration_method": "minmax",
+        "elapsed_seconds": 21.884813865995966,
+        "observed_batches": 16,
+        "observed_images": 512,
+        "per_channel": true,
+        "quant_format": "QDQ",
+        "requested_batches": 16,
+        "weight_type": "QInt8"
+      },
+      "runtime": "onnxruntime"
+    },
+    "torch_fp32": {
+      "artifact_path": "model/custom_cnn_improve/wide_seed123/best_stop_model.pt",
+      "artifact_size_bytes": 33513295,
+      "latency_mean_ms": 28.27428816696435,
+      "latency_measured_batches": 12,
+      "latency_p50_ms": 28.918085008626804,
+      "provider": "cuda",
+      "runtime": "torch"
+    }
+  },
+  "validation_dir": "data/raw/val"
+}
