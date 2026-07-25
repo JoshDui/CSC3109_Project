@@ -16,11 +16,7 @@ put_model() {
 }
 
 put_model \
-  "model/hetmcl_lite/onnx/hetmcl_lite_best_stop_int8_qdq.onnx" \
-  "hetmcl_lite_best_stop_int8_qdq.onnx"
-
-put_model \
   "model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx" \
   "semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx"
 
-echo "Uploaded ONNX edge models to r2://${R2_BUCKET}/${R2_PREFIX}/"
+echo "Uploaded CG-AF ONNX edge model to r2://${R2_BUCKET}/${R2_PREFIX}/"

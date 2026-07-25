@@ -3,13 +3,6 @@
   "segmentationLabels": ["background", "bridge", "freeway", "overpass", "railway"],
   "models": [
     {
-      "id": "hetmcl_lite_int8",
-      "displayName": "HETMCL-lite ResNet18 Hybrid (INT8)",
-      "description": "Hybrid ResNet18-based classifier served from the same-host ONNX edge path.",
-      "artifact": "hetmcl_lite_best_stop_int8_qdq.onnx",
-      "runtimeProfile": "imagenet-224-bilinear-classifier"
-    },
-    {
       "id": "semantic_guided_cgaf_int8",
       "displayName": "Semantic-Guided CG-AF (INT8)",
       "description": "Scene classifier plus semantic logits, served from the same-host ONNX edge path.",

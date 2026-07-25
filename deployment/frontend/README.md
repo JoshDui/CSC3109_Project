@@ -12,8 +12,7 @@ Local -> fetch ONNX from VITE_ONNX_MODEL_BASE_URL -> browser cache -> ONNX Runti
 The frontend is built into static files by the root Dockerfile and served by the
 FastAPI runtime image. In the local smoke stack, Caddy sits in front of the same
 container and serves ONNX artifacts from `/edge-models/models` for Local mode.
-The model set is intentionally limited to HETMCL-lite INT8 and
-Semantic-Guided CG-AF INT8.
+The deployment model is intentionally limited to Semantic-Guided CG-AF INT8.
 
 ## Commands
 
@@ -21,6 +20,7 @@ Semantic-Guided CG-AF INT8.
 bun install
 bun run dev
 bun run check
+bun run sync:assets
 bun run build
 ```
 
@@ -37,7 +37,11 @@ VITE_ONNX_MODEL_BASE_URL=https://models.example.com/models bun run build
 ## Model selector
 
 Web mode model cards come from the backend `/models` endpoint. Local mode model
-cards come from `public/models.json`, which is kept to the same two-model set:
-`hetmcl_lite_int8` and `semantic_guided_cgaf_int8`. Additional cards should
-only be added when the backend registry, edge ONNX catalog, and smoke tests are
-updated together.
+cards come from `public/models.json`; both expose only
+`semantic_guided_cgaf_int8`. Additional cards should only be added when the
+assignment scope, report, backend registry, edge ONNX catalog, and smoke tests
+are updated together.
+
+Run `bun run sync:assets` before a standalone frontend build that packages local
+ONNX files. The command removes stale generated ONNX copies from
+`public/models/` before copying CG-AF.

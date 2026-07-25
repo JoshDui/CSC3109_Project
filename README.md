@@ -96,6 +96,46 @@ uv run python -m src.data.inspect_dataset
 Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`. The
 project targets the Python version in `.python-version`.
 
+## Run the CG-AF Deployment
+
+The submission deployment serves only the Semantic-Guided CG-AF INT8 model. It
+includes FastAPI-backed **Web** inference and browser-side **Local** ONNX
+inference behind the same Caddy endpoint.
+
+From the repository root, build and start the complete stack:
+
+```bash
+docker compose --project-name csc3109-local \
+  --file deployment/edge_onnx/compose.local.yaml \
+  up --build --detach
+```
+
+Caddy binds to `0.0.0.0:8090`. Open `http://127.0.0.1:8090` on the host or
+`http://<host-ip>:8090` from another device on the same network. Binding to
+`0.0.0.0` exposes the service to reachable network interfaces, so use it only on
+a trusted network or behind an appropriate firewall.
+
+Verify the running deployment:
+
+```bash
+curl http://127.0.0.1:8090/health
+curl http://127.0.0.1:8090/models
+curl -I \
+  http://127.0.0.1:8090/edge-models/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
+```
+
+Stop the stack while preserving its staged-model volume:
+
+```bash
+docker compose --project-name csc3109-local \
+  --file deployment/edge_onnx/compose.local.yaml \
+  down
+```
+
+Add `--volumes` to the `down` command to remove the staged-model volume as well.
+See `deployment/README.md` and `deployment/edge_onnx/README.md` for direct API,
+prediction, and optional CDN instructions.
+
 ### JupyterLab for notebooks and collaboration
 
 Start a uv-managed JupyterLab server from the repository root:

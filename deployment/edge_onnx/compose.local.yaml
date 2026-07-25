@@ -11,12 +11,10 @@ services:
       - |
         set -eu
         mkdir -p /srv/edge-models/models
-        cp /repo/model/hetmcl_lite/onnx/hetmcl_lite_best_stop_int8_qdq.onnx \
-          /srv/edge-models/models/hetmcl_lite_best_stop_int8_qdq.onnx
+        rm -f /srv/edge-models/models/*.onnx /srv/edge-models/models/*.onnx.br
         cp /repo/model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx \
           /srv/edge-models/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
         for model in \
-          /repo/model/hetmcl_lite/onnx/hetmcl_lite_best_stop_int8_qdq.onnx \
           /repo/model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
         do
           if [ -f "$${model}.br" ]; then

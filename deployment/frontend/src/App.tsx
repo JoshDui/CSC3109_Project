@@ -9,7 +9,8 @@ type Status = "loading-models" | "idle" | "predicting" | "error" | "complete";
 type InferenceMode = "web" | "local";
 
 const CLASS_ORDER = ["bridge", "freeway", "overpass", "railway"];
-const LOCAL_ONNX_MODEL_IDS = new Set(["hetmcl_lite_int8", "semantic_guided_cgaf_int8"]);
+const DEPLOYMENT_MODEL_ID = "semantic_guided_cgaf_int8";
+const LOCAL_ONNX_MODEL_IDS = new Set([DEPLOYMENT_MODEL_ID]);
 
 export function App() {
   const [models, setModels] = useState<ModelSummary[]>([]);
@@ -35,7 +36,7 @@ export function App() {
           ?? catalog.models.find((model) => model.available)
           ?? catalog.models[0];
         setSelectedModelId(firstRunnable?.id ?? "");
-        setSelectedLocalModelId(localCatalog.find((model) => model.id === "hetmcl_lite_int8")?.id ?? "");
+        setSelectedLocalModelId(localCatalog.find((model) => model.id === DEPLOYMENT_MODEL_ID)?.id ?? "");
         setStatus("idle");
       })
       .catch((cause) => {
@@ -219,7 +220,7 @@ export function App() {
             <div className="model-panel-header">
               <div>
                 <p className="eyebrow">Model showcase</p>
-                <h2>{inferenceMode === "local" ? `${localModels.length} CDN ONNX models` : `${runnableCount} packaged / ${models.length} listed`}</h2>
+                <h2>{inferenceMode === "local" ? `${localModels.length} CDN ONNX ${localModels.length === 1 ? "model" : "models"}` : `${runnableCount} packaged / ${models.length} listed`}</h2>
               </div>
             </div>
             <div className="mode-switch" aria-label="Inference mode">
