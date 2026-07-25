@@ -1,0 +1,28 @@
+{
+  "fp32_gzip_to_int8_gzip_reduction_x": 5.399548092650953,
+  "fp32_raw_to_int8_raw_reduction_x": 3.8873050494991257,
+  "int8_gzip_vs_fp32_gzip_ratio": 0.1852006839907674,
+  "int8_raw_vs_fp32_raw_ratio": 0.25724762715209315,
+  "rows": [
+    {
+      "artifact": "onnx_fp32",
+      "gzip_bytes": 105855230,
+      "gzip_mib": 100.95141410827637,
+      "gzip_path": "model/semantic_guided_cgaf_onnx_exports_smoke_20260616_v3/semantic_guided_cgaf_fft_fp32.onnx.gz",
+      "gzip_ratio": 0.9287131332043277,
+      "raw_bytes": 113980546,
+      "raw_mib": 108.70031929016113,
+      "raw_path": "model/semantic_guided_cgaf_onnx_exports_smoke_20260616_v3/semantic_guided_cgaf_fft_fp32.onnx"
+    },
+    {
+      "artifact": "onnx_int8_qdq_fullcalib_minmax",
+      "gzip_bytes": 19604461,
+      "gzip_mib": 18.69627094268799,
+      "gzip_path": "model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx.gz",
+      "gzip_ratio": 0.6686098892525807,
+      "raw_bytes": 29321225,
+      "raw_mib": 27.962899208068848,
+      "raw_path": "model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx"
+    }
+  ]
+}

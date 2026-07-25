@@ -1,0 +1,68 @@
+{
+  "class_counts": {
+    "bridge": 700,
+    "freeway": 700,
+    "overpass": 700,
+    "railway": 700
+  },
+  "class_split_counts": {
+    "bridge/internal_tune": 140,
+    "bridge/train": 560,
+    "freeway/internal_tune": 140,
+    "freeway/train": 560,
+    "overpass/internal_tune": 140,
+    "overpass/train": 560,
+    "railway/internal_tune": 140,
+    "railway/train": 560
+  },
+  "class_stats": {
+    "bridge": {
+      "foreground_coverage_max": 0.9991455078125,
+      "foreground_coverage_mean": 0.23821565900530134,
+      "foreground_coverage_min": 0.0381927490234375,
+      "ignore_area_px_mean": 0,
+      "mask_area_px_mean": 15611.701428571429,
+      "rows": 700,
+      "success": 700
+    },
+    "freeway": {
+      "foreground_coverage_max": 0.99603271484375,
+      "foreground_coverage_mean": 0.5052270071847098,
+      "foreground_coverage_min": 0.2074432373046875,
+      "ignore_area_px_mean": 0,
+      "mask_area_px_mean": 33110.55714285714,
+      "rows": 700,
+      "success": 700
+    },
+    "overpass": {
+      "foreground_coverage_max": 0.88763427734375,
+      "foreground_coverage_mean": 0.22989981515066965,
+      "foreground_coverage_min": 0.0150146484375,
+      "ignore_area_px_mean": 0,
+      "mask_area_px_mean": 15066.714285714286,
+      "rows": 700,
+      "success": 700
+    },
+    "railway": {
+      "foreground_coverage_max": 0.9972381591796875,
+      "foreground_coverage_mean": 0.24735693795340402,
+      "foreground_coverage_min": 0.026458740234375,
+      "ignore_area_px_mean": 0,
+      "mask_area_px_mean": 16210.784285714286,
+      "rows": 700,
+      "success": 700
+    }
+  },
+  "manifest_rows": 2800,
+  "mask_schema": "scene_v1",
+  "split_counts": {
+    "internal_tune": 560,
+    "train": 2240
+  },
+  "status_counts": {
+    "success": 2800
+  },
+  "usable_for_training_counts": {
+    "true": 2800
+  }
+}

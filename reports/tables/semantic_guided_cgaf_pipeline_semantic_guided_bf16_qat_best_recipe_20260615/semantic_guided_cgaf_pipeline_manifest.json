@@ -1,0 +1,287 @@
+{
+  "architecture": "semantic_guided_cgaf",
+  "artifact_status": [
+    {
+      "artifact": "quant_summary",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval/semantic_guided_cgaf_quant_summary.csv",
+      "required": true
+    },
+    {
+      "artifact": "model_size_summary",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval/semantic_guided_cgaf_model_size_by_quant_mode.csv",
+      "required": true
+    },
+    {
+      "artifact": "checkpoint_export_manifest",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_checkpoint_export_manifest.csv",
+      "required": true
+    },
+    {
+      "artifact": "fft_raw_checkpoint_export",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/fft_raw.pt",
+      "required": true
+    },
+    {
+      "artifact": "peft_raw_checkpoint_export",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/peft_raw.pt",
+      "required": true
+    },
+    {
+      "artifact": "fft_awq_checkpoint",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/fft_awq_w8a8.pt",
+      "required": true
+    },
+    {
+      "artifact": "peft_awq_checkpoint",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/peft_awq_w8a8.pt",
+      "required": true
+    },
+    {
+      "artifact": "mask_export_manifest",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_manifest.csv",
+      "required": true
+    },
+    {
+      "artifact": "mask_export_summary",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.json",
+      "required": true
+    },
+    {
+      "artifact": "mask_export_summary_csv",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.csv",
+      "required": true
+    },
+    {
+      "artifact": "mask_figure_dir",
+      "exists": true,
+      "path": "/home/lucas/CSC3109_Project_qat/reports/figures/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615",
+      "required": true
+    }
+  ],
+  "checkpoint_handoff_validation": {
+    "fft_awq_checkpoint": {
+      "exists": true,
+      "metadata": {
+        "architecture": "semantic_guided_cgaf",
+        "model": "semantic_guided_cgaf",
+        "warnings": []
+      },
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/fft_awq_w8a8.pt",
+      "validated": true
+    },
+    "fft_checkpoint": {
+      "exists": true,
+      "metadata": {
+        "architecture": "semantic_guided_cgaf",
+        "model": "semantic_guided_cgaf_transfer",
+        "warnings": []
+      },
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_fft_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt",
+      "validated": true
+    },
+    "fft_raw_checkpoint_export": {
+      "exists": true,
+      "metadata": {
+        "architecture": "semantic_guided_cgaf",
+        "model": "semantic_guided_cgaf_transfer",
+        "warnings": []
+      },
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/fft_raw.pt",
+      "validated": true
+    },
+    "peft_awq_checkpoint": {
+      "exists": true,
+      "metadata": {
+        "architecture": "semantic_guided_cgaf",
+        "model": "semantic_guided_cgaf",
+        "warnings": []
+      },
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/peft_awq_w8a8.pt",
+      "validated": true
+    },
+    "peft_checkpoint": {
+      "exists": true,
+      "metadata": {
+        "architecture": "semantic_guided_cgaf",
+        "model": "semantic_guided_cgaf_transfer",
+        "warnings": []
+      },
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_peft_semantic_guided_bf16_qat_best_recipe_20260615/best_macro_f1.pt",
+      "validated": true
+    },
+    "peft_raw_checkpoint_export": {
+      "exists": true,
+      "metadata": {
+        "architecture": "semantic_guided_cgaf",
+        "model": "semantic_guided_cgaf_transfer",
+        "warnings": []
+      },
+      "path": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/peft_raw.pt",
+      "validated": true
+    }
+  },
+  "checkpoint_paths": {
+    "fft_awq_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/fft_awq_w8a8.pt",
+    "fft_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_fft_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt",
+    "fft_raw_checkpoint_export": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/fft_raw.pt",
+    "loveda_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_loveda_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt",
+    "peft_awq_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/peft_awq_w8a8.pt",
+    "peft_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_peft_semantic_guided_bf16_qat_best_recipe_20260615/best_macro_f1.pt",
+    "peft_raw_checkpoint_export": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/peft_raw.pt"
+  },
+  "commands": [
+    {
+      "command": [
+        "/home/lucas/CSC3109_Project_qat/.venv/bin/python",
+        "/home/lucas/CSC3109_Project_qat/tools/evaluate_semantic_guided_quant.py",
+        "--run-id",
+        "semantic_guided_bf16_qat_best_recipe_20260615",
+        "--checkpoint",
+        "fft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_fft_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt",
+        "--checkpoint",
+        "peft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_peft_semantic_guided_bf16_qat_best_recipe_20260615/best_macro_f1.pt",
+        "--modes",
+        "fp32,awq_w8a8",
+        "--output-dir",
+        "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval",
+        "--summary-filename",
+        "semantic_guided_cgaf_quant_summary.csv",
+        "--model-size-filename",
+        "semantic_guided_cgaf_model_size_by_quant_mode.csv",
+        "--checkpoint-export-dir",
+        "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615",
+        "--checkpoint-export-manifest",
+        "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_checkpoint_export_manifest.csv",
+        "--mask-source",
+        "sam3_class_aware",
+        "--manifest-path",
+        "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_sam3_class_aware_mask_manifest.csv",
+        "--calibration-batches",
+        "32",
+        "--batch-size",
+        "8",
+        "--num-workers",
+        "8",
+        "--image-size",
+        "512",
+        "--device",
+        "cuda"
+      ],
+      "display": "/home/lucas/CSC3109_Project_qat/.venv/bin/python /home/lucas/CSC3109_Project_qat/tools/evaluate_semantic_guided_quant.py --run-id semantic_guided_bf16_qat_best_recipe_20260615 --checkpoint fft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_fft_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt --checkpoint peft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_peft_semantic_guided_bf16_qat_best_recipe_20260615/best_macro_f1.pt --modes fp32,awq_w8a8 --output-dir /home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval --summary-filename semantic_guided_cgaf_quant_summary.csv --model-size-filename semantic_guided_cgaf_model_size_by_quant_mode.csv --checkpoint-export-dir /home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615 --checkpoint-export-manifest /home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_checkpoint_export_manifest.csv --mask-source sam3_class_aware --manifest-path /home/lucas/CSC3109_Project_qat/reports/tables/semantic_sam3_class_aware_mask_manifest.csv --calibration-batches 32 --batch-size 8 --num-workers 8 --image-size 512 --device cuda",
+      "executed": true,
+      "heavy": true,
+      "label": "evaluate quantization artifacts",
+      "returncode": 0,
+      "stage": "quant"
+    },
+    {
+      "command": [
+        "/home/lucas/CSC3109_Project_qat/.venv/bin/python",
+        "/home/lucas/CSC3109_Project_qat/tools/export_semantic_guided_masks.py",
+        "--run-id",
+        "semantic_guided_bf16_qat_best_recipe_20260615",
+        "--checkpoint",
+        "fft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_fft_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt",
+        "--checkpoint",
+        "peft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_peft_semantic_guided_bf16_qat_best_recipe_20260615/best_macro_f1.pt",
+        "--checkpoint-artifact",
+        "fft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/fft_awq_w8a8.pt",
+        "--checkpoint-artifact",
+        "peft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/peft_awq_w8a8.pt",
+        "--manifest-path",
+        "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_sam3_class_aware_mask_manifest.csv",
+        "--mask-source",
+        "sam3_class_aware",
+        "--split",
+        "internal_tune",
+        "--output-dir",
+        "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615",
+        "--figure-dir",
+        "/home/lucas/CSC3109_Project_qat/reports/figures/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615",
+        "--manifest-output",
+        "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_manifest.csv",
+        "--summary-output",
+        "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.json",
+        "--summary-csv-output",
+        "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.csv",
+        "--max-examples",
+        "0",
+        "--quant-mode",
+        "awq_w8a8",
+        "--calibration-split",
+        "train",
+        "--calibration-batches",
+        "32",
+        "--batch-size",
+        "8",
+        "--num-workers",
+        "8",
+        "--image-size",
+        "512",
+        "--device",
+        "cuda"
+      ],
+      "display": "/home/lucas/CSC3109_Project_qat/.venv/bin/python /home/lucas/CSC3109_Project_qat/tools/export_semantic_guided_masks.py --run-id semantic_guided_bf16_qat_best_recipe_20260615 --checkpoint fft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_fft_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt --checkpoint peft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_peft_semantic_guided_bf16_qat_best_recipe_20260615/best_macro_f1.pt --checkpoint-artifact fft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/fft_awq_w8a8.pt --checkpoint-artifact peft=/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/peft_awq_w8a8.pt --manifest-path /home/lucas/CSC3109_Project_qat/reports/tables/semantic_sam3_class_aware_mask_manifest.csv --mask-source sam3_class_aware --split internal_tune --output-dir /home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615 --figure-dir /home/lucas/CSC3109_Project_qat/reports/figures/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615 --manifest-output /home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_manifest.csv --summary-output /home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.json --summary-csv-output /home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.csv --max-examples 0 --quant-mode awq_w8a8 --calibration-split train --calibration-batches 32 --batch-size 8 --num-workers 8 --image-size 512 --device cuda",
+      "executed": true,
+      "heavy": true,
+      "label": "export FFT/PEFT masks and visual comparisons",
+      "returncode": 0,
+      "stage": "mask-export"
+    }
+  ],
+  "created_at": "2026-06-15T16:19:08.683247+00:00",
+  "model_display_name": "Semantic-Guided CG-AF CNN",
+  "outputs": {
+    "artifact_dir": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615",
+    "checkpoint_export_dir": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615",
+    "checkpoint_export_manifest": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_checkpoint_export_manifest.csv",
+    "fft_awq_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/fft_awq_w8a8.pt",
+    "fft_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_fft_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt",
+    "fft_raw_checkpoint_export": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/fft_raw.pt",
+    "figures_dir": "/home/lucas/CSC3109_Project_qat/reports/figures/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615",
+    "input_split_manifest": "/home/lucas/CSC3109_Project_qat/reports/tables/split_manifest.csv",
+    "loveda_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_loveda_semantic_guided_bf16_qat_best_recipe_20260615/best_miou.pt",
+    "mask_export_dir": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615",
+    "mask_export_manifest": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_manifest.csv",
+    "mask_export_quant_mode": "awq_w8a8",
+    "mask_export_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.json",
+    "mask_export_summary_csv": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.csv",
+    "mask_figure_dir": "/home/lucas/CSC3109_Project_qat/reports/figures/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615",
+    "mask_output_root": "/home/lucas/CSC3109_Project_qat/data/semantic_masks/sam3_class_aware",
+    "model_size_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval/semantic_guided_cgaf_model_size_by_quant_mode.csv",
+    "peft_awq_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/peft_awq_w8a8.pt",
+    "peft_checkpoint": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_peft_semantic_guided_bf16_qat_best_recipe_20260615/best_macro_f1.pt",
+    "peft_raw_checkpoint_export": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/peft_raw.pt",
+    "pipeline_manifest": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_pipeline_manifest.json",
+    "pipeline_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_pipeline_summary.csv",
+    "quant_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval/semantic_guided_cgaf_quant_summary.csv",
+    "raw_image_root": "/home/lucas/CSC3109_Project_qat/data",
+    "sam3_mask_manifest": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_sam3_class_aware_mask_manifest.csv",
+    "semantic_split_manifest": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_split_manifest.csv",
+    "tables_dir": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615"
+  },
+  "run_id": "semantic_guided_bf16_qat_best_recipe_20260615",
+  "stages": [
+    "quant",
+    "mask-export",
+    "jupyter-artifacts"
+  ],
+  "summary_paths": {
+    "checkpoint_export_manifest": "/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_checkpoint_export_manifest.csv",
+    "mask_export_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.json",
+    "mask_export_summary_csv": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_mask_exports_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_mask_export_summary.csv",
+    "model_size_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval/semantic_guided_cgaf_model_size_by_quant_mode.csv",
+    "pipeline_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/semantic_guided_cgaf_pipeline_summary.csv",
+    "quant_summary": "/home/lucas/CSC3109_Project_qat/reports/tables/semantic_guided_cgaf_pipeline_semantic_guided_bf16_qat_best_recipe_20260615/quant_eval/semantic_guided_cgaf_quant_summary.csv"
+  }
+}

@@ -1,0 +1,5 @@
+run_id,architecture,backbone,fpn_channels,attention,image_size,batch_size,device,total_params,trainable_params,macs,gmacs,latency_ms_per_batch,images_per_second,peak_memory_mb,macs_512_estimated_from_256,gmacs_512_estimated_from_256
+plan_b_tiny_fpn128,plan_b,convnext_tiny.in12k_ft_in1k,128,none,512,1,cpu,28631019,28631019,6718668800,6.7186688,49.175416002981365,20.33536431983357,0.0,26874675200,26.8746752
+plan_a_tiny_attnf128,plan_a,convnext_tiny.in12k_ft_in1k,128,gated_skips,512,1,cpu,28662954,28662954,6807093248,6.807093248,38.69998699519783,25.839801964896967,0.0,27228372992,27.228372992
+plan_b_base_fpn256,plan_b,convnext_base,256,none,512,1,cpu,90488715,90488715,23521460224,23.521460224,101.72304800653365,9.830613804806264,0.0,94085840896,94.085840896
+plan_a_base_attnf256,plan_a,convnext_base,256,gated_skips,512,1,cpu,90633482,90633482,23815749632,23.815749632,105.16968900628854,9.50844306423884,0.0,95262998528,95.262998528

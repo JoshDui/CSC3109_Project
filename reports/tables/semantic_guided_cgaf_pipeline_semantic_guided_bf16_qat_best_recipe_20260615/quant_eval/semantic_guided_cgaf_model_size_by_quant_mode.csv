@@ -1,0 +1,5 @@
+checkpoint,mode,checkpoint_artifact_path,weight_bits,activation_bits,awq_enabled,state_tensor_mib_emulated,state_tensor_mib_theoretical_packed,compression_vs_fp32_tensor,compression_vs_fp32_theoretical
+fft,fp32,/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/fft_raw.pt,,,False,108.53947448730469,108.53947448730469,1.000x,1.000x
+fft,awq_w8a8,/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/fft_awq_w8a8.pt,8,8,True,27.693035125732422,27.693035125732422,3.919x,3.919x
+peft,fp32,/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/raw/peft_raw.pt,,,False,108.53947448730469,108.53947448730469,1.000x,1.000x
+peft,awq_w8a8,/home/lucas/CSC3109_Project_qat/model/semantic_guided_cgaf_checkpoint_exports_semantic_guided_bf16_qat_best_recipe_20260615/awq_w8a8/peft_awq_w8a8.pt,8,8,True,27.693035125732422,27.693035125732422,3.919x,3.919x

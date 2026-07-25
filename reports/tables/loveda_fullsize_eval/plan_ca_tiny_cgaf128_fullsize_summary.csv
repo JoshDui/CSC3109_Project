@@ -1,0 +1,2 @@
+run_id,architecture,backbone,fpn_channels,checkpoint,checkpoint_epoch,split,image_size,mean_iou,mean_dice,pixel_accuracy
+plan_ca_tiny_cgaf128,plan_ca,convnext_tiny.in12k_ft_in1k,128,model/plan_ca_loveda_convnext_tiny_cgaf128_512/best.pt,11,val,1024,0.543391472276509,0.6976830985124699,0.7125223933556327
