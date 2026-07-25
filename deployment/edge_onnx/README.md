@@ -4,37 +4,32 @@ This path sits **next to** the containerized FastAPI deployment. Its primary use
 is a fast local Docker/Caddy smoke demo for browser-side ONNX inference.
 
 Use it when the React Local mode needs model artifacts from Caddy or an optional
-CDN/static model host. The backend container also packages the same HETMCL and
-CG-AF ONNX files for Web mode `/predict`.
+CDN/static model host. The backend container also packages the same CG-AF ONNX
+file for Web mode `/predict`.
 
 ## Models in scope
 
 ```text
-HETMCL INT8 QDQ
-model/hetmcl_lite/onnx/hetmcl_lite_best_stop_int8_qdq.onnx
-
 Semantic-Guided CG-AF INT8 QDQ
 model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
 ```
 
 ## Self-hosted Caddy model CDN
 
-Stage the ONNX files under a model root such as:
+Stage the ONNX file under a model root such as:
 
 ```text
-/srv/edge-models/models/hetmcl_lite_best_stop_int8_qdq.onnx
 /srv/edge-models/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
 ```
 
-For Brotli on the self-hosted path, place precompressed sidecars beside the raw
-ONNX files:
+For Brotli on the self-hosted path, place a precompressed sidecar beside the raw
+ONNX file:
 
 ```text
-/srv/edge-models/models/hetmcl_lite_best_stop_int8_qdq.onnx.br
 /srv/edge-models/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx.br
 ```
 
-Caddy serves those sidecars with:
+Caddy serves this sidecar with:
 
 ```caddyfile
 file_server {
@@ -49,7 +44,7 @@ Validate the model host with:
 
 ```bash
 curl -I -H 'Accept-Encoding: br' \
-  https://models.example.com/models/hetmcl_lite_best_stop_int8_qdq.onnx
+  https://models.example.com/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
 ```
 
 Expected headers include:
@@ -78,6 +73,7 @@ cp .env.cloudflare.example .env.cloudflare.local
 set -a && . ./.env.cloudflare.local && set +a
 sh upload-r2.sh
 cd ../frontend
+bun run sync:assets
 VITE_ONNX_MODEL_BASE_URL=https://models.example.com/models bun run build
 ```
 
@@ -107,18 +103,20 @@ Choose the model host at build/deploy time:
 
 ```bash
 # Same-host Caddy model CDN
+bun run sync:assets
 VITE_ONNX_MODEL_BASE_URL=/edge-models/models bun run build
 
 # Cloudflare R2/CDN custom domain
+bun run sync:assets
 VITE_ONNX_MODEL_BASE_URL=https://models.example.com/models bun run build
 ```
 
-`models.edge.example.json` shows the same artifact names without baking in a
+`models.edge.example.json` shows the same artifact name without baking in a
 specific host. The backend `/predict` flow does not need these edge model URLs.
 
 ## Local smoke stack
 
-Run the FastAPI/frontend container behind Caddy and serve ONNX edge models from
+Run the FastAPI/frontend container behind Caddy and serve the ONNX edge model from
 the same local host:
 
 ```bash
@@ -137,9 +135,9 @@ Smoke checks:
 curl -I http://127.0.0.1:8090/
 curl http://127.0.0.1:8090/health
 curl http://127.0.0.1:8090/models
-curl -I http://127.0.0.1:8090/edge-models/models/hetmcl_lite_best_stop_int8_qdq.onnx
+curl -I http://127.0.0.1:8090/edge-models/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
 curl -F "file=@data/raw/val/bridge/bridge722.jpg" \
-  -F "model_id=hetmcl_lite_int8" \
+  -F "model_id=semantic_guided_cgaf_int8" \
   http://127.0.0.1:8090/predict
 ```
 
@@ -149,5 +147,5 @@ Stop it with:
 docker compose -f deployment/edge_onnx/compose.local.yaml down
 ```
 
-The named Docker volume keeps staged model files between runs. Use `down -v` to
-remove it.
+The model-stage service reconciles the named Docker volume to the CG-AF artifact
+on every start. Use `down -v` to remove the volume completely.

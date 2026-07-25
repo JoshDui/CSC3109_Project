@@ -13,7 +13,7 @@ browser
   -> JSON response: predicted_label, confidence, class_scores
 
 browser local mode
-  -> downloads HETMCL/CG-AF ONNX from /edge-models/models or a configured CDN
+  -> downloads CG-AF ONNX from /edge-models/models or a configured CDN
   -> caches the model in the browser
   -> runs ONNX Runtime Web locally
 ```
@@ -34,14 +34,13 @@ repo root Dockerfile
 
 /app/backend/models/models.json
 /app/backend/models/class_labels.json
-/app/backend/models/hetmcl_lite_best_stop_int8_qdq.onnx
 /app/backend/models/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx
 ```
 
-The packaged deployment models are HETMCL-lite INT8 and Semantic-Guided CG-AF
-INT8. HETMCL remains the active default for backend `/predict`; CG-AF uses its
-`scene_logits` output for the same 4-class response contract. The same two ONNX
-artifacts are also the browser-side Local mode models.
+The packaged deployment model is Semantic-Guided CG-AF INT8. It is the active
+backend `/predict` model and uses its `scene_logits` output for the 4-class
+response contract. The same ONNX artifact is also used by browser-side Local
+mode.
 
 ## Model selection
 
@@ -55,10 +54,10 @@ Each registry entry reports whether it is packaged:
 
 ```json
 {
-  "id": "hetmcl_lite_int8",
-  "display_name": "HETMCL-lite ResNet18 Hybrid (INT8)",
+  "id": "semantic_guided_cgaf_int8",
+  "display_name": "Semantic-Guided CG-AF (INT8)",
   "available": true,
-  "role": "Packaged backend and edge classifier"
+  "role": "Packaged backend and edge semantic classifier"
 }
 ```
 
@@ -71,12 +70,10 @@ multipart form fields:
   model_id: model ID from /models
 ```
 
-The current registry intentionally lists only HETMCL-lite INT8 and
-Semantic-Guided CG-AF INT8. If another model is added later, copy its ONNX file
-to `deployment/backend/models/` and make sure its `models.json` entry has the
-correct tensor names and preprocessing settings; otherwise the frontend will
-mark it as `Not packaged` and the backend will reject direct calls with HTTP
-404.
+The current registry intentionally lists only Semantic-Guided CG-AF INT8 to
+match the assignment submission and final report. If another model is added
+later, its registry, artifact packaging, tensor names, preprocessing settings,
+and report scope must be updated together.
 
 ## GPU, CPU, and Mac behavior
 
@@ -124,15 +121,15 @@ Invoke-RestMethod http://localhost:8080/models
 Prediction endpoint with curl:
 
 ```powershell
-curl.exe -F "file=@data\raw\val\bridge\bridge722.jpg" -F "model_id=hetmcl_lite_int8" http://localhost:8080/predict
+curl.exe -F "file=@data\raw\val\bridge\bridge722.jpg" -F "model_id=semantic_guided_cgaf_int8" http://localhost:8080/predict
 ```
 
 The prediction response has this shape:
 
 ```json
 {
-  "model_id": "hetmcl_lite_int8",
-  "display_name": "HETMCL-lite ResNet18 Hybrid (INT8)",
+  "model_id": "semantic_guided_cgaf_int8",
+  "display_name": "Semantic-Guided CG-AF (INT8)",
   "predicted_label": "bridge",
   "confidence": 0.998,
   "class_scores": {
@@ -149,7 +146,7 @@ The prediction response has this shape:
 ## Local Caddy + browser ONNX smoke path
 
 For the full local demo, run the FastAPI/frontend container behind Caddy and
-serve the same HETMCL/CG-AF ONNX artifacts from `/edge-models/models`:
+serve the same CG-AF ONNX artifact from `/edge-models/models`:
 
 ```bash
 docker compose -f deployment/edge_onnx/compose.local.yaml up --build
@@ -167,8 +164,8 @@ docker compose -f deployment/edge_onnx/compose.local.yaml down
 to stop the stack.
 
 Do not copy the raw dataset or old training checkpoints into the Docker image.
-The image only needs the backend code, frontend build, the two selected ONNX
-model files, and the class-label/registry JSON files.
+The image only needs the backend code, frontend build, the selected CG-AF ONNX
+model file, and the class-label/registry JSON files.
 
 ## Optional VPS/CDN path
 

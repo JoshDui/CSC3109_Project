@@ -33,14 +33,19 @@ decide which artifacts are practical for browser-side / edge delivery.
 | clip_fft INT8 | classify | 224² | 328.6 MB | 76.4 | 21.8 | 45.8 |
 | clip_fft FP32 | classify | 224² | ~703 MB | 77.3 | 23.3 | 43.0 |
 
-## Verdicts
+## Benchmark Verdicts
+
+These verdicts compare isolated accuracy, payload, and latency measurements.
+They are not the submission deployment decision: the final report selects CG-AF
+for its inspectable semantic pathway, so the packaged Web and Local deployment
+intentionally serves CG-AF only.
 
 **Practical for edge delivery (small payload + fast):**
 - **custom_cnn_small** (1.3 MB INT8 / 4.6 MB FP32) — trivially deliverable over
   scarce RF; 96.25% acc. Best when bandwidth dominates.
-- **focalnet_tiny_srf INT8** (27.6 MB, 99.5% acc, fast) — the **sweet spot**:
-  highest accuracy, fast, and payload still feasible on a decent link. The right
-  default for accuracy-led edge deployment.
+- **focalnet_tiny_srf INT8** (27.6 MB, 99.5% acc, fast) — the **sweet spot** for
+  an accuracy-led classifier-only deployment: high accuracy, fast, and payload
+  still feasible on a decent link.
 
 **Now practical after INT8 export († quantized in this probe):**
 - **swin_tiny_lora INT8** (113.9 → **31.8 MB**, 3.6×, **99.25%** val acc) and
@@ -66,8 +71,9 @@ decide which artifacts are practical for browser-side / edge delivery.
 - **semantic_guided_cgaf (512², 157–215 ms/4-thr, ~5–6 fps)** — a
   segmentation + scene multitask model, ~10× the per-inference cost of the
   classifiers and a 512² input. 28 MB INT8 payload is fine, but in-browser WASM
-  (×2–3) would put it near ~0.5–1 s/frame. Use it only when you need
-  segmentation output, not for fast scene tagging.
+  (×2–3) would put it near ~0.5–1 s/frame. It is the submission deployment
+  because semantic introspection is the report's final selection criterion, not
+  because it is the fastest scene tagger.
 
 ## Notable observations
 
