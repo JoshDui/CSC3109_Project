@@ -35,6 +35,16 @@
     }
   },
   "metric_anchors": {
+    "parameter_count": {
+      "value": 28452972,
+      "source_key": "compute_profile.exact_512_json",
+      "source_field": "parameters.total"
+    },
+    "gmacs_512": {
+      "value": 27.106662656,
+      "source_key": "compute_profile.exact_512_json",
+      "source_field": "compute.gmacs"
+    },
     "awq_miou": {
       "value": 0.8105752296215446,
       "display_4dp": 0.8106,
@@ -73,6 +83,7 @@
     }
   },
   "artifacts": {
+    "compute_profile.exact_512_json": "reports/notebook_artifacts/semantic_guided_cgaf/compute_profile_512.json",
     "loveda.fullsize_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/fullsize_summary.csv",
     "loveda.fullsize_per_class_csv": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/fullsize_per_class.csv",
     "loveda.compute_comparison_csv": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/compute_comparison_512_estimated.csv",
