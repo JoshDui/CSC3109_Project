@@ -74,6 +74,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--label-smoothing", type=float, default=0.05)
     parser.add_argument("--dropout", type=float, default=CUSTOM_CNN_SMALL.dropout)
     parser.add_argument("--base-channels", type=int, default=CUSTOM_CNN_SMALL.base_channels)
+    # --- Phase 1 recipe levers (all default to off = current behavior) ---
+    parser.add_argument("--warmup-epochs", type=int, default=0, help="Linear LR warmup epochs before cosine.")
+    parser.add_argument("--mixup", type=float, default=0.0, help="MixUp alpha (0 disables).")
+    parser.add_argument("--cutmix", type=float, default=0.0, help="CutMix alpha (0 disables).")
+    parser.add_argument("--mix-prob", type=float, default=0.5, help="Per-batch probability of applying MixUp/CutMix.")
+    parser.add_argument("--ema-decay", type=float, default=0.0, help="EMA decay (e.g. 0.999); 0 disables.")
+    parser.add_argument("--tta", action="store_true", help="Flip test-time augmentation at holdout eval.")
+    # --- Phase 2 architecture levers (all default to off = current architecture) ---
+    parser.add_argument("--use-residual", action="store_true", help="Residual conv stages instead of plain VGG-style.")
+    parser.add_argument("--use-se", action="store_true", help="Squeeze-and-Excitation channel attention per stage.")
+    parser.add_argument("--drop-path-rate", type=float, default=0.0, help="Stochastic depth rate (needs residual stages).")
     parser.add_argument(
         "--patience",
         type=int,
@@ -119,6 +130,73 @@ def resolve_device(device_arg: str) -> torch.device:
 
 def class_names_from_mapping(class_to_idx: dict[str, int]) -> list[str]:
     return [name for name, _ in sorted(class_to_idx.items(), key=lambda item: item[1])]
+
+
+class ModelEma:
+    """Exponential moving average of model parameters/buffers with warmup decay.
+
+    Uses a warmup schedule ``decay_t = min(decay, (1 + t) / (10 + t))`` so early
+    updates track the live model closely and the random initialization is quickly
+    discarded. A fixed high decay (e.g. 0.999) over few steps otherwise leaves a
+    large fraction of the random init in the average and collapses accuracy.
+    """
+
+    def __init__(self, model: nn.Module, decay: float) -> None:
+        self.decay = decay
+        self.num_updates = 0
+        self.shadow = {k: v.detach().clone().float() for k, v in model.state_dict().items()}
+
+    @torch.no_grad()
+    def update(self, model: nn.Module) -> None:
+        self.num_updates += 1
+        decay = min(self.decay, (1.0 + self.num_updates) / (10.0 + self.num_updates))
+        for key, value in model.state_dict().items():
+            shadow = self.shadow[key]
+            if value.dtype.is_floating_point:
+                shadow.mul_(decay).add_(value.detach().float(), alpha=1.0 - decay)
+            else:
+                shadow.copy_(value)
+
+    def state_dict_for(self, model: nn.Module) -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        for key, value in model.state_dict().items():
+            out[key] = self.shadow[key].to(dtype=value.dtype)
+        return out
+
+
+def _rand_bbox(height: int, width: int, lam: float) -> tuple[int, int, int, int]:
+    cut_rat = float(np.sqrt(1.0 - lam))
+    cut_h, cut_w = int(height * cut_rat), int(width * cut_rat)
+    cy, cx = np.random.randint(height), np.random.randint(width)
+    y1, y2 = np.clip(cy - cut_h // 2, 0, height), np.clip(cy + cut_h // 2, 0, height)
+    x1, x2 = np.clip(cx - cut_w // 2, 0, width), np.clip(cx + cut_w // 2, 0, width)
+    return int(y1), int(y2), int(x1), int(x2)
+
+
+def apply_mix(images: torch.Tensor, labels: torch.Tensor, *, mixup: float, cutmix: float, prob: float):
+    """Return (mixed_images, labels_a, labels_b, lam). lam=1 => no mixing applied."""
+    use_mixup = mixup > 0.0
+    use_cutmix = cutmix > 0.0
+    if not (use_mixup or use_cutmix) or np.random.rand() > prob:
+        return images, labels, labels, 1.0
+
+    do_cutmix = use_cutmix and (not use_mixup or np.random.rand() < 0.5)
+    index = torch.randperm(images.size(0), device=images.device)
+    labels_b = labels[index]
+    if do_cutmix:
+        lam = float(np.random.beta(cutmix, cutmix))
+        y1, y2, x1, x2 = _rand_bbox(images.size(-2), images.size(-1), lam)
+        images[:, :, y1:y2, x1:x2] = images[index, :, y1:y2, x1:x2]
+        area = (x2 - x1) * (y2 - y1)
+        lam = 1.0 - area / (images.size(-1) * images.size(-2))
+    else:
+        lam = float(np.random.beta(mixup, mixup))
+        images = lam * images + (1.0 - lam) * images[index]
+    return images, labels, labels_b, lam
+
+
+def mix_criterion(criterion: nn.Module, logits: torch.Tensor, y_a: torch.Tensor, y_b: torch.Tensor, lam: float):
+    return lam * criterion(logits, y_a) + (1.0 - lam) * criterion(logits, y_b)
 
 
 def serialise_args(args: argparse.Namespace) -> dict[str, Any]:
@@ -177,6 +255,11 @@ def train_one_epoch(
     device: torch.device,
     epoch: int,
     max_batches: int | None = None,
+    *,
+    mixup: float = 0.0,
+    cutmix: float = 0.0,
+    mix_prob: float = 0.5,
+    ema: "ModelEma | None" = None,
 ) -> tuple[float, float]:
     model.train()
     running_loss = 0.0
@@ -188,11 +271,18 @@ def train_one_epoch(
         images = images.to(device)
         labels = labels.to(device)
 
+        images, y_a, y_b, lam = apply_mix(images, labels, mixup=mixup, cutmix=cutmix, prob=mix_prob)
+
         optimizer.zero_grad(set_to_none=True)
         logits = model(images)
-        loss = criterion(logits, labels)
+        if lam < 1.0:
+            loss = mix_criterion(criterion, logits, y_a, y_b, lam)
+        else:
+            loss = criterion(logits, labels)
         loss.backward()
         optimizer.step()
+        if ema is not None:
+            ema.update(model)
 
         batch_size = labels.size(0)
         running_loss += loss.item() * batch_size
@@ -217,6 +307,8 @@ def evaluate(
     epoch: int,
     phase: str = "tune",
     max_batches: int | None = None,
+    *,
+    tta: bool = False,
 ) -> tuple[float, float, list[int], list[int]]:
     model.eval()
     running_loss = 0.0
@@ -230,7 +322,14 @@ def evaluate(
         images = images.to(device)
         labels = labels.to(device)
 
-        logits = model(images)
+        if tta:
+            # Average softmax over flip views (aerial imagery is flip-invariant).
+            views = [images, torch.flip(images, dims=[3]), torch.flip(images, dims=[2]),
+                     torch.flip(images, dims=[2, 3])]
+            probs = torch.stack([torch.softmax(model(v), dim=1) for v in views]).mean(0)
+            logits = torch.log(probs.clamp_min(1e-12))
+        else:
+            logits = model(images)
         loss = criterion(logits, labels)
         predictions = logits.argmax(dim=1)
 
@@ -340,12 +439,34 @@ def main() -> None:
         num_classes=len(class_names),
         base_channels=args.base_channels,
         dropout=args.dropout,
+        use_residual=args.use_residual,
+        use_se=args.use_se,
+        drop_path_rate=args.drop_path_rate,
     ).to(device)
 
     criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
     parameters_to_update = list(trainable_parameters(model))
     optimizer = torch.optim.AdamW(parameters_to_update, lr=args.lr, weight_decay=args.weight_decay)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
+    if args.warmup_epochs > 0 and args.warmup_epochs < args.epochs:
+        warmup = torch.optim.lr_scheduler.LinearLR(
+            optimizer, start_factor=0.01, total_iters=args.warmup_epochs
+        )
+        cosine = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=args.epochs - args.warmup_epochs
+        )
+        scheduler = torch.optim.lr_scheduler.SequentialLR(
+            optimizer, [warmup, cosine], milestones=[args.warmup_epochs]
+        )
+    else:
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
+
+    ema = ModelEma(model, args.ema_decay) if args.ema_decay > 0.0 else None
+    if ema is not None:
+        print(f"EMA enabled: decay={args.ema_decay}")
+    if args.mixup > 0.0 or args.cutmix > 0.0:
+        print(f"MixUp={args.mixup} CutMix={args.cutmix} mix_prob={args.mix_prob}")
+    if args.warmup_epochs > 0:
+        print(f"LR warmup epochs: {args.warmup_epochs}")
 
     trainable_count = sum(parameter.numel() for parameter in parameters_to_update)
     total_count = sum(parameter.numel() for parameter in model.parameters())
@@ -373,6 +494,7 @@ def main() -> None:
     epochs_without_improvement = 0
     history: list[dict[str, Any]] = []
 
+    live_state_dict: dict[str, Any] | None = None
     for epoch in range(1, args.epochs + 1):
         train_loss, train_acc = train_one_epoch(
             model,
@@ -382,7 +504,15 @@ def main() -> None:
             device,
             epoch,
             max_batches=args.max_train_batches,
+            mixup=args.mixup,
+            cutmix=args.cutmix,
+            mix_prob=args.mix_prob,
+            ema=ema,
         )
+        # When EMA is active, select/checkpoint against the EMA weights.
+        if ema is not None:
+            live_state_dict = copy.deepcopy(model.state_dict())
+            model.load_state_dict(ema.state_dict_for(model))
         val_loss, val_acc, y_true, y_pred = evaluate(
             model,
             val_loader,
@@ -504,6 +634,10 @@ def main() -> None:
                 title="Custom CNN Best Macro-F1 Confusion Matrix",
             )
 
+        # Restore live (non-EMA) weights so training continues normally.
+        if ema is not None and live_state_dict is not None:
+            model.load_state_dict(live_state_dict)
+
         scheduler.step()
 
         if args.patience > 0 and epochs_without_improvement >= args.patience:
@@ -530,36 +664,45 @@ def main() -> None:
             f"{best_stop_metrics['selection_metric']}={best_stop_metrics['selection_value']:.4f}"
         )
 
-    if holdout_loader is not None and best_macro_f1_state_dict is not None:
-        model.load_state_dict(best_macro_f1_state_dict)
-        holdout_loss, holdout_acc, holdout_y_true, holdout_y_pred = evaluate(
-            model,
-            holdout_loader,
-            criterion,
-            device,
-            epoch=best_macro_f1_epoch or 0,
-            phase="holdout",
+    def run_holdout(state_dict, selected_epoch, selection_rule, out_name):
+        model.load_state_dict(state_dict)
+        h_loss, h_acc, h_yt, h_yp = evaluate(
+            model, holdout_loader, criterion, device,
+            epoch=selected_epoch or 0, phase="holdout", tta=args.tta,
         )
-        holdout_metrics = classification_metrics(holdout_y_true, holdout_y_pred, class_names)
-        holdout_payload = {
-            **holdout_metrics,
-            "loss": float(holdout_loss),
-            "accuracy": float(holdout_acc),
-            "selected_epoch": best_macro_f1_epoch,
+        h_metrics = classification_metrics(h_yt, h_yp, class_names)
+        payload = {
+            **h_metrics,
+            "loss": float(h_loss),
+            "accuracy": float(h_acc),
+            "selected_epoch": selected_epoch,
+            "selection_rule": selection_rule,
             "selection_source": args.tune_split,
             "evaluation_split": args.holdout_split,
+            "tta": bool(args.tta),
         }
-        write_metrics_json(holdout_payload, args.output_dir / "holdout_metrics.json")
+        write_metrics_json(payload, args.output_dir / out_name)
         save_confusion_matrix_plot(
-            holdout_metrics["confusion_matrix"],
-            class_names,
-            args.output_dir / "holdout_confusion_matrix.png",
-            title="Custom CNN Holdout Confusion Matrix",
+            h_metrics["confusion_matrix"], class_names,
+            args.output_dir / f"{Path(out_name).stem}_confusion_matrix.png",
+            title=f"Custom CNN Holdout ({selection_rule})",
         )
-        print(
-            "Holdout metrics: "
-            f"loss={holdout_loss:.4f}, acc={holdout_acc:.4f}, macro_f1={holdout_metrics['macro_f1']:.4f}"
-        )
+        print(f"Holdout [{selection_rule}] epoch={selected_epoch}: "
+              f"loss={h_loss:.4f} acc={h_acc:.4f} macro_f1={h_metrics['macro_f1']:.4f}")
+        return payload
+
+    if holdout_loader is not None:
+        # Primary selection = best tune-loss (robust when tune macro-F1 saturates to 1.0).
+        best_stop_path = args.output_dir / "best_stop_model.pt"
+        if best_stop_path.exists():
+            stop_sd = torch.load(best_stop_path, map_location=device, weights_only=False)["model_state_dict"]
+            run_holdout(stop_sd, best_stop_epoch, "best-tune-loss", "holdout_metrics.json")
+        elif best_macro_f1_state_dict is not None:
+            run_holdout(best_macro_f1_state_dict, best_macro_f1_epoch, "best-macro-f1", "holdout_metrics.json")
+        # Reference: best tune-macro-F1 checkpoint.
+        if best_macro_f1_state_dict is not None:
+            run_holdout(best_macro_f1_state_dict, best_macro_f1_epoch, "best-macro-f1",
+                        "holdout_metrics_macrof1.json")
 
 
 if __name__ == "__main__":
