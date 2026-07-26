@@ -38,7 +38,7 @@ Metric sources:
   `reports/hetmcl_lite_onnx_int8_qdq/summary.json`, and
   `notebooks/08_hetmcl_lite_quantisation.ipynb`.
 - FocalNet: `reports/focalnet_tiny_srf_onnx_int8_qdq/comparison_metrics.csv`.
-- Semantic-Guided CG-AF CNN: `notebooks/05_semantic_guided_cgaf_quantisation.ipynb` and `docs/semantic_guided_best_recipe.md`.
+- Semantic-Guided CG-AF CNN: `reports/notebook_artifacts/semantic_guided_cgaf/compute_profile_512.json`, `notebooks/05_semantic_guided_cgaf_quantisation.ipynb`, and `docs/semantic_guided_best_recipe.md`.
 - Custom CNN: `reports/custom_cnn_small_onnx_int8_qdq/comparison_metrics.csv`.
 - Swin-Tiny and DINOv2 PEFT LoRA: `reports/tables/swin_dino_peft_lora_summary.csv`, `notebooks/02_swin_dino_results_summary.ipynb`, and respective `reports/*_onnx_int8_qdq/comparison_metrics.csv` files.
 

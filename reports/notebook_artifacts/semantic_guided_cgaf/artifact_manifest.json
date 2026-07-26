@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "artifact_set": "semantic_guided_cgaf_notebook_05",
+  "canonical_root": "reports/notebook_artifacts/semantic_guided_cgaf",
+  "description": "Canonical report-only artifacts consumed by notebook 05. Paths are project-relative POSIX paths and do not require model checkpoints or model binaries.",
+  "canonicalization": {
+    "source_artifact_commit": "1ec26478",
+    "operation": "storage_and_resolution_only",
+    "metrics_regenerated": false,
+    "excluded_later_runs": [
+      "repro_20260622",
+      "fulltrain_repro_20260623"
+    ]
+  },
+  "source_runs": {
+    "sam3_transfer_20260614": {
+      "source_identifier": "plan_ca_semantic_sam3_20260614_164100",
+      "source_date": "2026-06-14",
+      "provenance_status": "original"
+    },
+    "best_recipe_20260615": {
+      "run_id": "semantic_guided_bf16_qat_best_recipe_20260615",
+      "source_date": "2026-06-15",
+      "provenance_status": "original",
+      "original_pipeline_manifest_key": "provenance.original_pipeline_manifest"
+    },
+    "fullcalib_minmax_20260616": {
+      "run_ids": [
+        "semantic_guided_onnx_eval_fullcalib_minmax_20260616",
+        "semantic_guided_unseen_val12_fullcalib_minmax_20260616"
+      ],
+      "source_date": "2026-06-16",
+      "calibration_method": "minmax",
+      "provenance_status": "original"
+    }
+  },
+  "metric_anchors": {
+    "parameter_count": {
+      "value": 28452972,
+      "source_key": "compute_profile.exact_512_json",
+      "source_field": "parameters.total"
+    },
+    "gmacs_512": {
+      "value": 27.106662656,
+      "source_key": "compute_profile.exact_512_json",
+      "source_field": "compute.gmacs"
+    },
+    "awq_miou": {
+      "value": 0.8105752296215446,
+      "display_4dp": 0.8106,
+      "source_key": "quantisation.mask_export_summary_csv",
+      "variant": "fft",
+      "quant_mode": "awq_w8a8",
+      "metric": "seg_mean_iou_vs_sam3"
+    },
+    "onnx_int8_segmentation_agreement": {
+      "value": 0.9732115173339844,
+      "display_4dp": 0.9732,
+      "source_key": "onnx_evaluation.unseen_summary_csv",
+      "variant": "onnx_int8_qdq",
+      "reference_variant": "torch_bf16",
+      "metric": "seg_pixel_agreement_vs_reference"
+    }
+  },
+  "display_sets": {
+    "awq_representative_panels": {
+      "bridge": "quantisation.representative_panel_bridge",
+      "freeway": "quantisation.representative_panel_freeway",
+      "overpass": "quantisation.representative_panel_overpass",
+      "railway": "quantisation.representative_panel_railway"
+    },
+    "sam3_class_examples": {
+      "bridge": "sam3_transfer.class_example_bridge",
+      "freeway": "sam3_transfer.class_example_freeway",
+      "overpass": "sam3_transfer.class_example_overpass",
+      "railway": "sam3_transfer.class_example_railway"
+    },
+    "unseen_int8_masks": {
+      "bridge": "onnx_evaluation.unseen_mask_bridge",
+      "freeway": "onnx_evaluation.unseen_mask_freeway",
+      "overpass": "onnx_evaluation.unseen_mask_overpass",
+      "railway": "onnx_evaluation.unseen_mask_railway"
+    }
+  },
+  "artifacts": {
+    "compute_profile.exact_512_json": "reports/notebook_artifacts/semantic_guided_cgaf/compute_profile_512.json",
+    "loveda.fullsize_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/fullsize_summary.csv",
+    "loveda.fullsize_per_class_csv": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/fullsize_per_class.csv",
+    "loveda.compute_comparison_csv": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/compute_comparison_512_estimated.csv",
+    "loveda.first_examples_figure": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/first_examples.png",
+    "loveda.worst_examples_figure": "reports/notebook_artifacts/semantic_guided_cgaf/loveda/worst_examples.png",
+    "sam3_transfer.fft_history_csv": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/fft_history.csv",
+    "sam3_transfer.peft_history_csv": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/peft_history.csv",
+    "sam3_transfer.mask_stats_json": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/mask_stats.json",
+    "sam3_transfer.mask_prediction_examples_figure": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/mask_prediction_examples.png",
+    "sam3_transfer.class_example_bridge": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/class_examples/bridge.png",
+    "sam3_transfer.class_example_freeway": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/class_examples/freeway.png",
+    "sam3_transfer.class_example_overpass": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/class_examples/overpass.png",
+    "sam3_transfer.class_example_railway": "reports/notebook_artifacts/semantic_guided_cgaf/sam3_transfer/class_examples/railway.png",
+    "quantisation.checkpoint_export_manifest_csv": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/checkpoint_export_manifest.csv",
+    "quantisation.summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/summary.csv",
+    "quantisation.model_size_by_mode_csv": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/model_size_by_quant_mode.csv",
+    "quantisation.mask_export_manifest_csv": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/mask_export_manifest.csv",
+    "quantisation.mask_export_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/mask_export_summary.csv",
+    "quantisation.mask_export_summary_json": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/mask_export_summary.json",
+    "quantisation.representative_panel_bridge": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/representative_panels/bridge.png",
+    "quantisation.representative_panel_freeway": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/representative_panels/freeway.png",
+    "quantisation.representative_panel_overpass": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/representative_panels/overpass.png",
+    "quantisation.representative_panel_railway": "reports/notebook_artifacts/semantic_guided_cgaf/quantisation/representative_panels/railway.png",
+    "onnx_evaluation.comparison_table_csv": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/comparison_table.csv",
+    "onnx_evaluation.drift_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/drift_summary.csv",
+    "onnx_evaluation.runtime_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/runtime_summary.csv",
+    "onnx_evaluation.unseen_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/unseen_summary.csv",
+    "onnx_evaluation.unseen_per_image_predictions_csv": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/unseen_per_image_predictions.csv",
+    "onnx_evaluation.delivery_size_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/delivery_size_summary.csv",
+    "onnx_evaluation.delivery_size_summary_json": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/delivery_size_summary.json",
+    "onnx_evaluation.unseen_mask_bridge": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/representative_unseen_masks/bridge.png",
+    "onnx_evaluation.unseen_mask_freeway": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/representative_unseen_masks/freeway.png",
+    "onnx_evaluation.unseen_mask_overpass": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/representative_unseen_masks/overpass.png",
+    "onnx_evaluation.unseen_mask_railway": "reports/notebook_artifacts/semantic_guided_cgaf/onnx_evaluation/representative_unseen_masks/railway.png",
+    "near_confusion.lowest_margin_top20_csv": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/lowest_margin_top20.csv",
+    "near_confusion.margin_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/margin_summary.csv",
+    "near_confusion.pair_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/pair_summary.csv",
+    "near_confusion.railway701_comparison_panel": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/railway701_comparison_panel.png",
+    "near_confusion.sample_panels_contact_sheet": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/sample_panels_contact_sheet.png",
+    "near_confusion.torch_bf16_confusion_counts": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/plots/torch_bf16_confusion_counts.png",
+    "near_confusion.onnx_fp32_confusion_counts": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/plots/onnx_fp32_confusion_counts.png",
+    "near_confusion.onnx_int8_confusion_counts": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/plots/onnx_int8_qdq_confusion_counts.png",
+    "near_confusion.onnx_int8_min_margin": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/plots/onnx_int8_qdq_min_margin.png",
+    "near_confusion.onnx_int8_max_runner_up_probability": "reports/notebook_artifacts/semantic_guided_cgaf/near_confusion/plots/onnx_int8_qdq_max_runner_up_probability.png",
+    "case_studies.awq_vs_onnx_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/case_studies/awq_vs_onnx_case_summary.csv",
+    "case_studies.johor_ciq_awq_vs_onnx_panel": "reports/notebook_artifacts/semantic_guided_cgaf/case_studies/johor_ciq_awq_vs_onnx_panel.png",
+    "case_studies.railway701_awq_vs_onnx_panel": "reports/notebook_artifacts/semantic_guided_cgaf/case_studies/railway701_awq_vs_onnx_panel.png",
+    "case_studies.johor_onnx_comparison_panel": "reports/notebook_artifacts/semantic_guided_cgaf/case_studies/johor_onnx_comparison_panel.png",
+    "case_studies.johor_onnx_segmentation_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/case_studies/johor_onnx_segmentation_summary.csv",
+    "provenance.original_pipeline_manifest": "reports/notebook_artifacts/semantic_guided_cgaf/provenance/original_pipeline_manifest.json",
+    "provenance.original_pipeline_summary_csv": "reports/notebook_artifacts/semantic_guided_cgaf/provenance/original_pipeline_summary.csv",
+    "provenance.original_near_confusion_manifest": "reports/notebook_artifacts/semantic_guided_cgaf/provenance/original_near_confusion_manifest.json",
+    "provenance.original_review_manifest": "reports/notebook_artifacts/semantic_guided_cgaf/provenance/original_review_manifest.json"
+  }
+}

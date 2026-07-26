@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "model_name": "semantic_guided_cgaf",
+  "model_display_name": "Semantic-Guided CG-AF CNN",
+  "profile_scope": "Dense architecture MACs for both deployed ONNX outputs at batch 1 and 512x512 input",
+  "input": {
+    "name": "images",
+    "shape": [
+      1,
+      3,
+      512,
+      512
+    ]
+  },
+  "outputs": [
+    "segmentation_logits",
+    "scene_logits"
+  ],
+  "source_models": {
+    "fp32": {
+      "path": "model/semantic_guided_cgaf_onnx_exports_smoke_20260616_v3/semantic_guided_cgaf_fft_fp32.onnx",
+      "sha256": "22c502d3a8728ea8bcddd72fa1b967a7efa5a55fd96505e78cc8492a2504f8ac",
+      "file_bytes": 113980546,
+      "opset": 18
+    },
+    "int8_qdq": {
+      "path": "model/semantic_guided_cgaf_onnx_int8_fullcalib_minmax_20260616/semantic_guided_cgaf_fft_int8_qdq_fullcalib_minmax.onnx",
+      "sha256": "502d3bbacae119f5b4327d117e958cc69365aa49fdaf1426932689065274ebf7",
+      "file_bytes": 29321225,
+      "opset": 18
+    }
+  },
+  "toolchain": {
+    "onnx": "1.22.0",
+    "onnxruntime": "1.27.0",
+    "shape_inference": "onnx.shape_inference.infer_shapes",
+    "method": "Explicit dense MAC formulas over inferred ONNX tensor shapes"
+  },
+  "counting_convention": {
+    "mac_definition": "One multiply-accumulate counts as one MAC",
+    "gmac_divisor": 1000000000,
+    "flops_per_mac": 2,
+    "included_operators": [
+      "Conv",
+      "MatMul",
+      "Gemm",
+      "Einsum"
+    ],
+    "excluded_operators": [
+      "Resize",
+      "normalization",
+      "activation",
+      "elementwise",
+      "pooling",
+      "QuantizeLinear",
+      "DequantizeLinear"
+    ]
+  },
+  "parameters": {
+    "total": 28452972,
+    "trainable": 28452972,
+    "onnx_fp32_initializer_elements": 28452972,
+    "pytorch_architecture_cross_check": 28452972
+  },
+  "compute": {
+    "macs": 27106662656,
+    "gmacs": 27.106662656,
+    "flops_if_two_per_mac": 54213325312,
+    "gflops_if_two_per_mac": 54.213325312,
+    "operator_breakdown_macs": {
+      "Conv": 5352706048,
+      "MatMul": 21743271936,
+      "Gemm": 198912,
+      "Einsum": 10485760
+    },
+    "component_breakdown_macs": {
+      "backbone": 23273865216,
+      "scene_head": 2523072768,
+      "fusion_decoder": 958398464,
+      "shallow_projections": 176160768,
+      "context_gates": 126484480,
+      "context_mixer": 38195200,
+      "segmentation_head": 10485760
+    }
+  },
+  "graph_consistency": {
+    "fp32_compute_nodes": {
+      "Conv": 45,
+      "MatMul": 36,
+      "Gemm": 2,
+      "Einsum": 1
+    },
+    "int8_qdq_compute_nodes": {
+      "Conv": 45,
+      "MatMul": 36,
+      "Gemm": 2,
+      "Einsum": 1
+    },
+    "logical_macs_match": true,
+    "int8_qdq_extra_nodes": {
+      "QuantizeLinear": 512,
+      "DequantizeLinear": 747
+    }
+  }
+}
